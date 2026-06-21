@@ -31,8 +31,50 @@
     <section class="zone-demarrage-session" aria-labelledby="start-title">
       <h2 id="start-title">Démarrage de session</h2>
       <p>
-        Le prochain écran permettra d'indiquer l'agent qui traite les documents et la date de tampon à utiliser.
+        Indiquez l'agent qui traite les documents et la date de tampon à utiliser.
       </p>
+
+      <form id="formulaire-demarrage-session" class="formulaire-demarrage-session" novalidate>
+        <div class="champ-formulaire">
+          <label for="champ-agent">Initiales ou nom court de l'agent</label>
+          <input
+            id="champ-agent"
+            name="agent"
+            type="text"
+            autocomplete="off"
+            placeholder="Exemple : RDS"
+          >
+        </div>
+
+        <div class="champ-formulaire">
+          <label for="champ-date-tampon">Date de tampon</label>
+          <input id="champ-date-tampon" name="tamponDate" type="date">
+        </div>
+
+        <p id="message-erreur-demarrage" class="message-erreur-formulaire" aria-live="polite"></p>
+
+        <button class="bouton-demarrer-session" type="submit">
+          Démarrer la session
+        </button>
+      </form>
+
+      <article id="carte-session-creee" class="carte-session-creee" hidden>
+        <h3>Session créée</h3>
+        <dl class="liste-informations-session">
+          <div>
+            <dt>Agent</dt>
+            <dd id="valeur-agent-session"></dd>
+          </div>
+          <div>
+            <dt>Date de tampon</dt>
+            <dd id="valeur-date-session"></dd>
+          </div>
+          <div>
+            <dt>Session</dt>
+            <dd id="valeur-nom-session"></dd>
+          </div>
+        </dl>
+      </article>
     </section>
   </main>
 </body>
