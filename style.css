@@ -218,6 +218,14 @@ h1 {
   font-size: 1.1rem;
 }
 
+.compteur-documents-session {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--gris-bordure);
+  color: var(--gris-texte);
+  font-weight: 700;
+}
+
 @media (max-width: 640px) {
   .page-principale {
     padding: 24px 16px;
