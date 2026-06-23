@@ -98,3 +98,128 @@ Limites volontaires de ce commit :
 - aucun ajout de document ;
 - aucune lecture Excel ;
 - aucun export.
+
+## 9104bfc - App base: Add data model helpers
+
+Date : 2026-06-21
+
+Objectif : préparer le modèle JavaScript interne pour les futurs documents.
+
+Modifications principales :
+
+- ajout du tableau `documents` dans `currentSession` ;
+- ajout des constantes `PUBLIC_TYPES`, `DOCUMENT_TYPES` et `SECTORIZATION_STATUS` ;
+- ajout de la fonction `generateDocumentId()` ;
+- ajout de la fonction `createDocument()` ;
+- ajout de la fonction `addDocumentToSession()` ;
+- ajout d'un compteur simple indiquant le nombre de documents dans le lot.
+
+Limites volontaires de ce commit :
+
+- aucun formulaire complet d'ajout de document ;
+- aucune lecture Excel ;
+- aucun import PDF ;
+- aucune sauvegarde.
+
+## cd7a5c2 - Docs: Add detailed commit history
+
+Date : 2026-06-21
+
+Objectif : ajouter un journal de développement plus détaillé que l'historique Git brut.
+
+Modifications principales :
+
+- création du fichier `COMMIT_HISTORY.md` ;
+- description des commits déjà réalisés ;
+- ajout des objectifs, modifications principales et limites utiles pour chaque étape.
+
+## 6bd3407 - Data: Organize sectorization spreadsheets
+
+Date : 2026-06-23
+
+Objectif : ranger les fichiers Excel de sectorisation dans le dossier prévu pour les données.
+
+Modifications principales :
+
+- ajout de `data/sectorisation_adulte.xlsx` ;
+- ajout de `data/sectorisation_enfant.xlsx` ;
+- ajout de `data/sectorisation_pch.xlsx` ;
+- renommage des fichiers avec des noms courts et stables.
+
+Limites volontaires de ce commit :
+
+- aucune lecture Excel ;
+- aucune validation des colonnes ;
+- aucune sectorisation automatique.
+
+## 25f0211 - Documents: Add document form
+
+Date : 2026-06-23
+
+Objectif : ajouter le formulaire d'ajout de document après le démarrage de session.
+
+Modifications principales :
+
+- ajout du champ "Nom MultiGest" ;
+- ajout du champ "Public" ;
+- ajout du champ "Type de document" ;
+- ajout de la case "PCH uniquement" ;
+- ajout du champ "Ville" ;
+- ajout du champ "École / GEVASCO" ;
+- ajout de la case "Hors département" ;
+- affichage de la zone documents uniquement après démarrage d'une session ;
+- ajout des documents dans `currentSession.documents` ;
+- mise à jour du compteur de documents.
+
+Limites volontaires de ce commit :
+
+- aucune liste détaillée des documents ;
+- aucun import PDF ;
+- aucune attribution d'instructrice ;
+- aucune lecture Excel.
+
+## ae67cac - Documents: Show document list
+
+Date : 2026-06-23
+
+Objectif : afficher les documents ajoutés dans le lot.
+
+Modifications principales :
+
+- ajout de la liste des documents ;
+- ajout d'un message quand aucun document n'est présent ;
+- ajout de l'icône `assets/empty-icon.svg` pour indiquer qu'aucun PDF n'est associé ;
+- affichage du nom MultiGest ;
+- affichage du public ;
+- affichage du type de document ;
+- affichage de la ville ;
+- affichage des informations optionnelles : PCH, École / GEVASCO, hors département.
+
+Limites volontaires de ce commit :
+
+- aucun vrai PDF associé ;
+- aucune miniature PDF ;
+- aucune modification ou suppression.
+
+## 94af452 - Documents: Add edit and delete actions
+
+Date : 2026-06-23
+
+Objectif : permettre la modification et la suppression des documents du lot.
+
+Modifications principales :
+
+- ajout du bouton "Modifier" sur chaque document ;
+- remplissage du formulaire avec les données du document à modifier ;
+- ajout d'un mode "Enregistrer les modifications" ;
+- ajout d'un bouton pour annuler la modification ;
+- ajout du bouton "Supprimer" sur chaque document ;
+- ajout d'une confirmation avant suppression ;
+- mise à jour de la liste et du compteur après modification ou suppression.
+
+Limites volontaires de ce commit :
+
+- aucune sauvegarde persistante ;
+- aucune gestion PDF ;
+- aucune sectorisation ;
+- aucune statistique complète.
