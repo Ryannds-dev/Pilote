@@ -329,3 +329,44 @@ Limites volontaires de ce commit :
 - aucune modification manuelle de l'instructrice ;
 - aucune statistique par instructrice ;
 - aucune sauvegarde persistante.
+
+## e12885c - Data: Convert sectorization workbooks to JSON
+
+Date : 2026-06-23
+
+Objectif : préparer les données de sectorisation dans un format lisible sans serveur local.
+
+Modifications principales :
+
+- ajout du script `scripts/convert-sectorization-data.js` ;
+- conversion des fichiers Excel du dossier `data` ;
+- génération de `data/sectorisation-data.json` ;
+- génération de `data/sectorisation-data.js` pour chargement direct dans le navigateur ;
+- conservation des noms de fichiers Excel sources dans les données générées ;
+- conservation des lignes utiles adulte, PCH et enfant.
+
+Intérêt :
+
+- l'application peut utiliser les données de sectorisation sans `fetch()` ;
+- l'ouverture directe de `index.html` reste possible ;
+- aucun serveur local n'est nécessaire pour lire les données converties.
+
+## 7fa6165 - Excel: Use converted sectorization data
+
+Date : 2026-06-23
+
+Objectif : faire utiliser à PILOTE les données converties plutôt que les fichiers Excel au runtime.
+
+Modifications principales :
+
+- remplacement du chargement runtime de SheetJS par `data/sectorisation-data.js` ;
+- suppression de la lecture Excel par `fetch()` dans `app.js` ;
+- lecture directe de `window.PILOTE_SECTORIZATION_DATA` ;
+- conservation des suggestions ville / école ;
+- conservation de l'attribution automatique de l'instructrice ;
+- mise à jour du texte d'interface pour parler de données préparées localement.
+
+Limites volontaires :
+
+- les fichiers JSON doivent être régénérés si les fichiers Excel changent ;
+- pas encore d'écran dédié pour régénérer les données depuis l'application.
