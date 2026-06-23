@@ -94,6 +94,7 @@ function showSessionInformation(session) {
   document.getElementById("valeur-date-session").textContent = formatDateForDisplay(session.tamponDate);
   document.getElementById("valeur-nom-session").textContent = session.sessionId;
   updateDocumentCounter();
+  renderDocumentList();
   document.getElementById("carte-session-creee").hidden = false;
   document.getElementById("zone-documents").hidden = false;
 }
@@ -149,6 +150,7 @@ function addDocumentToSession(documentData = {}) {
 
   currentSession.documents.push(document);
   updateDocumentCounter();
+  renderDocumentList();
 
   return document;
 }
@@ -213,4 +215,96 @@ function updateDocumentCounter() {
   }
 
   documentCounter.textContent = currentSession.documents.length;
+}
+
+function renderDocumentList() {
+  const documentList = document.getElementById("liste-documents");
+  const emptyListMessage = document.getElementById("message-liste-vide");
+
+  if (!documentList || !emptyListMessage) {
+    return;
+  }
+
+  documentList.innerHTML = "";
+  emptyListMessage.hidden = currentSession.documents.length > 0;
+
+  currentSession.documents.forEach((documentItem) => {
+    documentList.appendChild(createDocumentCard(documentItem));
+  });
+}
+
+function createDocumentCard(documentItem) {
+  const documentCard = document.createElement("article");
+  const pdfIcon = document.createElement("img");
+  const cardContent = document.createElement("div");
+  const documentTitle = document.createElement("p");
+  const documentDetails = document.createElement("div");
+
+  documentCard.className = "carte-document";
+  pdfIcon.className = "icone-pdf-document";
+  pdfIcon.src = "assets/empty-icon.svg";
+  pdfIcon.alt = "PDF non associé";
+  cardContent.className = "contenu-carte-document";
+  documentTitle.className = "titre-document";
+  documentTitle.textContent = documentItem.multigestFileName;
+  documentDetails.className = "details-document";
+
+  addDocumentDetail(documentDetails, `Public : ${formatPublicType(documentItem.publicType)}`);
+  addDocumentDetail(documentDetails, `Type : ${formatDocumentType(documentItem.documentType)}`);
+  addDocumentDetail(documentDetails, `Ville : ${documentItem.city || "Non renseignée"}`);
+
+  if (documentItem.gevascoSchoolOrCity) {
+    addDocumentDetail(documentDetails, `École / GEVASCO : ${documentItem.gevascoSchoolOrCity}`);
+  }
+
+  if (documentItem.pchOnly) {
+    addDocumentDetail(documentDetails, "PCH uniquement");
+  }
+
+  if (documentItem.outOfDepartment) {
+    addDocumentDetail(documentDetails, "Hors département");
+  }
+
+  cardContent.appendChild(documentTitle);
+  cardContent.appendChild(documentDetails);
+  documentCard.appendChild(pdfIcon);
+  documentCard.appendChild(cardContent);
+
+  return documentCard;
+}
+
+function addDocumentDetail(documentDetails, text) {
+  const detail = document.createElement("span");
+
+  detail.className = "detail-document";
+  detail.textContent = text;
+  documentDetails.appendChild(detail);
+}
+
+function formatPublicType(publicType) {
+  if (publicType === PUBLIC_TYPES.ADULT) {
+    return "Adulte";
+  }
+
+  if (publicType === PUBLIC_TYPES.CHILD) {
+    return "Enfant";
+  }
+
+  return "Non renseigné";
+}
+
+function formatDocumentType(documentType) {
+  if (documentType === DOCUMENT_TYPES.REQUEST) {
+    return "Demande";
+  }
+
+  if (documentType === DOCUMENT_TYPES.COMPLEMENTARY) {
+    return "Pièce complémentaire";
+  }
+
+  if (documentType === DOCUMENT_TYPES.APPEAL) {
+    return "Recours";
+  }
+
+  return "Non renseigné";
 }

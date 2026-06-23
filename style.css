@@ -279,6 +279,66 @@ h1 {
   grid-column: 1 / -1;
 }
 
+.zone-liste-documents {
+  margin-top: 32px;
+  padding-top: 28px;
+  border-top: 1px solid var(--gris-bordure);
+}
+
+.zone-liste-documents h3 {
+  margin-top: 0;
+  margin-bottom: 14px;
+  font-size: 1.1rem;
+}
+
+.message-liste-vide {
+  margin-bottom: 0;
+  color: var(--gris-secondaire);
+}
+
+.liste-documents {
+  display: grid;
+  gap: 14px;
+}
+
+.carte-document {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid var(--gris-bordure);
+  background: var(--blanc);
+}
+
+.icone-pdf-document {
+  width: 48px;
+  height: 48px;
+}
+
+.contenu-carte-document {
+  min-width: 0;
+}
+
+.titre-document {
+  margin-bottom: 10px;
+  color: var(--gris-texte);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.details-document {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.detail-document {
+  padding: 6px 8px;
+  color: var(--gris-texte);
+  background: var(--gris-fond-page);
+  font-size: 0.92rem;
+}
+
 @media (max-width: 640px) {
   .page-principale {
     padding: 24px 16px;
@@ -316,6 +376,10 @@ h1 {
   }
 
   .formulaire-document {
+    grid-template-columns: 1fr;
+  }
+
+  .carte-document {
     grid-template-columns: 1fr;
   }
 

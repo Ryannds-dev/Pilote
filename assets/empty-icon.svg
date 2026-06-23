@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">PDF non associé</title>
+  <path d="M18 6h21l13 13v39H18z" fill="#ffffff" stroke="#b3122d" stroke-width="3"/>
+  <path d="M39 6v14h13" fill="none" stroke="#b3122d" stroke-width="3"/>
+  <path d="M24 39h22" stroke="#4f5661" stroke-width="3" stroke-linecap="round"/>
+  <path d="M24 47h14" stroke="#4f5661" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="32" cy="29" r="8" fill="#fff3f5" stroke="#b3122d" stroke-width="3"/>
+  <path d="M28 29h8" stroke="#b3122d" stroke-width="3" stroke-linecap="round"/>
+</svg>
