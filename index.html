@@ -1,85 +1,194 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PILOTE - Outil local de sectorisation</title>
-  <link rel="icon" type="image/png" href="assets/favicon.png">
-  <link rel="stylesheet" href="style.css">
-  <script src="app.js" defer></script>
-</head>
-<body>
-  <main class="page-principale">
-    <header class="bloc-presentation" aria-labelledby="app-title">
-      <div class="ligne-logo">
-        <img class="logo-pilote" src="assets/logo-header.png" alt="PILOTE">
-        <div class="texte-a-cote-du-logo">
-          <p class="mention-usage-interne">MDPH - usage interne</p>
-          <h1 id="app-title" class="titre-cache-pour-accessibilite">PILOTE</h1>
-        </div>
-      </div>
-
-      <p class="texte-presentation">
-        Un outil local pour aider à orienter les documents numérisés vers la bonne instructrice.
-      </p>
-
-      <p class="message-confidentialite">
-        Les informations restent sur ce poste : aucune donnée n'est envoyée sur Internet.
-      </p>
-    </header>
-
-    <section class="zone-demarrage-session" aria-labelledby="start-title">
-      <h2 id="start-title">Démarrage de session</h2>
-      <p>
-        Indiquez l'agent qui traite les documents et la date de tampon à utiliser.
-      </p>
-
-      <form id="formulaire-demarrage-session" class="formulaire-demarrage-session" novalidate>
-        <div class="champ-formulaire">
-          <label for="champ-agent">Initiales ou nom court de l'agent</label>
-          <input
-            id="champ-agent"
-            name="agent"
-            type="text"
-            autocomplete="off"
-            placeholder="Exemple : RDS"
-          >
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PILOTE - Outil local de sectorisation</title>
+    <link rel="icon" type="image/png" href="assets/favicon.png" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <main class="page-principale">
+      <header class="bloc-presentation" aria-labelledby="app-title">
+        <div class="ligne-logo">
+          <img class="logo-pilote" src="assets/logo-header.png" alt="PILOTE" />
+          <div class="texte-a-cote-du-logo">
+            <p class="mention-usage-interne">MDPH - usage interne</p>
+            <h1 id="app-title" class="titre-cache-pour-accessibilite">
+              PILOTE
+            </h1>
+          </div>
         </div>
 
-        <div class="champ-formulaire">
-          <label for="champ-date-tampon">Date de tampon</label>
-          <input id="champ-date-tampon" name="tamponDate" type="date">
-        </div>
-
-        <p id="message-erreur-demarrage" class="message-erreur-formulaire" aria-live="polite"></p>
-
-        <button class="bouton-demarrer-session" type="submit">
-          Démarrer la session
-        </button>
-      </form>
-
-      <article id="carte-session-creee" class="carte-session-creee" hidden>
-        <h3>Session créée</h3>
-        <dl class="liste-informations-session">
-          <div>
-            <dt>Agent</dt>
-            <dd id="valeur-agent-session"></dd>
-          </div>
-          <div>
-            <dt>Date de tampon</dt>
-            <dd id="valeur-date-session"></dd>
-          </div>
-          <div>
-            <dt>Session</dt>
-            <dd id="valeur-nom-session"></dd>
-          </div>
-        </dl>
-
-        <p class="compteur-documents-session">
-          Documents dans le lot : <span id="nombre-documents-session">0</span>
+        <p class="texte-presentation">
+          Un outil local pour aider à orienter les documents numérisés vers la
+          bonne instructrice.
         </p>
-      </article>
-    </section>
-  </main>
-</body>
+
+        <p class="message-confidentialite">
+          Les informations restent sur ce poste : aucune donnée n'est envoyée
+          sur Internet.
+        </p>
+      </header>
+
+      <section class="zone-demarrage-session" aria-labelledby="start-title">
+        <h2 id="start-title">Démarrage de session</h2>
+        <p>
+          Indiquez l'agent qui traite les documents et la date de tampon à
+          utiliser.
+        </p>
+
+        <form
+          id="formulaire-demarrage-session"
+          class="formulaire-demarrage-session"
+          novalidate
+        >
+          <div class="champ-formulaire">
+            <label for="champ-agent">Initiales ou nom court de l'agent</label>
+            <input
+              id="champ-agent"
+              name="agent"
+              type="text"
+              autocomplete="off"
+              placeholder="Exemple : RDS"
+            />
+          </div>
+
+          <div class="champ-formulaire">
+            <label for="champ-date-tampon">Date de tampon</label>
+            <input id="champ-date-tampon" name="tamponDate" type="date" />
+          </div>
+
+          <p
+            id="message-erreur-demarrage"
+            class="message-erreur-formulaire"
+            aria-live="polite"
+          ></p>
+
+          <button class="bouton-demarrer-session" type="submit">
+            Démarrer la session
+          </button>
+        </form>
+
+        <article id="carte-session-creee" class="carte-session-creee" hidden>
+          <h3>Session créée</h3>
+          <dl class="liste-informations-session">
+            <div>
+              <dt>Agent</dt>
+              <dd id="valeur-agent-session"></dd>
+            </div>
+            <div>
+              <dt>Date de tampon</dt>
+              <dd id="valeur-date-session"></dd>
+            </div>
+            <div>
+              <dt>Session</dt>
+              <dd id="valeur-nom-session"></dd>
+            </div>
+          </dl>
+
+          <p class="compteur-documents-session">
+            Documents dans le lot : <span id="nombre-documents-session">0</span>
+          </p>
+        </article>
+      </section>
+
+      <section
+        id="zone-documents"
+        class="zone-documents"
+        aria-labelledby="documents-title"
+        hidden
+      >
+        <h2 id="documents-title">Documents du lot</h2>
+
+        <section
+          class="zone-ajout-document"
+          aria-labelledby="ajout-document-title"
+        >
+          <h3 id="ajout-document-title">Ajouter un document</h3>
+
+          <form id="formulaire-document" class="formulaire-document" novalidate>
+            <div class="champ-formulaire">
+              <label for="champ-nom-multigest">Nom MultiGest</label>
+              <input
+                id="champ-nom-multigest"
+                name="multigestFileName"
+                type="text"
+                autocomplete="off"
+                placeholder="Nom du document dans MultiGest"
+              />
+            </div>
+
+            <div class="champ-formulaire">
+              <label for="champ-public">Public</label>
+              <select id="champ-public" name="publicType">
+                <option value="">Sélectionner</option>
+                <option value="adulte">Adulte</option>
+                <option value="enfant">Enfant</option>
+              </select>
+            </div>
+
+            <div class="champ-formulaire">
+              <label for="champ-type-document">Type de document</label>
+              <select id="champ-type-document" name="documentType">
+                <option value="">Sélectionner</option>
+                <option value="demande">Demande</option>
+                <option value="piece_complementaire">Pièce complémentaire</option>
+                <option value="recours">Recours</option>
+              </select>
+            </div>
+
+            <div class="champ-formulaire">
+              <label for="champ-ville">Ville</label>
+              <input
+                id="champ-ville"
+                name="city"
+                type="text"
+                autocomplete="off"
+                placeholder="Ville de résidence"
+              />
+            </div>
+
+            <div class="champ-formulaire">
+              <label for="champ-gevasco">École / GEVASCO</label>
+              <input
+                id="champ-gevasco"
+                name="gevascoSchoolOrCity"
+                type="text"
+                autocomplete="off"
+                placeholder="École ou ville GEVASCO si besoin"
+              />
+            </div>
+
+            <div class="cases-formulaire">
+              <label>
+                <input id="champ-pch" name="pchOnly" type="checkbox" />
+                PCH uniquement
+              </label>
+
+              <label>
+                <input
+                  id="champ-hors-departement"
+                  name="outOfDepartment"
+                  type="checkbox"
+                />
+                Hors département
+              </label>
+            </div>
+
+            <p
+              id="message-erreur-document"
+              class="message-erreur-formulaire"
+              aria-live="polite"
+            ></p>
+
+            <button class="bouton-ajouter-document" type="submit">
+              Ajouter le document
+            </button>
+          </form>
+        </section>
+      </section>
+    </main>
+  </body>
 </html>

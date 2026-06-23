@@ -30,8 +30,10 @@ let documentIdCounter = 0;
 
 document.addEventListener("DOMContentLoaded", () => {
   const formulaireDemarrage = document.getElementById("formulaire-demarrage-session");
+  const formulaireDocument = document.getElementById("formulaire-document");
 
   formulaireDemarrage.addEventListener("submit", handleSessionStart);
+  formulaireDocument.addEventListener("submit", handleDocumentSubmit);
 });
 
 function handleSessionStart(event) {
@@ -93,6 +95,7 @@ function showSessionInformation(session) {
   document.getElementById("valeur-nom-session").textContent = session.sessionId;
   updateDocumentCounter();
   document.getElementById("carte-session-creee").hidden = false;
+  document.getElementById("zone-documents").hidden = false;
 }
 
 function formatDateForDisplay(dateValue) {
@@ -148,6 +151,58 @@ function addDocumentToSession(documentData = {}) {
   updateDocumentCounter();
 
   return document;
+}
+
+function handleDocumentSubmit(event) {
+  event.preventDefault();
+
+  const documentData = getDocumentFormData();
+  const validationMessage = validateDocumentForm(documentData);
+
+  if (validationMessage) {
+    showDocumentFormError(validationMessage);
+    return;
+  }
+
+  addDocumentToSession(documentData);
+  clearDocumentFormError();
+  event.target.reset();
+}
+
+function getDocumentFormData() {
+  return {
+    multigestFileName: document.getElementById("champ-nom-multigest").value.trim(),
+    publicType: document.getElementById("champ-public").value,
+    documentType: document.getElementById("champ-type-document").value,
+    pchOnly: document.getElementById("champ-pch").checked,
+    city: document.getElementById("champ-ville").value.trim(),
+    gevascoSchoolOrCity: document.getElementById("champ-gevasco").value.trim(),
+    outOfDepartment: document.getElementById("champ-hors-departement").checked
+  };
+}
+
+function validateDocumentForm(documentData) {
+  if (!documentData.multigestFileName) {
+    return "Veuillez indiquer le nom MultiGest du document.";
+  }
+
+  if (!documentData.publicType) {
+    return "Veuillez sélectionner le public concerné.";
+  }
+
+  if (!documentData.documentType) {
+    return "Veuillez sélectionner le type de document.";
+  }
+
+  return "";
+}
+
+function showDocumentFormError(message) {
+  document.getElementById("message-erreur-document").textContent = message;
+}
+
+function clearDocumentFormError() {
+  document.getElementById("message-erreur-document").textContent = "";
 }
 
 function updateDocumentCounter() {

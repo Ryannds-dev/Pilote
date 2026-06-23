@@ -139,7 +139,8 @@ h1 {
   font-weight: 700;
 }
 
-.champ-formulaire input {
+.champ-formulaire input,
+.champ-formulaire select {
   width: 100%;
   min-height: 46px;
   padding: 10px 12px;
@@ -149,7 +150,8 @@ h1 {
   font: inherit;
 }
 
-.champ-formulaire input:focus {
+.champ-formulaire input:focus,
+.champ-formulaire select:focus {
   outline: 3px solid #f7c8d1;
   border-color: var(--rouge-pilote);
 }
@@ -161,7 +163,8 @@ h1 {
   font-weight: 700;
 }
 
-.bouton-demarrer-session {
+.bouton-demarrer-session,
+.bouton-ajouter-document {
   width: fit-content;
   min-height: 46px;
   padding: 12px 18px;
@@ -174,11 +177,14 @@ h1 {
 }
 
 .bouton-demarrer-session:hover,
-.bouton-demarrer-session:focus {
+.bouton-demarrer-session:focus,
+.bouton-ajouter-document:hover,
+.bouton-ajouter-document:focus {
   background: #8f0f25;
 }
 
-.bouton-demarrer-session:focus {
+.bouton-demarrer-session:focus,
+.bouton-ajouter-document:focus {
   outline: 3px solid #f7c8d1;
   outline-offset: 2px;
 }
@@ -226,6 +232,53 @@ h1 {
   font-weight: 700;
 }
 
+.zone-documents {
+  margin-top: 28px;
+  padding: 32px;
+  background: var(--blanc);
+}
+
+.zone-documents h2 {
+  margin-bottom: 24px;
+  font-size: 1.25rem;
+}
+
+.zone-ajout-document h3 {
+  margin-top: 0;
+  margin-bottom: 18px;
+  font-size: 1.1rem;
+}
+
+.formulaire-document {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.cases-formulaire {
+  display: grid;
+  gap: 10px;
+  align-content: end;
+}
+
+.cases-formulaire label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+}
+
+.cases-formulaire input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--rouge-pilote);
+}
+
+.formulaire-document .message-erreur-formulaire,
+.formulaire-document .bouton-ajouter-document {
+  grid-column: 1 / -1;
+}
+
 @media (max-width: 640px) {
   .page-principale {
     padding: 24px 16px;
@@ -258,7 +311,16 @@ h1 {
     padding: 24px;
   }
 
-  .bouton-demarrer-session {
+  .zone-documents {
+    padding: 24px;
+  }
+
+  .formulaire-document {
+    grid-template-columns: 1fr;
+  }
+
+  .bouton-demarrer-session,
+  .bouton-ajouter-document {
     width: 100%;
   }
 }
