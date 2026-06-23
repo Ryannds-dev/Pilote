@@ -164,7 +164,10 @@ h1 {
 }
 
 .bouton-demarrer-session,
-.bouton-ajouter-document {
+.bouton-ajouter-document,
+.bouton-annuler-modification,
+.bouton-modifier-document,
+.bouton-supprimer-document {
   width: fit-content;
   min-height: 46px;
   padding: 12px 18px;
@@ -176,6 +179,14 @@ h1 {
   cursor: pointer;
 }
 
+.bouton-annuler-modification,
+.bouton-modifier-document,
+.bouton-supprimer-document {
+  border: 1px solid var(--gris-bordure);
+  color: var(--gris-texte);
+  background: var(--blanc);
+}
+
 .bouton-demarrer-session:hover,
 .bouton-demarrer-session:focus,
 .bouton-ajouter-document:hover,
@@ -183,8 +194,26 @@ h1 {
   background: #8f0f25;
 }
 
+.bouton-annuler-modification:hover,
+.bouton-annuler-modification:focus,
+.bouton-modifier-document:hover,
+.bouton-modifier-document:focus {
+  border-color: var(--rouge-pilote);
+  color: var(--rouge-pilote);
+}
+
+.bouton-supprimer-document:hover,
+.bouton-supprimer-document:focus {
+  border-color: var(--rouge-pilote);
+  color: var(--blanc);
+  background: var(--rouge-pilote);
+}
+
 .bouton-demarrer-session:focus,
-.bouton-ajouter-document:focus {
+.bouton-ajouter-document:focus,
+.bouton-annuler-modification:focus,
+.bouton-modifier-document:focus,
+.bouton-supprimer-document:focus {
   outline: 3px solid #f7c8d1;
   outline-offset: 2px;
 }
@@ -275,7 +304,8 @@ h1 {
 }
 
 .formulaire-document .message-erreur-formulaire,
-.formulaire-document .bouton-ajouter-document {
+.formulaire-document .bouton-ajouter-document,
+.formulaire-document .bouton-annuler-modification {
   grid-column: 1 / -1;
 }
 
@@ -339,6 +369,13 @@ h1 {
   font-size: 0.92rem;
 }
 
+.actions-document {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
 @media (max-width: 640px) {
   .page-principale {
     padding: 24px 16px;
@@ -384,7 +421,10 @@ h1 {
   }
 
   .bouton-demarrer-session,
-  .bouton-ajouter-document {
+  .bouton-ajouter-document,
+  .bouton-annuler-modification,
+  .bouton-modifier-document,
+  .bouton-supprimer-document {
     width: 100%;
   }
 }

@@ -27,13 +27,16 @@ const currentSession = {
 };
 
 let documentIdCounter = 0;
+let editedDocumentId = "";
 
 document.addEventListener("DOMContentLoaded", () => {
   const formulaireDemarrage = document.getElementById("formulaire-demarrage-session");
   const formulaireDocument = document.getElementById("formulaire-document");
+  const cancelEditButton = document.getElementById("bouton-annuler-modification");
 
   formulaireDemarrage.addEventListener("submit", handleSessionStart);
   formulaireDocument.addEventListener("submit", handleDocumentSubmit);
+  cancelEditButton.addEventListener("click", cancelDocumentEdition);
 });
 
 function handleSessionStart(event) {
@@ -55,6 +58,7 @@ function handleSessionStart(event) {
   currentSession.sessionId = generateSessionId(tamponDateValue, cleanAgent);
   currentSession.createdAt = new Date().toISOString();
   currentSession.documents = [];
+  editedDocumentId = "";
 
   clearStartFormError();
   showSessionInformation(currentSession);
@@ -166,9 +170,14 @@ function handleDocumentSubmit(event) {
     return;
   }
 
-  addDocumentToSession(documentData);
+  if (editedDocumentId) {
+    updateDocumentInSession(editedDocumentId, documentData);
+  } else {
+    addDocumentToSession(documentData);
+  }
+
   clearDocumentFormError();
-  event.target.reset();
+  resetDocumentForm();
 }
 
 function getDocumentFormData() {
@@ -207,6 +216,97 @@ function clearDocumentFormError() {
   document.getElementById("message-erreur-document").textContent = "";
 }
 
+function updateDocumentInSession(documentId, documentData) {
+  const documentIndex = currentSession.documents.findIndex((documentItem) => {
+    return documentItem.id === documentId;
+  });
+
+  if (documentIndex === -1) {
+    throw new Error("Impossible de modifier ce document : il est introuvable.");
+  }
+
+  currentSession.documents[documentIndex] = {
+    ...currentSession.documents[documentIndex],
+    ...documentData,
+    updatedAt: new Date().toISOString()
+  };
+
+  renderDocumentList();
+}
+
+function deleteDocumentFromSession(documentId) {
+  const documentToDelete = currentSession.documents.find((documentItem) => {
+    return documentItem.id === documentId;
+  });
+
+  if (!documentToDelete) {
+    return;
+  }
+
+  const deletionConfirmed = window.confirm(
+    `Supprimer le document "${documentToDelete.multigestFileName}" ?`
+  );
+
+  if (!deletionConfirmed) {
+    return;
+  }
+
+  currentSession.documents = currentSession.documents.filter((documentItem) => {
+    return documentItem.id !== documentId;
+  });
+
+  if (editedDocumentId === documentId) {
+    resetDocumentForm();
+  }
+
+  updateDocumentCounter();
+  renderDocumentList();
+}
+
+function startDocumentEdition(documentId) {
+  const documentToEdit = currentSession.documents.find((documentItem) => {
+    return documentItem.id === documentId;
+  });
+
+  if (!documentToEdit) {
+    return;
+  }
+
+  editedDocumentId = documentId;
+  fillDocumentForm(documentToEdit);
+  document.getElementById("message-erreur-document").textContent = "";
+  document.querySelector(".bouton-ajouter-document").textContent =
+    "Enregistrer les modifications";
+  document.getElementById("bouton-annuler-modification").hidden = false;
+}
+
+function fillDocumentForm(documentItem) {
+  document.getElementById("champ-nom-multigest").value =
+    documentItem.multigestFileName;
+  document.getElementById("champ-public").value = documentItem.publicType;
+  document.getElementById("champ-type-document").value =
+    documentItem.documentType;
+  document.getElementById("champ-pch").checked = documentItem.pchOnly;
+  document.getElementById("champ-ville").value = documentItem.city;
+  document.getElementById("champ-gevasco").value =
+    documentItem.gevascoSchoolOrCity;
+  document.getElementById("champ-hors-departement").checked =
+    documentItem.outOfDepartment;
+}
+
+function cancelDocumentEdition() {
+  resetDocumentForm();
+  clearDocumentFormError();
+}
+
+function resetDocumentForm() {
+  document.getElementById("formulaire-document").reset();
+  editedDocumentId = "";
+  document.querySelector(".bouton-ajouter-document").textContent =
+    "Ajouter le document";
+  document.getElementById("bouton-annuler-modification").hidden = true;
+}
+
 function updateDocumentCounter() {
   const documentCounter = document.getElementById("nombre-documents-session");
 
@@ -239,6 +339,9 @@ function createDocumentCard(documentItem) {
   const cardContent = document.createElement("div");
   const documentTitle = document.createElement("p");
   const documentDetails = document.createElement("div");
+  const documentActions = document.createElement("div");
+  const editButton = document.createElement("button");
+  const deleteButton = document.createElement("button");
 
   documentCard.className = "carte-document";
   pdfIcon.className = "icone-pdf-document";
@@ -248,6 +351,19 @@ function createDocumentCard(documentItem) {
   documentTitle.className = "titre-document";
   documentTitle.textContent = documentItem.multigestFileName;
   documentDetails.className = "details-document";
+  documentActions.className = "actions-document";
+  editButton.className = "bouton-modifier-document";
+  editButton.type = "button";
+  editButton.textContent = "Modifier";
+  editButton.addEventListener("click", () => {
+    startDocumentEdition(documentItem.id);
+  });
+  deleteButton.className = "bouton-supprimer-document";
+  deleteButton.type = "button";
+  deleteButton.textContent = "Supprimer";
+  deleteButton.addEventListener("click", () => {
+    deleteDocumentFromSession(documentItem.id);
+  });
 
   addDocumentDetail(documentDetails, `Public : ${formatPublicType(documentItem.publicType)}`);
   addDocumentDetail(documentDetails, `Type : ${formatDocumentType(documentItem.documentType)}`);
@@ -267,6 +383,9 @@ function createDocumentCard(documentItem) {
 
   cardContent.appendChild(documentTitle);
   cardContent.appendChild(documentDetails);
+  documentActions.appendChild(editButton);
+  documentActions.appendChild(deleteButton);
+  cardContent.appendChild(documentActions);
   documentCard.appendChild(pdfIcon);
   documentCard.appendChild(cardContent);
 
