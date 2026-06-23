@@ -583,10 +583,12 @@ function handleDocumentSubmit(event) {
     return;
   }
 
+  const documentDataWithSectorization = applySectorizationToDocumentData(documentData);
+
   if (editedDocumentId) {
-    updateDocumentInSession(editedDocumentId, documentData);
+    updateDocumentInSession(editedDocumentId, documentDataWithSectorization);
   } else {
-    addDocumentToSession(documentData);
+    addDocumentToSession(documentDataWithSectorization);
   }
 
   clearDocumentFormError();
@@ -627,6 +629,106 @@ function showDocumentFormError(message) {
 
 function clearDocumentFormError() {
   document.getElementById("message-erreur-document").textContent = "";
+}
+
+function applySectorizationToDocumentData(documentData) {
+  const sectorizationResult = findInstructorForDocument(documentData);
+
+  return {
+    ...documentData,
+    instructor: sectorizationResult.instructor,
+    sectorizationSource: sectorizationResult.source,
+    sectorizationStatus: sectorizationResult.status
+  };
+}
+
+function findInstructorForDocument(documentData) {
+  if (documentData.outOfDepartment) {
+    return createSectorizationResult("", "", SECTORIZATION_STATUS.WARNING);
+  }
+
+  if (documentData.pchOnly) {
+    return findInstructorByCity("PCH", documentData.city);
+  }
+
+  if (documentData.publicType === PUBLIC_TYPES.CHILD) {
+    return findChildInstructor(documentData);
+  }
+
+  if (documentData.publicType === PUBLIC_TYPES.ADULT) {
+    return findInstructorByCity("ADULT", documentData.city);
+  }
+
+  return createSectorizationResult("", "", SECTORIZATION_STATUS.PENDING);
+}
+
+function findChildInstructor(documentData) {
+  if (documentData.gevascoSchoolOrCity) {
+    const schoolResult = findInstructorBySchool(documentData.gevascoSchoolOrCity);
+
+    if (schoolResult.status === SECTORIZATION_STATUS.FOUND) {
+      return schoolResult;
+    }
+  }
+
+  return findInstructorByCity("CHILD", documentData.city);
+}
+
+function findInstructorBySchool(schoolName) {
+  const matchingRows = findRowsByNormalizedValue("CHILD", "school", schoolName);
+
+  return buildInstructorResultFromRows("CHILD", matchingRows);
+}
+
+function findInstructorByCity(fileKey, cityName) {
+  const matchingRows = findRowsByNormalizedValue(fileKey, "city", cityName);
+
+  return buildInstructorResultFromRows(fileKey, matchingRows);
+}
+
+function findRowsByNormalizedValue(fileKey, fieldName, value) {
+  const fileState = excelData.files[fileKey];
+  const normalizedValue = normalizeExcelText(value);
+
+  if (!fileState?.usableRows || !normalizedValue) {
+    return [];
+  }
+
+  return fileState.usableRows.filter((row) => {
+    return normalizeExcelText(row[fieldName]) === normalizedValue;
+  });
+}
+
+function buildInstructorResultFromRows(fileKey, rows) {
+  if (rows.length === 0) {
+    return createSectorizationResult("", "", SECTORIZATION_STATUS.PENDING);
+  }
+
+  const instructorNames = [
+    ...new Set(rows.map((row) => row.instructor).filter(Boolean))
+  ];
+
+  if (instructorNames.length !== 1) {
+    return createSectorizationResult(
+      "",
+      EXCEL_FILES[fileKey].label,
+      SECTORIZATION_STATUS.WARNING
+    );
+  }
+
+  return createSectorizationResult(
+    instructorNames[0],
+    EXCEL_FILES[fileKey].label,
+    SECTORIZATION_STATUS.FOUND
+  );
+}
+
+function createSectorizationResult(instructor, source, status) {
+  return {
+    instructor,
+    source,
+    status
+  };
 }
 
 function updateDocumentInSession(documentId, documentData) {
@@ -781,6 +883,7 @@ function createDocumentCard(documentItem) {
   addDocumentDetail(documentDetails, `Public : ${formatPublicType(documentItem.publicType)}`);
   addDocumentDetail(documentDetails, `Type : ${formatDocumentType(documentItem.documentType)}`);
   addDocumentDetail(documentDetails, `Ville : ${documentItem.city || "Non renseignée"}`);
+  addDocumentDetail(documentDetails, `Instructrice : ${formatInstructor(documentItem)}`);
 
   if (documentItem.gevascoSchoolOrCity) {
     addDocumentDetail(documentDetails, `École / GEVASCO : ${documentItem.gevascoSchoolOrCity}`);
@@ -839,4 +942,16 @@ function formatDocumentType(documentType) {
   }
 
   return "Non renseigné";
+}
+
+function formatInstructor(documentItem) {
+  if (documentItem.instructor) {
+    return documentItem.instructor;
+  }
+
+  if (documentItem.sectorizationStatus === SECTORIZATION_STATUS.WARNING) {
+    return "À vérifier";
+  }
+
+  return "Non trouvée";
 }
