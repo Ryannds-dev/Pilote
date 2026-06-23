@@ -223,3 +223,109 @@ Limites volontaires de ce commit :
 - aucune gestion PDF ;
 - aucune sectorisation ;
 - aucune statistique complète.
+
+## 7a45c14 - Excel: Add local SheetJS library
+
+Date : 2026-06-23
+
+Objectif : intégrer SheetJS localement pour préparer la lecture des fichiers Excel.
+
+Modifications principales :
+
+- ajout du fichier `vendor/xlsx.full.min.js` ;
+- chargement de SheetJS avant `app.js` ;
+- ajout d'une vérification JavaScript indiquant si SheetJS n'est pas disponible ;
+- correction du libellé agent en "Initiales ou nom de l'agent".
+
+Limites volontaires de ce commit :
+
+- aucune lecture de fichier Excel ;
+- aucune validation de colonnes ;
+- aucune attribution d'instructrice.
+
+## bd20460 - Excel: Load sectorization workbooks
+
+Date : 2026-06-23
+
+Objectif : charger dynamiquement les fichiers Excel de sectorisation depuis le dossier `data`.
+
+Modifications principales :
+
+- ajout d'une configuration des fichiers Excel attendus ;
+- chargement de `data/sectorisation_adulte.xlsx` ;
+- chargement de `data/sectorisation_pch.xlsx` ;
+- chargement de `data/sectorisation_enfant.xlsx` ;
+- préparation de `data/statistiques.xlsx` comme fichier optionnel ;
+- extraction des feuilles de chaque classeur ;
+- ajout d'un affichage de statut dans l'interface.
+
+Limites volontaires de ce commit :
+
+- `statistiques.xlsx` n'est pas encore fourni ;
+- aucune validation fine des colonnes ;
+- aucune suggestion de saisie ;
+- aucune attribution automatique.
+
+## 13389ef - Excel: Validate workbook columns
+
+Date : 2026-06-23
+
+Objectif : valider que les fichiers Excel contiennent les colonnes nécessaires.
+
+Modifications principales :
+
+- détection des lignes d'en-têtes même si elles ne sont pas en première ligne ;
+- validation des colonnes adulte ;
+- validation des colonnes PCH ;
+- validation des colonnes enfant ;
+- normalisation des textes d'en-têtes pour tolérer accents, espaces et retours à la ligne ;
+- extraction des lignes utilisables ;
+- exclusion des lignes vides et des en-têtes répétés.
+
+Limites volontaires de ce commit :
+
+- aucune recherche floue avancée ;
+- aucune interface de correction manuelle des colonnes.
+
+## 8bf6cc7 - Excel: Add city and school suggestions
+
+Date : 2026-06-23
+
+Objectif : utiliser les fichiers Excel pour proposer les villes et écoles connues pendant la saisie.
+
+Modifications principales :
+
+- extraction des villes depuis les fichiers adulte, PCH et enfant ;
+- extraction des écoles depuis le fichier enfant ;
+- ajout des suggestions sur le champ "Ville" ;
+- ajout des suggestions sur le champ "École / GEVASCO" ;
+- normalisation des valeurs pour tolérer accents, apostrophes, tirets et espaces.
+
+Limites volontaires de ce commit :
+
+- suggestions natives du navigateur uniquement ;
+- aucune recherche proche avancée ;
+- aucune sélection manuelle de correction.
+
+## 5547ffd - Excel: Add instructor lookup
+
+Date : 2026-06-23
+
+Objectif : déduire une instructrice à partir des données Excel chargées.
+
+Modifications principales :
+
+- recherche de l'instructrice PCH par ville ;
+- recherche de l'instructrice adulte par ville ;
+- recherche de l'instructrice enfant par école quand elle est renseignée ;
+- recherche de secours enfant par ville quand la correspondance est claire ;
+- gestion des dossiers hors département en statut "à vérifier" ;
+- affichage de l'instructrice dans la carte document ;
+- statut "Non trouvée" quand aucune correspondance n'est disponible.
+
+Limites volontaires de ce commit :
+
+- aucune recherche approximative avancée ;
+- aucune modification manuelle de l'instructrice ;
+- aucune statistique par instructrice ;
+- aucune sauvegarde persistante.
