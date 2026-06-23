@@ -6,7 +6,7 @@
     <title>PILOTE - Outil local de sectorisation</title>
     <link rel="icon" type="image/png" href="assets/favicon.png" />
     <link rel="stylesheet" href="style.css" />
-    <script src="data/sectorisation-data.js" defer></script>
+    <script src="libs/xlsx.full.min.js" defer></script>
     <script src="app.js" defer></script>
   </head>
   <body>
@@ -33,11 +33,59 @@
         </p>
       </header>
 
+      <section class="zone-excel" aria-labelledby="excel-title">
+        <h2 id="excel-title">Fichiers de sectorisation</h2>
+        <p>
+          Importez les fichiers Excel de sectorisation avant de commencer. PILOTE
+          les lit uniquement depuis ce poste et ne les envoie nulle part.
+        </p>
+
+        <div class="liste-imports-excel">
+          <div class="bloc-import-excel">
+            <label for="fichier-sectorisation-adulte">
+              Sectorisation adulte
+            </label>
+            <input
+              id="fichier-sectorisation-adulte"
+              type="file"
+              accept=".xlsx,.xls"
+            />
+          </div>
+
+          <div class="bloc-import-excel">
+            <label for="fichier-sectorisation-pch">Sectorisation PCH</label>
+            <input
+              id="fichier-sectorisation-pch"
+              type="file"
+              accept=".xlsx,.xls"
+            />
+          </div>
+
+          <div class="bloc-import-excel">
+            <label for="fichier-sectorisation-enfant">
+              Sectorisation enfant
+            </label>
+            <input
+              id="fichier-sectorisation-enfant"
+              type="file"
+              accept=".xlsx,.xls"
+            />
+          </div>
+        </div>
+
+        <p id="message-import-excel" class="message-import-excel">
+          Import obligatoire : chargez les 3 fichiers pour débloquer le
+          démarrage de session.
+        </p>
+
+        <ul id="liste-fichiers-excel" class="liste-fichiers-excel"></ul>
+      </section>
+
       <section class="zone-demarrage-session" aria-labelledby="start-title">
         <h2 id="start-title">Démarrage de session</h2>
         <p>
           Indiquez l'agent qui traite les documents et la date de tampon à
-          utiliser.
+          utiliser après avoir importé les fichiers de sectorisation.
         </p>
 
         <form
@@ -53,12 +101,18 @@
               type="text"
               autocomplete="off"
               placeholder="Exemple : RDS"
+              disabled
             />
           </div>
 
           <div class="champ-formulaire">
             <label for="champ-date-tampon">Date de tampon</label>
-            <input id="champ-date-tampon" name="tamponDate" type="date" />
+            <input
+              id="champ-date-tampon"
+              name="tamponDate"
+              type="date"
+              disabled
+            />
           </div>
 
           <p
@@ -67,7 +121,7 @@
             aria-live="polite"
           ></p>
 
-          <button class="bouton-demarrer-session" type="submit">
+          <button class="bouton-demarrer-session" type="submit" disabled>
             Démarrer la session
           </button>
         </form>
@@ -93,15 +147,6 @@
             Documents dans le lot : <span id="nombre-documents-session">0</span>
           </p>
         </article>
-      </section>
-
-      <section class="zone-excel" aria-labelledby="excel-title">
-        <h2 id="excel-title">Données de sectorisation</h2>
-        <p>
-          Les données utilisées par PILOTE sont préparées localement à partir
-          des fichiers Excel de sectorisation.
-        </p>
-        <ul id="liste-fichiers-excel" class="liste-fichiers-excel"></ul>
       </section>
 
       <section

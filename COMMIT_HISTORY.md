@@ -1,8 +1,8 @@
 # Historique des commits
 
-Ce fichier détaille les principaux changements apportés au projet PILOTE.
+Ce fichier résume les changements importants du projet PILOTE.
 
-Il sert à comprendre rapidement ce que chaque commit a ajouté, sans devoir lire tout le code ou parcourir l'historique Git ligne par ligne.
+Il sert à comprendre rapidement ce que chaque étape a ajouté, sans devoir relire tout le code ou parcourir l'historique Git.
 
 ## 5054eb9 - Set up project structure
 
@@ -10,30 +10,23 @@ Date : 2026-06-20
 
 Objectif : créer le socle initial du projet.
 
-Modifications principales :
-
 - création de l'arborescence de base ;
 - ajout des dossiers `assets`, `data`, `sessions` et `exports` ;
-- ajout des fichiers `index.html`, `style.css`, `app.js` et `README.md` ;
-- création d'une page d'accueil simple pour PILOTE ;
-- ajout d'un emplacement initial pour le logo ;
-- ajout d'un message indiquant que les données restent locales ;
-- préparation d'une zone destinée au futur démarrage de session.
+- ajout de `index.html`, `style.css`, `app.js` et `README.md` ;
+- page d'accueil simple pour PILOTE ;
+- message indiquant que les données restent locales ;
+- zone prévue pour le futur démarrage de session.
 
 ## 6ca60b9 - App base: Add favicon and logos
 
 Date : 2026-06-21
 
-Objectif : intégrer les premiers éléments visuels officiels de PILOTE.
+Objectif : intégrer les premiers éléments visuels officiels.
 
-Modifications principales :
-
-- ajout du favicon dans `assets/favicon.png` ;
-- ajout du logo d'en-tête dans `assets/logo-header.png` ;
+- ajout du favicon ;
+- ajout du logo d'en-tête ;
 - déclaration du favicon dans `index.html` ;
-- remplacement de l'ancien emplacement de logo par le vrai logo PILOTE ;
-- ajustement du style pour afficher correctement le logo long dans l'en-tête ;
-- conservation d'un titre accessible pour les lecteurs d'écran.
+- affichage du logo long PILOTE dans l'en-tête.
 
 ## 0532b3b - App base: Make style names easier to read
 
@@ -41,332 +34,202 @@ Date : 2026-06-21
 
 Objectif : rendre le HTML et le CSS plus faciles à comprendre.
 
-Modifications principales :
-
-- remplacement des noms de classes trop techniques par des noms explicites en français ;
-- renommage des variables CSS avec des noms plus lisibles ;
-- clarification de la structure visuelle de la page ;
-- conservation du même rendu visuel, sans ajout de fonctionnalité.
-
-Exemples de noms rendus plus clairs :
-
-- `page-principale` ;
-- `bloc-presentation` ;
-- `logo-pilote` ;
-- `message-confidentialite` ;
-- `zone-demarrage-session`.
+- noms de classes plus explicites ;
+- variables CSS plus lisibles ;
+- structure visuelle clarifiée.
 
 ## eacddf6 - App base: Clarify start screen wording
 
 Date : 2026-06-21
 
-Objectif : améliorer le texte affiché dans la zone de démarrage.
+Objectif : clarifier le texte affiché dans la zone de démarrage.
 
-Modifications principales :
-
-- remplacement d'une phrase trop floue sur la "session de travail" ;
-- ajout d'une formulation plus claire pour les agents ;
-- précision sur les deux informations attendues au démarrage : l'agent et la date de tampon.
+- phrase de démarrage simplifiée ;
+- précision sur l'agent et la date de tampon attendus.
 
 ## c26a0f9 - App base: Add session start screen
 
 Date : 2026-06-21
 
-Objectif : ajouter le vrai écran de démarrage de session.
+Objectif : ajouter l'écran de démarrage de session.
 
-Modifications principales :
-
-- ajout d'un formulaire de démarrage ;
-- ajout du champ "Initiales ou nom court de l'agent" ;
-- ajout du champ "Date de tampon" ;
-- ajout du bouton "Démarrer la session" ;
-- validation du formulaire avant démarrage ;
-- affichage d'un message d'erreur si l'agent est vide ;
-- affichage d'un message d'erreur si la date est vide ;
-- conversion automatique de l'agent en majuscules ;
-- remplacement des espaces par des tirets dans le nom de l'agent ;
-- génération automatique du nom de session au format `YYYY-MM-DD_AGENT` ;
-- création de l'objet JavaScript `currentSession` ;
-- stockage en mémoire de l'agent, de la date, du nom de session et de la date réelle de création ;
-- masquage du formulaire après création ;
-- affichage d'une carte récapitulative avec l'agent, la date de tampon et le nom de session.
-
-Limites volontaires de ce commit :
-
-- aucune sauvegarde JSON ;
-- aucun stockage `localStorage` ;
-- aucun ajout de document ;
-- aucune lecture Excel ;
-- aucun export.
+- formulaire agent/date ;
+- validation des champs obligatoires ;
+- génération du nom de session `YYYY-MM-DD_AGENT` ;
+- création de l'objet `currentSession` ;
+- affichage d'une carte récapitulative après démarrage.
 
 ## 9104bfc - App base: Add data model helpers
 
 Date : 2026-06-21
 
-Objectif : préparer le modèle JavaScript interne pour les futurs documents.
-
-Modifications principales :
+Objectif : préparer le modèle JavaScript interne.
 
 - ajout du tableau `documents` dans `currentSession` ;
-- ajout des constantes `PUBLIC_TYPES`, `DOCUMENT_TYPES` et `SECTORIZATION_STATUS` ;
-- ajout de la fonction `generateDocumentId()` ;
-- ajout de la fonction `createDocument()` ;
-- ajout de la fonction `addDocumentToSession()` ;
-- ajout d'un compteur simple indiquant le nombre de documents dans le lot.
-
-Limites volontaires de ce commit :
-
-- aucun formulaire complet d'ajout de document ;
-- aucune lecture Excel ;
-- aucun import PDF ;
-- aucune sauvegarde.
+- ajout des constantes de public, type de document et statut de sectorisation ;
+- fonctions de création de documents ;
+- compteur de documents.
 
 ## cd7a5c2 - Docs: Add detailed commit history
 
 Date : 2026-06-21
 
-Objectif : ajouter un journal de développement plus détaillé que l'historique Git brut.
+Objectif : documenter les étapes de développement.
 
-Modifications principales :
-
-- création du fichier `COMMIT_HISTORY.md` ;
-- description des commits déjà réalisés ;
-- ajout des objectifs, modifications principales et limites utiles pour chaque étape.
+- création de `COMMIT_HISTORY.md` ;
+- résumé des commits déjà réalisés.
 
 ## 6bd3407 - Data: Organize sectorization spreadsheets
 
 Date : 2026-06-23
 
-Objectif : ranger les fichiers Excel de sectorisation dans le dossier prévu pour les données.
-
-Modifications principales :
+Objectif : ranger les fichiers Excel de sectorisation.
 
 - ajout de `data/sectorisation_adulte.xlsx` ;
 - ajout de `data/sectorisation_enfant.xlsx` ;
 - ajout de `data/sectorisation_pch.xlsx` ;
-- renommage des fichiers avec des noms courts et stables.
-
-Limites volontaires de ce commit :
-
-- aucune lecture Excel ;
-- aucune validation des colonnes ;
-- aucune sectorisation automatique.
+- noms de fichiers courts et stables.
 
 ## 25f0211 - Documents: Add document form
 
 Date : 2026-06-23
 
-Objectif : ajouter le formulaire d'ajout de document après le démarrage de session.
+Objectif : ajouter le formulaire d'ajout de document.
 
-Modifications principales :
-
-- ajout du champ "Nom MultiGest" ;
-- ajout du champ "Public" ;
-- ajout du champ "Type de document" ;
-- ajout de la case "PCH uniquement" ;
-- ajout du champ "Ville" ;
-- ajout du champ "École / GEVASCO" ;
-- ajout de la case "Hors département" ;
-- affichage de la zone documents uniquement après démarrage d'une session ;
-- ajout des documents dans `currentSession.documents` ;
-- mise à jour du compteur de documents.
-
-Limites volontaires de ce commit :
-
-- aucune liste détaillée des documents ;
-- aucun import PDF ;
-- aucune attribution d'instructrice ;
-- aucune lecture Excel.
+- champ Nom MultiGest ;
+- public ;
+- type de document ;
+- PCH uniquement ;
+- ville ;
+- école / GEVASCO ;
+- hors département ;
+- ajout dans `currentSession.documents`.
 
 ## ae67cac - Documents: Show document list
 
 Date : 2026-06-23
 
-Objectif : afficher les documents ajoutés dans le lot.
+Objectif : afficher les documents ajoutés.
 
-Modifications principales :
-
-- ajout de la liste des documents ;
-- ajout d'un message quand aucun document n'est présent ;
-- ajout de l'icône `assets/empty-icon.svg` pour indiquer qu'aucun PDF n'est associé ;
-- affichage du nom MultiGest ;
-- affichage du public ;
-- affichage du type de document ;
-- affichage de la ville ;
-- affichage des informations optionnelles : PCH, École / GEVASCO, hors département.
-
-Limites volontaires de ce commit :
-
-- aucun vrai PDF associé ;
-- aucune miniature PDF ;
-- aucune modification ou suppression.
+- liste des documents ;
+- message de liste vide ;
+- icône PDF vide ;
+- affichage des informations saisies.
 
 ## 94af452 - Documents: Add edit and delete actions
 
 Date : 2026-06-23
 
-Objectif : permettre la modification et la suppression des documents du lot.
+Objectif : permettre la modification et la suppression.
 
-Modifications principales :
-
-- ajout du bouton "Modifier" sur chaque document ;
-- remplissage du formulaire avec les données du document à modifier ;
-- ajout d'un mode "Enregistrer les modifications" ;
-- ajout d'un bouton pour annuler la modification ;
-- ajout du bouton "Supprimer" sur chaque document ;
-- ajout d'une confirmation avant suppression ;
-- mise à jour de la liste et du compteur après modification ou suppression.
-
-Limites volontaires de ce commit :
-
-- aucune sauvegarde persistante ;
-- aucune gestion PDF ;
-- aucune sectorisation ;
-- aucune statistique complète.
+- bouton Modifier ;
+- remplissage du formulaire en mode modification ;
+- bouton Annuler la modification ;
+- bouton Supprimer ;
+- confirmation avant suppression.
 
 ## 7a45c14 - Excel: Add local SheetJS library
 
 Date : 2026-06-23
 
-Objectif : intégrer SheetJS localement pour préparer la lecture des fichiers Excel.
+Objectif : intégrer SheetJS localement.
 
-Modifications principales :
-
-- ajout du fichier `vendor/xlsx.full.min.js` ;
-- chargement de SheetJS avant `app.js` ;
-- ajout d'une vérification JavaScript indiquant si SheetJS n'est pas disponible ;
-- correction du libellé agent en "Initiales ou nom de l'agent".
-
-Limites volontaires de ce commit :
-
-- aucune lecture de fichier Excel ;
-- aucune validation de colonnes ;
-- aucune attribution d'instructrice.
+- ajout de `libs/xlsx.full.min.js` ;
+- ajout de la licence SheetJS ;
+- ajout de `libs/README.md` pour expliquer le rôle des fichiers externes ;
+- préparation de la lecture Excel sans dépendance distante.
 
 ## bd20460 - Excel: Load sectorization workbooks
 
 Date : 2026-06-23
 
-Objectif : charger dynamiquement les fichiers Excel de sectorisation depuis le dossier `data`.
+Objectif : tester le chargement dynamique des fichiers Excel depuis `data`.
 
-Modifications principales :
+- configuration des fichiers attendus ;
+- première lecture des classeurs de sectorisation ;
+- affichage de statuts dans l'interface.
 
-- ajout d'une configuration des fichiers Excel attendus ;
-- chargement de `data/sectorisation_adulte.xlsx` ;
-- chargement de `data/sectorisation_pch.xlsx` ;
-- chargement de `data/sectorisation_enfant.xlsx` ;
-- préparation de `data/statistiques.xlsx` comme fichier optionnel ;
-- extraction des feuilles de chaque classeur ;
-- ajout d'un affichage de statut dans l'interface.
-
-Limites volontaires de ce commit :
-
-- `statistiques.xlsx` n'est pas encore fourni ;
-- aucune validation fine des colonnes ;
-- aucune suggestion de saisie ;
-- aucune attribution automatique.
+Limite ensuite remplacée : cette approche demandait un serveur local avec certains navigateurs.
 
 ## 13389ef - Excel: Validate workbook columns
 
 Date : 2026-06-23
 
-Objectif : valider que les fichiers Excel contiennent les colonnes nécessaires.
+Objectif : valider les colonnes nécessaires.
 
-Modifications principales :
-
-- détection des lignes d'en-têtes même si elles ne sont pas en première ligne ;
-- validation des colonnes adulte ;
-- validation des colonnes PCH ;
-- validation des colonnes enfant ;
-- normalisation des textes d'en-têtes pour tolérer accents, espaces et retours à la ligne ;
-- extraction des lignes utilisables ;
-- exclusion des lignes vides et des en-têtes répétés.
-
-Limites volontaires de ce commit :
-
-- aucune recherche floue avancée ;
-- aucune interface de correction manuelle des colonnes.
+- détection des lignes d'en-tête ;
+- validation des colonnes adulte, PCH et enfant ;
+- normalisation des textes ;
+- extraction des lignes utilisables.
 
 ## 8bf6cc7 - Excel: Add city and school suggestions
 
 Date : 2026-06-23
 
-Objectif : utiliser les fichiers Excel pour proposer les villes et écoles connues pendant la saisie.
+Objectif : proposer des villes et écoles pendant la saisie.
 
-Modifications principales :
-
-- extraction des villes depuis les fichiers adulte, PCH et enfant ;
-- extraction des écoles depuis le fichier enfant ;
-- ajout des suggestions sur le champ "Ville" ;
-- ajout des suggestions sur le champ "École / GEVASCO" ;
-- normalisation des valeurs pour tolérer accents, apostrophes, tirets et espaces.
-
-Limites volontaires de ce commit :
-
-- suggestions natives du navigateur uniquement ;
-- aucune recherche proche avancée ;
-- aucune sélection manuelle de correction.
+- suggestions de villes depuis les fichiers Excel ;
+- suggestions d'écoles / GEVASCO depuis la sectorisation enfant ;
+- tolérance sur accents, apostrophes, tirets et espaces.
 
 ## 5547ffd - Excel: Add instructor lookup
 
 Date : 2026-06-23
 
-Objectif : déduire une instructrice à partir des données Excel chargées.
+Objectif : déduire l'instructrice à partir des données Excel.
 
-Modifications principales :
-
-- recherche de l'instructrice PCH par ville ;
-- recherche de l'instructrice adulte par ville ;
-- recherche de l'instructrice enfant par école quand elle est renseignée ;
-- recherche de secours enfant par ville quand la correspondance est claire ;
-- gestion des dossiers hors département en statut "à vérifier" ;
-- affichage de l'instructrice dans la carte document ;
-- statut "Non trouvée" quand aucune correspondance n'est disponible.
-
-Limites volontaires de ce commit :
-
-- aucune recherche approximative avancée ;
-- aucune modification manuelle de l'instructrice ;
-- aucune statistique par instructrice ;
-- aucune sauvegarde persistante.
+- recherche adulte par ville ;
+- recherche PCH par ville ;
+- recherche enfant par école puis par ville ;
+- statut "À vérifier" pour les cas ambigus ou hors département ;
+- affichage de l'instructrice dans la carte document.
 
 ## e12885c - Data: Convert sectorization workbooks to JSON
 
 Date : 2026-06-23
 
-Objectif : préparer les données de sectorisation dans un format lisible sans serveur local.
+Objectif : essayer une solution sans serveur avec données converties.
 
-Modifications principales :
-
-- ajout du script `scripts/convert-sectorization-data.js` ;
-- conversion des fichiers Excel du dossier `data` ;
+- script de conversion Excel vers JSON/JS ;
 - génération de `data/sectorisation-data.json` ;
-- génération de `data/sectorisation-data.js` pour chargement direct dans le navigateur ;
-- conservation des noms de fichiers Excel sources dans les données générées ;
-- conservation des lignes utiles adulte, PCH et enfant.
+- génération de `data/sectorisation-data.js`.
 
-Intérêt :
-
-- l'application peut utiliser les données de sectorisation sans `fetch()` ;
-- l'ouverture directe de `index.html` reste possible ;
-- aucun serveur local n'est nécessaire pour lire les données converties.
+Limite ensuite remplacée : il fallait régénérer les fichiers quand les Excel changeaient.
 
 ## 7fa6165 - Excel: Use converted sectorization data
 
 Date : 2026-06-23
 
-Objectif : faire utiliser à PILOTE les données converties plutôt que les fichiers Excel au runtime.
+Objectif : utiliser les données converties dans PILOTE.
 
-Modifications principales :
+- chargement de `data/sectorisation-data.js` ;
+- suppression de la lecture Excel automatique au runtime ;
+- conservation des suggestions et de l'attribution automatique.
 
-- remplacement du chargement runtime de SheetJS par `data/sectorisation-data.js` ;
-- suppression de la lecture Excel par `fetch()` dans `app.js` ;
-- lecture directe de `window.PILOTE_SECTORIZATION_DATA` ;
-- conservation des suggestions ville / école ;
-- conservation de l'attribution automatique de l'instructrice ;
-- mise à jour du texte d'interface pour parler de données préparées localement.
+Limite ensuite remplacée : cette solution ajoutait des fichiers générés peu pratiques à maintenir.
+
+## Excel: Require manual sectorization import
+
+Date : 2026-06-24
+
+Objectif : remplacer les données générées par un import manuel des Excel.
+
+- suppression du chargement de `data/sectorisation-data.js` ;
+- suppression de `data/sectorisation-data.js` et `data/sectorisation-data.json` ;
+- suppression du script `scripts/convert-sectorization-data.js` ;
+- chargement de SheetJS dans `index.html` ;
+- zone d'import très visible pour les 3 fichiers Excel de sectorisation ;
+- bouton "Démarrer la session" bloqué tant que les 3 fichiers ne sont pas validés ;
+- champs agent et date bloqués tant que les 3 fichiers ne sont pas validés ;
+- lecture des fichiers choisis par l'agent avec `FileReader` ;
+- conservation de la validation des colonnes ;
+- conservation des suggestions de villes et d'écoles / GEVASCO ;
+- conservation de l'attribution automatique de l'instructrice.
 
 Limites volontaires :
 
-- les fichiers JSON doivent être régénérés si les fichiers Excel changent ;
-- pas encore d'écran dédié pour régénérer les données depuis l'application.
+- pas de serveur local ;
+- pas de conversion JSON ;
+- pas de sauvegarde persistante ;
+- pas d'import PDF ;
+- pas de statistiques.

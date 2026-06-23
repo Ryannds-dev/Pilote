@@ -21,23 +21,28 @@ const SECTORIZATION_STATUS = {
 const EXCEL_FILES = {
   ADULT: {
     label: "Sectorisation adulte",
-    path: "data/sectorisation_adulte.xlsx",
-    convertedSourceKey: "adult"
+    inputId: "fichier-sectorisation-adulte",
+    requiredColumns: {
+      city: ["commune"],
+      instructor: ["assistant de gestion"]
+    }
   },
   PCH: {
     label: "Sectorisation PCH",
-    path: "data/sectorisation_pch.xlsx",
-    convertedSourceKey: "pch"
+    inputId: "fichier-sectorisation-pch",
+    requiredColumns: {
+      city: ["commune"],
+      instructor: ["instructeur pch"]
+    }
   },
   CHILD: {
     label: "Sectorisation enfant",
-    path: "data/sectorisation_enfant.xlsx",
-    convertedSourceKey: "child"
-  },
-  STATISTICS: {
-    label: "Statistiques",
-    path: "data/statistiques.xlsx",
-    optional: true
+    inputId: "fichier-sectorisation-enfant",
+    requiredColumns: {
+      school: ["nom"],
+      city: ["commune"],
+      instructor: ["instructrice enfant"]
+    }
   }
 };
 
@@ -57,8 +62,7 @@ const excelData = {
   references: {
     cities: [],
     schools: []
-  },
-  errors: []
+  }
 };
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -69,74 +73,253 @@ document.addEventListener("DOMContentLoaded", () => {
   formulaireDemarrage.addEventListener("submit", handleSessionStart);
   formulaireDocument.addEventListener("submit", handleDocumentSubmit);
   cancelEditButton.addEventListener("click", cancelDocumentEdition);
-  loadConvertedSectorizationData();
+
+  prepareExcelImportArea();
 });
 
-function loadConvertedSectorizationData() {
-  renderExcelFileStatuses();
+function prepareExcelImportArea() {
+  Object.entries(EXCEL_FILES).forEach(([fileKey, fileConfig]) => {
+    excelData.files[fileKey] = {
+      ...fileConfig,
+      status: "waiting",
+      sourceFileName: "",
+      selectedSheetName: "",
+      usableRows: [],
+      errors: []
+    };
 
-  if (!window.PILOTE_SECTORIZATION_DATA?.sources) {
-    markAllExcelFilesAsUnavailable("Données de sectorisation converties indisponibles.");
+    const fileInput = document.getElementById(fileConfig.inputId);
+
+    fileInput.addEventListener("change", () => {
+      handleExcelFileSelection(fileKey, fileInput.files[0]);
+    });
+  });
+
+  renderExcelFileStatuses();
+  updateSessionStartAvailability();
+}
+
+function handleExcelFileSelection(fileKey, selectedFile) {
+  if (!selectedFile) {
+    resetExcelFileState(fileKey);
     return;
   }
 
-  loadConvertedSource("ADULT");
-  loadConvertedSource("PCH");
-  loadConvertedSource("CHILD");
-  markOptionalStatisticsFile();
+  excelData.files[fileKey].status = "loading";
+  excelData.files[fileKey].sourceFileName = selectedFile.name;
+  excelData.files[fileKey].errors = [];
+  renderExcelFileStatuses();
+  updateSessionStartAvailability();
+
+  const fileReader = new FileReader();
+
+  fileReader.onload = (event) => {
+    try {
+      readExcelWorkbook(fileKey, event.target.result, selectedFile.name);
+      buildExcelReferences();
+      renderExcelSuggestions();
+    } catch (error) {
+      setExcelFileError(fileKey, selectedFile.name, error.message);
+    }
+
+    renderExcelFileStatuses();
+    updateSessionStartAvailability();
+  };
+
+  fileReader.onerror = () => {
+    setExcelFileError(fileKey, selectedFile.name, "lecture du fichier impossible");
+    renderExcelFileStatuses();
+    updateSessionStartAvailability();
+  };
+
+  fileReader.readAsArrayBuffer(selectedFile);
+}
+
+function resetExcelFileState(fileKey) {
+  excelData.files[fileKey] = {
+    ...excelData.files[fileKey],
+    status: "waiting",
+    sourceFileName: "",
+    selectedSheetName: "",
+    usableRows: [],
+    errors: []
+  };
 
   buildExcelReferences();
   renderExcelSuggestions();
   renderExcelFileStatuses();
+  updateSessionStartAvailability();
 }
 
-function loadConvertedSource(fileKey) {
-  const fileConfig = EXCEL_FILES[fileKey];
-  const convertedSource = window.PILOTE_SECTORIZATION_DATA.sources[fileConfig.convertedSourceKey];
+function readExcelWorkbook(fileKey, fileContent, sourceFileName) {
+  if (!window.XLSX) {
+    throw new Error("bibliothèque SheetJS indisponible");
+  }
 
-  if (!convertedSource) {
-    excelData.files[fileKey] = {
-      ...fileConfig,
-      status: "error",
-      usableRows: [],
-      errors: ["données converties introuvables"]
+  const workbook = XLSX.read(fileContent, { type: "array" });
+  const sheets = workbook.SheetNames.map((sheetName) => {
+    const worksheet = workbook.Sheets[sheetName];
+
+    return {
+      name: sheetName,
+      rows: XLSX.utils.sheet_to_json(worksheet, {
+        header: 1,
+        defval: "",
+        blankrows: false
+      })
     };
+  });
 
-    return;
+  const sheetValidation = findValidSheet(
+    sheets,
+    EXCEL_FILES[fileKey].requiredColumns
+  );
+
+  if (!sheetValidation) {
+    throw new Error("colonnes attendues introuvables");
   }
 
   excelData.files[fileKey] = {
-    ...fileConfig,
+    ...excelData.files[fileKey],
     status: "validated",
-    sourceFileName: convertedSource.sourceFileName,
-    selectedSheetName: convertedSource.selectedSheetName,
-    usableRows: convertedSource.rows || [],
+    sourceFileName,
+    selectedSheetName: sheetValidation.sheetName,
+    usableRows: sheetValidation.usableRows,
     errors: []
   };
 }
 
-function markOptionalStatisticsFile() {
-  const fileConfig = EXCEL_FILES.STATISTICS;
+function findValidSheet(sheets, requiredColumns) {
+  for (const sheet of sheets) {
+    const sheetValidation = validateSheetRows(sheet, requiredColumns);
 
-  excelData.files.STATISTICS = {
-    ...fileConfig,
-    status: "missing_optional",
-    usableRows: [],
-    errors: ["fichier optionnel absent"]
-  };
+    if (sheetValidation) {
+      return {
+        ...sheetValidation,
+        sheetName: sheet.name
+      };
+    }
+  }
+
+  return null;
 }
 
-function markAllExcelFilesAsUnavailable(message) {
-  Object.entries(EXCEL_FILES).forEach(([fileKey, fileConfig]) => {
-    excelData.files[fileKey] = {
-      ...fileConfig,
-      status: "error",
-      usableRows: [],
-      errors: [message]
-    };
+function validateSheetRows(sheet, requiredColumns) {
+  for (let rowIndex = 0; rowIndex < sheet.rows.length; rowIndex += 1) {
+    const headerRow = sheet.rows[rowIndex];
+    const columnMap = findExpectedColumns(headerRow, requiredColumns);
+
+    if (columnMap) {
+      return {
+        usableRows: buildUsableRows(sheet.rows.slice(rowIndex + 1), columnMap)
+      };
+    }
+  }
+
+  return null;
+}
+
+function findExpectedColumns(headerRow, requiredColumns) {
+  const columnMap = {};
+
+  for (const [fieldName, acceptedHeaders] of Object.entries(requiredColumns)) {
+    const columnIndex = headerRow.findIndex((headerCell) => {
+      return acceptedHeaders.some((acceptedHeader) => {
+        return normalizeExcelText(headerCell) === normalizeExcelText(acceptedHeader);
+      });
+    });
+
+    if (columnIndex === -1) {
+      return null;
+    }
+
+    columnMap[fieldName] = columnIndex;
+  }
+
+  return columnMap;
+}
+
+function buildUsableRows(rows, columnMap) {
+  return rows
+    .map((row) => {
+      return buildUsableRow(row, columnMap);
+    })
+    .filter(isUsableRow);
+}
+
+function buildUsableRow(row, columnMap) {
+  const usableRow = {};
+
+  Object.entries(columnMap).forEach(([fieldName, columnIndex]) => {
+    usableRow[fieldName] = String(row[columnIndex] || "").trim();
   });
 
-  renderExcelFileStatuses();
+  return usableRow;
+}
+
+function isUsableRow(row) {
+  const hasContent = Object.values(row).some((value) => value !== "");
+
+  if (!hasContent) {
+    return false;
+  }
+
+  if (normalizeExcelText(row.city) === "commune") {
+    return false;
+  }
+
+  if (normalizeExcelText(row.instructor).includes("instructeur")) {
+    return false;
+  }
+
+  if (normalizeExcelText(row.instructor) === "assistant de gestion") {
+    return false;
+  }
+
+  return true;
+}
+
+function setExcelFileError(fileKey, sourceFileName, message) {
+  excelData.files[fileKey] = {
+    ...excelData.files[fileKey],
+    status: "error",
+    sourceFileName,
+    selectedSheetName: "",
+    usableRows: [],
+    errors: [message]
+  };
+
+  buildExcelReferences();
+  renderExcelSuggestions();
+}
+
+function areRequiredExcelFilesReady() {
+  return Object.values(excelData.files).every((fileState) => {
+    return fileState.status === "validated";
+  });
+}
+
+function updateSessionStartAvailability() {
+  const startButton = document.querySelector(".bouton-demarrer-session");
+  const agentInput = document.getElementById("champ-agent");
+  const tamponDateInput = document.getElementById("champ-date-tampon");
+  const excelMessage = document.getElementById("message-import-excel");
+  const ready = areRequiredExcelFilesReady();
+
+  startButton.disabled = !ready;
+  agentInput.disabled = !ready;
+  tamponDateInput.disabled = !ready;
+
+  if (ready) {
+    excelMessage.textContent =
+      "Import terminé : vous pouvez démarrer une session.";
+    excelMessage.className = "message-import-excel message-import-excel-ok";
+    return;
+  }
+
+  excelMessage.textContent =
+    "Import obligatoire : chargez les 3 fichiers pour débloquer le démarrage de session.";
+  excelMessage.className = "message-import-excel message-import-excel-attente";
 }
 
 function renderExcelFileStatuses() {
@@ -153,11 +336,11 @@ function renderExcelFileStatuses() {
     const statusItem = document.createElement("li");
     const fileName = document.createElement("strong");
     const fileMessage = document.createElement("span");
-    const status = fileState?.status || "pending";
+    const status = fileState?.status || "waiting";
 
     statusItem.className = `statut-fichier-excel ${getExcelStatusClass(status)}`;
     fileName.textContent = fileConfig.label;
-    fileMessage.textContent = getExcelStatusMessage(fileState, fileConfig);
+    fileMessage.textContent = getExcelStatusMessage(fileState);
 
     statusItem.appendChild(fileName);
     statusItem.appendChild(fileMessage);
@@ -166,35 +349,35 @@ function renderExcelFileStatuses() {
 }
 
 function getExcelStatusClass(status) {
-  if (status === "loaded" || status === "validated") {
+  if (status === "validated") {
     return "ok";
   }
 
-  if (status === "missing_optional") {
-    return "warning";
+  if (status === "loading") {
+    return "loading";
   }
 
   if (status === "error") {
     return "error";
   }
 
-  return "";
+  return "waiting";
 }
 
-function getExcelStatusMessage(fileState, fileConfig) {
-  if (!fileState) {
-    return "En attente de chargement.";
+function getExcelStatusMessage(fileState) {
+  if (!fileState || fileState.status === "waiting") {
+    return "Fichier à importer.";
+  }
+
+  if (fileState.status === "loading") {
+    return `Lecture en cours : ${fileState.sourceFileName}.`;
   }
 
   if (fileState.status === "validated") {
-    return `${fileState.usableRows.length} ligne(s) utilisable(s), source ${fileState.sourceFileName}.`;
+    return `${fileState.usableRows.length} ligne(s) utilisable(s), fichier ${fileState.sourceFileName}.`;
   }
 
-  if (fileState.status === "missing_optional") {
-    return `Fichier optionnel absent : ${fileConfig.path}.`;
-  }
-
-  return `Chargement impossible : ${fileState.errors.join(", ")}.`;
+  return `Import impossible : ${fileState.errors.join(", ")}.`;
 }
 
 function buildExcelReferences() {
@@ -314,6 +497,10 @@ function handleSessionStart(event) {
 }
 
 function validateStartForm(agentValue, tamponDateValue) {
+  if (!areRequiredExcelFilesReady()) {
+    return "Veuillez importer les fichiers de sectorisation avant de démarrer.";
+  }
+
   if (!agentValue.trim()) {
     return "Veuillez indiquer les initiales ou le nom court de l'agent.";
   }
