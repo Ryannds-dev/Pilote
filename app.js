@@ -21,42 +21,23 @@ const SECTORIZATION_STATUS = {
 const EXCEL_FILES = {
   ADULT: {
     label: "Sectorisation adulte",
-    path: "data/sectorisation_adulte.xlsx"
+    path: "data/sectorisation_adulte.xlsx",
+    convertedSourceKey: "adult"
   },
   PCH: {
     label: "Sectorisation PCH",
-    path: "data/sectorisation_pch.xlsx"
+    path: "data/sectorisation_pch.xlsx",
+    convertedSourceKey: "pch"
   },
   CHILD: {
     label: "Sectorisation enfant",
-    path: "data/sectorisation_enfant.xlsx"
+    path: "data/sectorisation_enfant.xlsx",
+    convertedSourceKey: "child"
   },
   STATISTICS: {
     label: "Statistiques",
     path: "data/statistiques.xlsx",
     optional: true
-  }
-};
-
-const EXCEL_VALIDATION_RULES = {
-  ADULT: {
-    requiredColumns: {
-      city: ["commune"],
-      instructor: ["assistant de gestion"]
-    }
-  },
-  PCH: {
-    requiredColumns: {
-      city: ["commune"],
-      instructor: ["instructeur pch"]
-    }
-  },
-  CHILD: {
-    requiredColumns: {
-      school: ["nom"],
-      city: ["commune"],
-      instructor: ["instructrice enfant"]
-    }
   }
 };
 
@@ -81,8 +62,6 @@ const excelData = {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-  checkExcelLibraryAvailability();
-
   const formulaireDemarrage = document.getElementById("formulaire-demarrage-session");
   const formulaireDocument = document.getElementById("formulaire-document");
   const cancelEditButton = document.getElementById("bouton-annuler-modification");
@@ -90,82 +69,61 @@ document.addEventListener("DOMContentLoaded", () => {
   formulaireDemarrage.addEventListener("submit", handleSessionStart);
   formulaireDocument.addEventListener("submit", handleDocumentSubmit);
   cancelEditButton.addEventListener("click", cancelDocumentEdition);
-  loadExcelFiles();
+  loadConvertedSectorizationData();
 });
 
-function checkExcelLibraryAvailability() {
-  if (!window.XLSX) {
-    console.error("SheetJS n'est pas chargé. La lecture des fichiers Excel est indisponible.");
-  }
-}
-
-async function loadExcelFiles() {
+function loadConvertedSectorizationData() {
   renderExcelFileStatuses();
 
-  if (!window.XLSX) {
-    markAllExcelFilesAsUnavailable("SheetJS n'est pas chargé.");
+  if (!window.PILOTE_SECTORIZATION_DATA?.sources) {
+    markAllExcelFilesAsUnavailable("Données de sectorisation converties indisponibles.");
     return;
   }
 
-  const excelFileConfigs = Object.entries(EXCEL_FILES);
-
-  for (const [fileKey, fileConfig] of excelFileConfigs) {
-    await loadExcelFile(fileKey, fileConfig);
-    renderExcelFileStatuses();
-  }
+  loadConvertedSource("ADULT");
+  loadConvertedSource("PCH");
+  loadConvertedSource("CHILD");
+  markOptionalStatisticsFile();
 
   buildExcelReferences();
   renderExcelSuggestions();
+  renderExcelFileStatuses();
 }
 
-async function loadExcelFile(fileKey, fileConfig) {
-  try {
-    const response = await fetch(fileConfig.path);
+function loadConvertedSource(fileKey) {
+  const fileConfig = EXCEL_FILES[fileKey];
+  const convertedSource = window.PILOTE_SECTORIZATION_DATA.sources[fileConfig.convertedSourceKey];
 
-    if (!response.ok) {
-      throw new Error("fichier introuvable");
-    }
-
-    const fileContent = await response.arrayBuffer();
-    const workbook = XLSX.read(fileContent, { type: "array" });
-
+  if (!convertedSource) {
     excelData.files[fileKey] = {
       ...fileConfig,
-      status: "loaded",
-      workbook,
-      sheets: extractWorkbookSheets(workbook),
+      status: "error",
       usableRows: [],
-      columnMap: {},
-      errors: []
+      errors: ["données converties introuvables"]
     };
 
-    validateExcelFile(fileKey);
-  } catch (error) {
-    excelData.files[fileKey] = {
-      ...fileConfig,
-      status: fileConfig.optional ? "missing_optional" : "error",
-      workbook: null,
-      sheets: [],
-      usableRows: [],
-      columnMap: {},
-      errors: [error.message]
-    };
+    return;
   }
+
+  excelData.files[fileKey] = {
+    ...fileConfig,
+    status: "validated",
+    sourceFileName: convertedSource.sourceFileName,
+    selectedSheetName: convertedSource.selectedSheetName,
+    usableRows: convertedSource.rows || [],
+    errors: []
+  };
 }
 
-function extractWorkbookSheets(workbook) {
-  return workbook.SheetNames.map((sheetName) => {
-    const worksheet = workbook.Sheets[sheetName];
+function markOptionalStatisticsFile() {
+  const fileConfig = EXCEL_FILES.STATISTICS;
 
-    return {
-      name: sheetName,
-      rows: XLSX.utils.sheet_to_json(worksheet, {
-        header: 1,
-        defval: "",
-        blankrows: false
-      })
-    };
-  });
+  excelData.files.STATISTICS = {
+    ...fileConfig,
+    status: "missing_optional",
+    usableRows: [],
+    errors: ["fichier optionnel absent"]
+  };
 }
 
 function markAllExcelFilesAsUnavailable(message) {
@@ -173,10 +131,7 @@ function markAllExcelFilesAsUnavailable(message) {
     excelData.files[fileKey] = {
       ...fileConfig,
       status: "error",
-      workbook: null,
-      sheets: [],
       usableRows: [],
-      columnMap: {},
       errors: [message]
     };
   });
@@ -231,12 +186,8 @@ function getExcelStatusMessage(fileState, fileConfig) {
     return "En attente de chargement.";
   }
 
-  if (fileState.status === "loaded") {
-    return `${fileState.sheets.length} feuille(s) chargée(s) depuis ${fileConfig.path}.`;
-  }
-
   if (fileState.status === "validated") {
-    return `${fileState.usableRows.length} ligne(s) utilisable(s) dans ${fileConfig.path}.`;
+    return `${fileState.usableRows.length} ligne(s) utilisable(s), source ${fileState.sourceFileName}.`;
   }
 
   if (fileState.status === "missing_optional") {
@@ -244,28 +195,6 @@ function getExcelStatusMessage(fileState, fileConfig) {
   }
 
   return `Chargement impossible : ${fileState.errors.join(", ")}.`;
-}
-
-function validateExcelFile(fileKey) {
-  const fileState = excelData.files[fileKey];
-  const validationRule = EXCEL_VALIDATION_RULES[fileKey];
-
-  if (!fileState || !validationRule) {
-    return;
-  }
-
-  const sheetValidation = findValidSheet(fileState.sheets, validationRule);
-
-  if (!sheetValidation) {
-    fileState.status = "error";
-    fileState.errors = ["colonnes attendues introuvables"];
-    return;
-  }
-
-  fileState.status = "validated";
-  fileState.selectedSheetName = sheetValidation.sheetName;
-  fileState.columnMap = sheetValidation.columnMap;
-  fileState.usableRows = sheetValidation.usableRows;
 }
 
 function buildExcelReferences() {
@@ -346,99 +275,6 @@ function renderDatalistOptions(datalistId, references) {
     option.value = reference.label;
     datalist.appendChild(option);
   });
-}
-
-function findValidSheet(sheets, validationRule) {
-  for (const sheet of sheets) {
-    const sheetValidation = validateSheetRows(sheet, validationRule);
-
-    if (sheetValidation) {
-      return {
-        ...sheetValidation,
-        sheetName: sheet.name
-      };
-    }
-  }
-
-  return null;
-}
-
-function validateSheetRows(sheet, validationRule) {
-  for (let rowIndex = 0; rowIndex < sheet.rows.length; rowIndex += 1) {
-    const headerRow = sheet.rows[rowIndex];
-    const columnMap = findExpectedColumns(headerRow, validationRule.requiredColumns);
-
-    if (columnMap) {
-      return {
-        columnMap,
-        usableRows: buildUsableRows(sheet.rows.slice(rowIndex + 1), columnMap)
-      };
-    }
-  }
-
-  return null;
-}
-
-function findExpectedColumns(headerRow, requiredColumns) {
-  const columnMap = {};
-
-  for (const [fieldName, acceptedHeaders] of Object.entries(requiredColumns)) {
-    const columnIndex = headerRow.findIndex((headerCell) => {
-      return acceptedHeaders.some((acceptedHeader) => {
-        return normalizeExcelText(headerCell) === normalizeExcelText(acceptedHeader);
-      });
-    });
-
-    if (columnIndex === -1) {
-      return null;
-    }
-
-    columnMap[fieldName] = columnIndex;
-  }
-
-  return columnMap;
-}
-
-function buildUsableRows(rows, columnMap) {
-  return rows
-    .map((row) => {
-      return buildUsableRow(row, columnMap);
-    })
-    .filter((row) => {
-      return isUsableExcelRow(row);
-    });
-}
-
-function buildUsableRow(row, columnMap) {
-  const usableRow = {};
-
-  Object.entries(columnMap).forEach(([fieldName, columnIndex]) => {
-    usableRow[fieldName] = String(row[columnIndex] || "").trim();
-  });
-
-  return usableRow;
-}
-
-function isUsableExcelRow(row) {
-  const hasContent = Object.values(row).some((value) => value !== "");
-
-  if (!hasContent) {
-    return false;
-  }
-
-  if (normalizeExcelText(row.city) === "commune") {
-    return false;
-  }
-
-  if (normalizeExcelText(row.instructor).includes("instructeur")) {
-    return false;
-  }
-
-  if (normalizeExcelText(row.instructor) === "assistant de gestion") {
-    return false;
-  }
-
-  return true;
 }
 
 function normalizeExcelText(value) {

@@ -6,7 +6,7 @@
     <title>PILOTE - Outil local de sectorisation</title>
     <link rel="icon" type="image/png" href="assets/favicon.png" />
     <link rel="stylesheet" href="style.css" />
-    <script src="vendor/xlsx.full.min.js" defer></script>
+    <script src="data/sectorisation-data.js" defer></script>
     <script src="app.js" defer></script>
   </head>
   <body>
@@ -96,10 +96,10 @@
       </section>
 
       <section class="zone-excel" aria-labelledby="excel-title">
-        <h2 id="excel-title">Fichiers Excel</h2>
+        <h2 id="excel-title">Données de sectorisation</h2>
         <p>
-          Les fichiers de sectorisation sont chargés depuis le dossier local
-          <code>data</code>.
+          Les données utilisées par PILOTE sont préparées localement à partir
+          des fichiers Excel de sectorisation.
         </p>
         <ul id="liste-fichiers-excel" class="liste-fichiers-excel"></ul>
       </section>
