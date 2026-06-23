@@ -38,6 +38,28 @@ const EXCEL_FILES = {
   }
 };
 
+const EXCEL_VALIDATION_RULES = {
+  ADULT: {
+    requiredColumns: {
+      city: ["commune"],
+      instructor: ["assistant de gestion"]
+    }
+  },
+  PCH: {
+    requiredColumns: {
+      city: ["commune"],
+      instructor: ["instructeur pch"]
+    }
+  },
+  CHILD: {
+    requiredColumns: {
+      school: ["nom"],
+      city: ["commune"],
+      instructor: ["instructrice enfant"]
+    }
+  }
+};
+
 const currentSession = {
   agent: "",
   tamponDate: "",
@@ -105,14 +127,20 @@ async function loadExcelFile(fileKey, fileConfig) {
       status: "loaded",
       workbook,
       sheets: extractWorkbookSheets(workbook),
+      usableRows: [],
+      columnMap: {},
       errors: []
     };
+
+    validateExcelFile(fileKey);
   } catch (error) {
     excelData.files[fileKey] = {
       ...fileConfig,
       status: fileConfig.optional ? "missing_optional" : "error",
       workbook: null,
       sheets: [],
+      usableRows: [],
+      columnMap: {},
       errors: [error.message]
     };
   }
@@ -140,6 +168,8 @@ function markAllExcelFilesAsUnavailable(message) {
       status: "error",
       workbook: null,
       sheets: [],
+      usableRows: [],
+      columnMap: {},
       errors: [message]
     };
   });
@@ -174,7 +204,7 @@ function renderExcelFileStatuses() {
 }
 
 function getExcelStatusClass(status) {
-  if (status === "loaded") {
+  if (status === "loaded" || status === "validated") {
     return "ok";
   }
 
@@ -198,11 +228,139 @@ function getExcelStatusMessage(fileState, fileConfig) {
     return `${fileState.sheets.length} feuille(s) chargée(s) depuis ${fileConfig.path}.`;
   }
 
+  if (fileState.status === "validated") {
+    return `${fileState.usableRows.length} ligne(s) utilisable(s) dans ${fileConfig.path}.`;
+  }
+
   if (fileState.status === "missing_optional") {
     return `Fichier optionnel absent : ${fileConfig.path}.`;
   }
 
   return `Chargement impossible : ${fileState.errors.join(", ")}.`;
+}
+
+function validateExcelFile(fileKey) {
+  const fileState = excelData.files[fileKey];
+  const validationRule = EXCEL_VALIDATION_RULES[fileKey];
+
+  if (!fileState || !validationRule) {
+    return;
+  }
+
+  const sheetValidation = findValidSheet(fileState.sheets, validationRule);
+
+  if (!sheetValidation) {
+    fileState.status = "error";
+    fileState.errors = ["colonnes attendues introuvables"];
+    return;
+  }
+
+  fileState.status = "validated";
+  fileState.selectedSheetName = sheetValidation.sheetName;
+  fileState.columnMap = sheetValidation.columnMap;
+  fileState.usableRows = sheetValidation.usableRows;
+}
+
+function findValidSheet(sheets, validationRule) {
+  for (const sheet of sheets) {
+    const sheetValidation = validateSheetRows(sheet, validationRule);
+
+    if (sheetValidation) {
+      return {
+        ...sheetValidation,
+        sheetName: sheet.name
+      };
+    }
+  }
+
+  return null;
+}
+
+function validateSheetRows(sheet, validationRule) {
+  for (let rowIndex = 0; rowIndex < sheet.rows.length; rowIndex += 1) {
+    const headerRow = sheet.rows[rowIndex];
+    const columnMap = findExpectedColumns(headerRow, validationRule.requiredColumns);
+
+    if (columnMap) {
+      return {
+        columnMap,
+        usableRows: buildUsableRows(sheet.rows.slice(rowIndex + 1), columnMap)
+      };
+    }
+  }
+
+  return null;
+}
+
+function findExpectedColumns(headerRow, requiredColumns) {
+  const columnMap = {};
+
+  for (const [fieldName, acceptedHeaders] of Object.entries(requiredColumns)) {
+    const columnIndex = headerRow.findIndex((headerCell) => {
+      return acceptedHeaders.some((acceptedHeader) => {
+        return normalizeExcelText(headerCell) === normalizeExcelText(acceptedHeader);
+      });
+    });
+
+    if (columnIndex === -1) {
+      return null;
+    }
+
+    columnMap[fieldName] = columnIndex;
+  }
+
+  return columnMap;
+}
+
+function buildUsableRows(rows, columnMap) {
+  return rows
+    .map((row) => {
+      return buildUsableRow(row, columnMap);
+    })
+    .filter((row) => {
+      return isUsableExcelRow(row);
+    });
+}
+
+function buildUsableRow(row, columnMap) {
+  const usableRow = {};
+
+  Object.entries(columnMap).forEach(([fieldName, columnIndex]) => {
+    usableRow[fieldName] = String(row[columnIndex] || "").trim();
+  });
+
+  return usableRow;
+}
+
+function isUsableExcelRow(row) {
+  const hasContent = Object.values(row).some((value) => value !== "");
+
+  if (!hasContent) {
+    return false;
+  }
+
+  if (normalizeExcelText(row.city) === "commune") {
+    return false;
+  }
+
+  if (normalizeExcelText(row.instructor).includes("instructeur")) {
+    return false;
+  }
+
+  if (normalizeExcelText(row.instructor) === "assistant de gestion") {
+    return false;
+  }
+
+  return true;
+}
+
+function normalizeExcelText(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
 }
 
 function handleSessionStart(event) {
