@@ -30,6 +30,8 @@ let documentIdCounter = 0;
 let editedDocumentId = "";
 
 document.addEventListener("DOMContentLoaded", () => {
+  checkExcelLibraryAvailability();
+
   const formulaireDemarrage = document.getElementById("formulaire-demarrage-session");
   const formulaireDocument = document.getElementById("formulaire-document");
   const cancelEditButton = document.getElementById("bouton-annuler-modification");
@@ -38,6 +40,12 @@ document.addEventListener("DOMContentLoaded", () => {
   formulaireDocument.addEventListener("submit", handleDocumentSubmit);
   cancelEditButton.addEventListener("click", cancelDocumentEdition);
 });
+
+function checkExcelLibraryAvailability() {
+  if (!window.XLSX) {
+    console.error("SheetJS n'est pas chargé. La lecture des fichiers Excel est indisponible.");
+  }
+}
 
 function handleSessionStart(event) {
   event.preventDefault();
