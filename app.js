@@ -73,6 +73,10 @@ let editedDocumentId = "";
 
 const excelData = {
   files: {},
+  references: {
+    cities: [],
+    schools: []
+  },
   errors: []
 };
 
@@ -109,6 +113,9 @@ async function loadExcelFiles() {
     await loadExcelFile(fileKey, fileConfig);
     renderExcelFileStatuses();
   }
+
+  buildExcelReferences();
+  renderExcelSuggestions();
 }
 
 async function loadExcelFile(fileKey, fileConfig) {
@@ -261,6 +268,86 @@ function validateExcelFile(fileKey) {
   fileState.usableRows = sheetValidation.usableRows;
 }
 
+function buildExcelReferences() {
+  const cityMap = new Map();
+  const schoolMap = new Map();
+
+  addCityReferences(cityMap, "ADULT");
+  addCityReferences(cityMap, "PCH");
+  addCityReferences(cityMap, "CHILD");
+  addSchoolReferences(schoolMap, "CHILD");
+
+  excelData.references.cities = [...cityMap.values()].sort(compareReferenceLabels);
+  excelData.references.schools = [...schoolMap.values()].sort(compareReferenceLabels);
+}
+
+function addCityReferences(cityMap, fileKey) {
+  const fileState = excelData.files[fileKey];
+
+  if (!fileState?.usableRows) {
+    return;
+  }
+
+  fileState.usableRows.forEach((row) => {
+    addReference(cityMap, row.city);
+  });
+}
+
+function addSchoolReferences(schoolMap, fileKey) {
+  const fileState = excelData.files[fileKey];
+
+  if (!fileState?.usableRows) {
+    return;
+  }
+
+  fileState.usableRows.forEach((row) => {
+    addReference(schoolMap, row.school);
+  });
+}
+
+function addReference(referenceMap, label) {
+  const cleanLabel = String(label || "").trim();
+
+  if (!cleanLabel) {
+    return;
+  }
+
+  const normalizedLabel = normalizeExcelText(cleanLabel);
+
+  if (!referenceMap.has(normalizedLabel)) {
+    referenceMap.set(normalizedLabel, {
+      label: cleanLabel,
+      normalizedLabel
+    });
+  }
+}
+
+function compareReferenceLabels(firstReference, secondReference) {
+  return firstReference.label.localeCompare(secondReference.label, "fr");
+}
+
+function renderExcelSuggestions() {
+  renderDatalistOptions("suggestions-villes", excelData.references.cities);
+  renderDatalistOptions("suggestions-ecoles-gevasco", excelData.references.schools);
+}
+
+function renderDatalistOptions(datalistId, references) {
+  const datalist = document.getElementById(datalistId);
+
+  if (!datalist) {
+    return;
+  }
+
+  datalist.innerHTML = "";
+
+  references.forEach((reference) => {
+    const option = document.createElement("option");
+
+    option.value = reference.label;
+    datalist.appendChild(option);
+  });
+}
+
 function findValidSheet(sheets, validationRule) {
   for (const sheet of sheets) {
     const sheetValidation = validateSheetRows(sheet, validationRule);
@@ -358,6 +445,8 @@ function normalizeExcelText(value) {
   return String(value || "")
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
+    .replace(/['’`´-]/g, " ")
+    .replace(/[^a-zA-Z0-9]+/g, " ")
     .replace(/\s+/g, " ")
     .trim()
     .toLowerCase();
