@@ -261,6 +261,58 @@ h1 {
   font-weight: 700;
 }
 
+.zone-excel {
+  margin-top: 28px;
+  padding: 32px;
+  background: var(--blanc);
+}
+
+.zone-excel h2 {
+  margin-bottom: 10px;
+  font-size: 1.25rem;
+}
+
+.zone-excel p {
+  margin-bottom: 18px;
+  color: var(--gris-secondaire);
+  line-height: 1.6;
+}
+
+.liste-fichiers-excel {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.statut-fichier-excel {
+  padding: 12px 14px;
+  border-left: 4px solid var(--gris-bordure);
+  background: var(--gris-fond-page);
+}
+
+.statut-fichier-excel strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.statut-fichier-excel span {
+  color: var(--gris-secondaire);
+}
+
+.statut-fichier-excel.ok {
+  border-left-color: #267a3e;
+}
+
+.statut-fichier-excel.warning {
+  border-left-color: #b36b00;
+}
+
+.statut-fichier-excel.error {
+  border-left-color: var(--rouge-pilote);
+}
+
 .zone-documents {
   margin-top: 28px;
   padding: 32px;
@@ -409,6 +461,10 @@ h1 {
   }
 
   .zone-documents {
+    padding: 24px;
+  }
+
+  .zone-excel {
     padding: 24px;
   }
 

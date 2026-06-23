@@ -18,6 +18,26 @@ const SECTORIZATION_STATUS = {
   MANUAL: "manual"
 };
 
+const EXCEL_FILES = {
+  ADULT: {
+    label: "Sectorisation adulte",
+    path: "data/sectorisation_adulte.xlsx"
+  },
+  PCH: {
+    label: "Sectorisation PCH",
+    path: "data/sectorisation_pch.xlsx"
+  },
+  CHILD: {
+    label: "Sectorisation enfant",
+    path: "data/sectorisation_enfant.xlsx"
+  },
+  STATISTICS: {
+    label: "Statistiques",
+    path: "data/statistiques.xlsx",
+    optional: true
+  }
+};
+
 const currentSession = {
   agent: "",
   tamponDate: "",
@@ -29,6 +49,11 @@ const currentSession = {
 let documentIdCounter = 0;
 let editedDocumentId = "";
 
+const excelData = {
+  files: {},
+  errors: []
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   checkExcelLibraryAvailability();
 
@@ -39,12 +64,145 @@ document.addEventListener("DOMContentLoaded", () => {
   formulaireDemarrage.addEventListener("submit", handleSessionStart);
   formulaireDocument.addEventListener("submit", handleDocumentSubmit);
   cancelEditButton.addEventListener("click", cancelDocumentEdition);
+  loadExcelFiles();
 });
 
 function checkExcelLibraryAvailability() {
   if (!window.XLSX) {
     console.error("SheetJS n'est pas chargé. La lecture des fichiers Excel est indisponible.");
   }
+}
+
+async function loadExcelFiles() {
+  renderExcelFileStatuses();
+
+  if (!window.XLSX) {
+    markAllExcelFilesAsUnavailable("SheetJS n'est pas chargé.");
+    return;
+  }
+
+  const excelFileConfigs = Object.entries(EXCEL_FILES);
+
+  for (const [fileKey, fileConfig] of excelFileConfigs) {
+    await loadExcelFile(fileKey, fileConfig);
+    renderExcelFileStatuses();
+  }
+}
+
+async function loadExcelFile(fileKey, fileConfig) {
+  try {
+    const response = await fetch(fileConfig.path);
+
+    if (!response.ok) {
+      throw new Error("fichier introuvable");
+    }
+
+    const fileContent = await response.arrayBuffer();
+    const workbook = XLSX.read(fileContent, { type: "array" });
+
+    excelData.files[fileKey] = {
+      ...fileConfig,
+      status: "loaded",
+      workbook,
+      sheets: extractWorkbookSheets(workbook),
+      errors: []
+    };
+  } catch (error) {
+    excelData.files[fileKey] = {
+      ...fileConfig,
+      status: fileConfig.optional ? "missing_optional" : "error",
+      workbook: null,
+      sheets: [],
+      errors: [error.message]
+    };
+  }
+}
+
+function extractWorkbookSheets(workbook) {
+  return workbook.SheetNames.map((sheetName) => {
+    const worksheet = workbook.Sheets[sheetName];
+
+    return {
+      name: sheetName,
+      rows: XLSX.utils.sheet_to_json(worksheet, {
+        header: 1,
+        defval: "",
+        blankrows: false
+      })
+    };
+  });
+}
+
+function markAllExcelFilesAsUnavailable(message) {
+  Object.entries(EXCEL_FILES).forEach(([fileKey, fileConfig]) => {
+    excelData.files[fileKey] = {
+      ...fileConfig,
+      status: "error",
+      workbook: null,
+      sheets: [],
+      errors: [message]
+    };
+  });
+
+  renderExcelFileStatuses();
+}
+
+function renderExcelFileStatuses() {
+  const excelFileList = document.getElementById("liste-fichiers-excel");
+
+  if (!excelFileList) {
+    return;
+  }
+
+  excelFileList.innerHTML = "";
+
+  Object.entries(EXCEL_FILES).forEach(([fileKey, fileConfig]) => {
+    const fileState = excelData.files[fileKey];
+    const statusItem = document.createElement("li");
+    const fileName = document.createElement("strong");
+    const fileMessage = document.createElement("span");
+    const status = fileState?.status || "pending";
+
+    statusItem.className = `statut-fichier-excel ${getExcelStatusClass(status)}`;
+    fileName.textContent = fileConfig.label;
+    fileMessage.textContent = getExcelStatusMessage(fileState, fileConfig);
+
+    statusItem.appendChild(fileName);
+    statusItem.appendChild(fileMessage);
+    excelFileList.appendChild(statusItem);
+  });
+}
+
+function getExcelStatusClass(status) {
+  if (status === "loaded") {
+    return "ok";
+  }
+
+  if (status === "missing_optional") {
+    return "warning";
+  }
+
+  if (status === "error") {
+    return "error";
+  }
+
+  return "";
+}
+
+function getExcelStatusMessage(fileState, fileConfig) {
+  if (!fileState) {
+    return "En attente de chargement.";
+  }
+
+  if (fileState.status === "loaded") {
+    return `${fileState.sheets.length} feuille(s) chargée(s) depuis ${fileConfig.path}.`;
+  }
+
+  if (fileState.status === "missing_optional") {
+    return `Fichier optionnel absent : ${fileConfig.path}.`;
+  }
+
+  return `Chargement impossible : ${fileState.errors.join(", ")}.`;
 }
 
 function handleSessionStart(event) {
