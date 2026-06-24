@@ -267,3 +267,13 @@ Objectif : rendre les suggestions de villes et d'écoles plus tolérantes pendan
 - meilleure prise en compte des saisies en majuscules ;
 - meilleure prise en compte des tirets remplacés par des espaces ;
 - conservation de la comparaison normalisée pour l'attribution d'instructrice.
+
+## Excel: Match child schools with city
+
+Date : 2026-06-24
+
+Objectif : fiabiliser l'attribution enfant quand plusieurs écoles portent le même nom.
+
+- croisement de l'école / GEVASCO avec la ville saisie ;
+- attribution à partir des lignes qui correspondent à la fois à l'école et à la ville ;
+- conservation du repli par ville si l'école ne donne pas de résultat clair.

@@ -707,7 +707,10 @@ function findInstructorForDocument(documentData) {
 
 function findChildInstructor(documentData) {
   if (documentData.gevascoSchoolOrCity) {
-    const schoolResult = findInstructorBySchool(documentData.gevascoSchoolOrCity);
+    const schoolResult = findInstructorBySchool(
+      documentData.gevascoSchoolOrCity,
+      documentData.city
+    );
 
     if (schoolResult.status === SECTORIZATION_STATUS.FOUND) {
       return schoolResult;
@@ -717,8 +720,17 @@ function findChildInstructor(documentData) {
   return findInstructorByCity("CHILD", documentData.city);
 }
 
-function findInstructorBySchool(schoolName) {
+function findInstructorBySchool(schoolName, cityName) {
   const matchingRows = findRowsByNormalizedValue("CHILD", "school", schoolName);
+  const matchingRowsInCity = filterRowsByNormalizedValue(
+    matchingRows,
+    "city",
+    cityName
+  );
+
+  if (matchingRowsInCity.length > 0) {
+    return buildInstructorResultFromRows("CHILD", matchingRowsInCity);
+  }
 
   return buildInstructorResultFromRows("CHILD", matchingRows);
 }
@@ -738,6 +750,18 @@ function findRowsByNormalizedValue(fileKey, fieldName, value) {
   }
 
   return fileState.usableRows.filter((row) => {
+    return normalizeExcelText(row[fieldName]) === normalizedValue;
+  });
+}
+
+function filterRowsByNormalizedValue(rows, fieldName, value) {
+  const normalizedValue = normalizeExcelText(value);
+
+  if (!normalizedValue) {
+    return [];
+  }
+
+  return rows.filter((row) => {
     return normalizeExcelText(row[fieldName]) === normalizedValue;
   });
 }
