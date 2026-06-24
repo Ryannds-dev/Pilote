@@ -22,6 +22,8 @@ const EXCEL_FILES = {
   ADULT: {
     label: "Sectorisation adulte",
     inputId: "fichier-sectorisation-adulte",
+    invalidFileMessage:
+      "Ce fichier ne semble pas être la sectorisation adulte. Vérifiez le fichier sélectionné.",
     requiredColumns: {
       city: ["commune"],
       instructor: ["assistant de gestion"]
@@ -30,6 +32,8 @@ const EXCEL_FILES = {
   PCH: {
     label: "Sectorisation PCH",
     inputId: "fichier-sectorisation-pch",
+    invalidFileMessage:
+      "Ce fichier ne semble pas être la sectorisation PCH. Vérifiez le fichier sélectionné.",
     requiredColumns: {
       city: ["commune"],
       instructor: ["instructeur pch"]
@@ -38,6 +42,8 @@ const EXCEL_FILES = {
   CHILD: {
     label: "Sectorisation enfant",
     inputId: "fichier-sectorisation-enfant",
+    invalidFileMessage:
+      "Ce fichier ne semble pas être la sectorisation enfant. Vérifiez le fichier sélectionné.",
     requiredColumns: {
       school: ["nom"],
       city: ["commune"],
@@ -176,7 +182,7 @@ function readExcelWorkbook(fileKey, fileContent, sourceFileName) {
   );
 
   if (!sheetValidation) {
-    throw new Error("colonnes attendues introuvables");
+    throw new Error(EXCEL_FILES[fileKey].invalidFileMessage);
   }
 
   excelData.files[fileKey] = {

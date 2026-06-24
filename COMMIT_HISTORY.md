@@ -277,3 +277,14 @@ Objectif : fiabiliser l'attribution enfant quand plusieurs écoles portent le m�
 - croisement de l'école / GEVASCO avec la ville saisie ;
 - attribution à partir des lignes qui correspondent à la fois à l'école et à la ville ;
 - conservation du repli par ville si l'école ne donne pas de résultat clair.
+
+## Excel: Clarify wrong file imports
+
+Date : 2026-06-24
+
+Objectif : rendre les erreurs d'import Excel plus compréhensibles.
+
+- message dédié quand le fichier adulte ne correspond pas ;
+- message dédié quand le fichier PCH ne correspond pas ;
+- message dédié quand le fichier enfant ne correspond pas ;
+- suppression du message trop technique sur les colonnes introuvables.
