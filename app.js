@@ -445,6 +445,7 @@ function renderExcelSuggestions() {
 
 function renderDatalistOptions(datalistId, references) {
   const datalist = document.getElementById(datalistId);
+  const displayedSuggestions = new Set();
 
   if (!datalist) {
     return;
@@ -453,11 +454,28 @@ function renderDatalistOptions(datalistId, references) {
   datalist.innerHTML = "";
 
   references.forEach((reference) => {
-    const option = document.createElement("option");
-
-    option.value = reference.label;
-    datalist.appendChild(option);
+    addDatalistOption(datalist, displayedSuggestions, reference.label);
+    addDatalistOption(
+      datalist,
+      displayedSuggestions,
+      reference.normalizedLabel.toUpperCase()
+    );
   });
+}
+
+function addDatalistOption(datalist, displayedSuggestions, value) {
+  const cleanValue = String(value || "").trim();
+  const suggestionKey = cleanValue.toLowerCase();
+
+  if (!cleanValue || displayedSuggestions.has(suggestionKey)) {
+    return;
+  }
+
+  const option = document.createElement("option");
+
+  option.value = cleanValue;
+  datalist.appendChild(option);
+  displayedSuggestions.add(suggestionKey);
 }
 
 function normalizeExcelText(value) {

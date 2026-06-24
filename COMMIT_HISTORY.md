@@ -256,3 +256,14 @@ Limites volontaires :
 - pas d'écriture dans `statistiques.xlsx` ;
 - pas de graphique ;
 - pas de sauvegarde persistante.
+
+## Excel: Improve normalized suggestions
+
+Date : 2026-06-24
+
+Objectif : rendre les suggestions de villes et d'écoles plus tolérantes pendant la saisie.
+
+- ajout de variantes sans accents dans les suggestions ;
+- meilleure prise en compte des saisies en majuscules ;
+- meilleure prise en compte des tirets remplacés par des espaces ;
+- conservation de la comparaison normalisée pour l'attribution d'instructrice.
