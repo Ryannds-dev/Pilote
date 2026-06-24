@@ -535,6 +535,7 @@ function showSessionInformation(session) {
   document.getElementById("valeur-nom-session").textContent = session.sessionId;
   updateDocumentCounter();
   renderDocumentList();
+  updateStatisticsDisplay();
   document.getElementById("carte-session-creee").hidden = false;
   document.getElementById("zone-documents").hidden = false;
 }
@@ -591,6 +592,7 @@ function addDocumentToSession(documentData = {}) {
   currentSession.documents.push(document);
   updateDocumentCounter();
   renderDocumentList();
+  updateStatisticsDisplay();
 
   return document;
 }
@@ -770,6 +772,7 @@ function updateDocumentInSession(documentId, documentData) {
   };
 
   renderDocumentList();
+  updateStatisticsDisplay();
 }
 
 function deleteDocumentFromSession(documentId) {
@@ -799,6 +802,7 @@ function deleteDocumentFromSession(documentId) {
 
   updateDocumentCounter();
   renderDocumentList();
+  updateStatisticsDisplay();
 }
 
 function startDocumentEdition(documentId) {
@@ -853,6 +857,140 @@ function updateDocumentCounter() {
   }
 
   documentCounter.textContent = currentSession.documents.length;
+}
+
+function updateStatisticsDisplay() {
+  const statistics = calculateSessionStatistics();
+
+  updateStatisticValue("stat-total-documents", statistics.totalDocuments);
+  updateStatisticValue("stat-demandes", statistics.requests);
+  updateStatisticValue("stat-pieces", statistics.complementaryDocuments);
+  updateStatisticValue("stat-recours", statistics.appeals);
+  updateStatisticValue("stat-pch", statistics.pchDocuments);
+  updateStatisticValue("stat-hors-departement", statistics.outOfDepartmentDocuments);
+  renderInstructorStatistics(statistics.byInstructor);
+}
+
+function calculateSessionStatistics() {
+  const statistics = {
+    totalDocuments: currentSession.documents.length,
+    requests: 0,
+    complementaryDocuments: 0,
+    appeals: 0,
+    pchDocuments: 0,
+    outOfDepartmentDocuments: 0,
+    byInstructor: new Map()
+  };
+
+  currentSession.documents.forEach((documentItem) => {
+    updateDocumentTypeStatistics(statistics, documentItem);
+    updateSpecificCaseStatistics(statistics, documentItem);
+    updateInstructorStatistics(statistics.byInstructor, documentItem);
+  });
+
+  return statistics;
+}
+
+function updateDocumentTypeStatistics(statistics, documentItem) {
+  if (documentItem.documentType === DOCUMENT_TYPES.REQUEST) {
+    statistics.requests += 1;
+  }
+
+  if (documentItem.documentType === DOCUMENT_TYPES.COMPLEMENTARY) {
+    statistics.complementaryDocuments += 1;
+  }
+
+  if (documentItem.documentType === DOCUMENT_TYPES.APPEAL) {
+    statistics.appeals += 1;
+  }
+}
+
+function updateSpecificCaseStatistics(statistics, documentItem) {
+  if (documentItem.pchOnly) {
+    statistics.pchDocuments += 1;
+  }
+
+  if (documentItem.outOfDepartment) {
+    statistics.outOfDepartmentDocuments += 1;
+  }
+}
+
+function updateInstructorStatistics(instructorMap, documentItem) {
+  const instructorName = getInstructorStatisticName(documentItem);
+
+  if (!instructorMap.has(instructorName)) {
+    instructorMap.set(instructorName, 0);
+  }
+
+  instructorMap.set(instructorName, instructorMap.get(instructorName) + 1);
+}
+
+function getInstructorStatisticName(documentItem) {
+  if (documentItem.instructor) {
+    return documentItem.instructor;
+  }
+
+  if (documentItem.sectorizationStatus === SECTORIZATION_STATUS.WARNING) {
+    return "À vérifier";
+  }
+
+  return "Non trouvée";
+}
+
+function updateStatisticValue(elementId, value) {
+  const statisticElement = document.getElementById(elementId);
+
+  if (!statisticElement) {
+    return;
+  }
+
+  statisticElement.textContent = value;
+}
+
+function renderInstructorStatistics(instructorMap) {
+  const instructorStatisticsList = document.getElementById("liste-statistiques-instructrices");
+  const emptyMessage = document.getElementById("message-statistiques-instructrices-vide");
+
+  if (!instructorStatisticsList || !emptyMessage) {
+    return;
+  }
+
+  const instructorStatistics = [...instructorMap.entries()].sort(compareInstructorStatistics);
+
+  instructorStatisticsList.innerHTML = "";
+  emptyMessage.hidden = instructorStatistics.length > 0;
+
+  instructorStatistics.forEach(([instructorName, documentCount]) => {
+    instructorStatisticsList.appendChild(
+      createInstructorStatisticLine(instructorName, documentCount)
+    );
+  });
+}
+
+function compareInstructorStatistics(firstStatistic, secondStatistic) {
+  const [firstInstructorName, firstDocumentCount] = firstStatistic;
+  const [secondInstructorName, secondDocumentCount] = secondStatistic;
+
+  if (firstDocumentCount !== secondDocumentCount) {
+    return secondDocumentCount - firstDocumentCount;
+  }
+
+  return firstInstructorName.localeCompare(secondInstructorName, "fr");
+}
+
+function createInstructorStatisticLine(instructorName, documentCount) {
+  const statisticLine = document.createElement("div");
+  const instructorLabel = document.createElement("span");
+  const documentCountLabel = document.createElement("strong");
+
+  statisticLine.className = "ligne-statistique-instructrice";
+  instructorLabel.textContent = instructorName;
+  documentCountLabel.textContent = documentCount;
+
+  statisticLine.appendChild(instructorLabel);
+  statisticLine.appendChild(documentCountLabel);
+
+  return statisticLine;
 }
 
 function renderDocumentList() {

@@ -158,6 +158,59 @@
         <h2 id="documents-title">Documents du lot</h2>
 
         <section
+          class="zone-statistiques"
+          aria-labelledby="statistiques-title"
+        >
+          <h3 id="statistiques-title">Statistiques</h3>
+
+          <div class="grille-statistiques" aria-label="Statistiques du lot">
+            <article class="carte-statistique">
+              <span class="libelle-statistique">Total documents</span>
+              <strong id="stat-total-documents">0</strong>
+            </article>
+
+            <article class="carte-statistique">
+              <span class="libelle-statistique">Demandes</span>
+              <strong id="stat-demandes">0</strong>
+            </article>
+
+            <article class="carte-statistique">
+              <span class="libelle-statistique">Pièces</span>
+              <strong id="stat-pieces">0</strong>
+            </article>
+
+            <article class="carte-statistique">
+              <span class="libelle-statistique">Recours</span>
+              <strong id="stat-recours">0</strong>
+            </article>
+
+            <article class="carte-statistique">
+              <span class="libelle-statistique">PCH</span>
+              <strong id="stat-pch">0</strong>
+            </article>
+
+            <article class="carte-statistique">
+              <span class="libelle-statistique">Hors département</span>
+              <strong id="stat-hors-departement">0</strong>
+            </article>
+          </div>
+
+          <div class="bloc-statistiques-instructrices">
+            <h4>Par instructrice</h4>
+            <p
+              id="message-statistiques-instructrices-vide"
+              class="message-statistiques-vide"
+            >
+              Aucun document attribué pour le moment.
+            </p>
+            <div
+              id="liste-statistiques-instructrices"
+              class="liste-statistiques-instructrices"
+            ></div>
+          </div>
+        </section>
+
+        <section
           class="zone-ajout-document"
           aria-labelledby="ajout-document-title"
         >

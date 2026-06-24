@@ -24,6 +24,8 @@ Le formulaire de démarrage est bloqué tant que les 3 fichiers de sectorisation
 - Création d'une session de travail.
 - Ajout, modification et suppression de documents.
 - Attribution automatique d'une instructrice quand une correspondance claire est trouvée.
+- Statistiques en temps réel sur les documents du lot.
+- Comptage des documents par instructrice.
 - Affichage des documents ajoutés dans le lot.
 
 ## Structure
@@ -64,4 +66,4 @@ Le dossier `libs` contient SheetJS, utilisé pour lire les fichiers Excel.
 
 La licence officielle est conservée dans `libs/SheetJS-LICENSE.txt`.
 
-Les informations de source et les empreintes SHA-256 sont détaillées dans `libs/README.md`.
+Les informations utiles sur cette bibliothèque sont détaillées dans `libs/README.md`.

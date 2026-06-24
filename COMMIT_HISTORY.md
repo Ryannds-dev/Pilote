@@ -233,3 +233,26 @@ Limites volontaires :
 - pas de sauvegarde persistante ;
 - pas d'import PDF ;
 - pas de statistiques.
+
+## Stats: Add live and instructor statistics
+
+Date : 2026-06-24
+
+Objectif : afficher les statistiques de la session en temps réel.
+
+- ajout d'une zone "Statistiques" dans l'écran des documents ;
+- comptage du total des documents ;
+- comptage des demandes ;
+- comptage des pièces complémentaires ;
+- comptage des recours ;
+- comptage des documents PCH ;
+- comptage des documents hors département ;
+- comptage des documents par instructrice ;
+- mise à jour automatique après ajout, modification ou suppression d'un document.
+
+Limites volontaires :
+
+- pas d'export statistique ;
+- pas d'écriture dans `statistiques.xlsx` ;
+- pas de graphique ;
+- pas de sauvegarde persistante.
