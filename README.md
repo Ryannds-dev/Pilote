@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logo-header.png" alt="PILOTE" width="360">
+</p>
+
 # PILOTE
 
 PILOTE est un outil local d'aide à la sectorisation des documents numérisés pour une MDPH.
