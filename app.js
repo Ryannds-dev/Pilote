@@ -67,7 +67,8 @@ const excelData = {
   files: {},
   references: {
     cities: [],
-    schools: []
+    schools: [],
+    instructors: []
   }
 };
 
@@ -389,14 +390,19 @@ function getExcelStatusMessage(fileState) {
 function buildExcelReferences() {
   const cityMap = new Map();
   const schoolMap = new Map();
+  const instructorMap = new Map();
 
   addCityReferences(cityMap, "ADULT");
   addCityReferences(cityMap, "PCH");
   addCityReferences(cityMap, "CHILD");
   addSchoolReferences(schoolMap, "CHILD");
+  addInstructorReferences(instructorMap, "ADULT");
+  addInstructorReferences(instructorMap, "PCH");
+  addInstructorReferences(instructorMap, "CHILD");
 
   excelData.references.cities = [...cityMap.values()].sort(compareReferenceLabels);
   excelData.references.schools = [...schoolMap.values()].sort(compareReferenceLabels);
+  excelData.references.instructors = [...instructorMap.values()].sort(compareReferenceLabels);
 }
 
 function addCityReferences(cityMap, fileKey) {
@@ -420,6 +426,18 @@ function addSchoolReferences(schoolMap, fileKey) {
 
   fileState.usableRows.forEach((row) => {
     addReference(schoolMap, row.school);
+  });
+}
+
+function addInstructorReferences(instructorMap, fileKey) {
+  const fileState = excelData.files[fileKey];
+
+  if (!fileState?.usableRows) {
+    return;
+  }
+
+  fileState.usableRows.forEach((row) => {
+    addReference(instructorMap, row.instructor);
   });
 }
 
@@ -447,6 +465,7 @@ function compareReferenceLabels(firstReference, secondReference) {
 function renderExcelSuggestions() {
   renderDatalistOptions("suggestions-villes", excelData.references.cities);
   renderDatalistOptions("suggestions-ecoles-gevasco", excelData.references.schools);
+  renderDatalistOptions("suggestions-instructrices", excelData.references.instructors);
 }
 
 function renderDatalistOptions(datalistId, references) {
@@ -590,6 +609,7 @@ function createDocument(documentData = {}) {
     gevascoSchoolOrCity: "",
     outOfDepartment: false,
     instructor: "",
+    manualInstructor: "",
     sectorizationSource: "",
     sectorizationStatus: SECTORIZATION_STATUS.PENDING,
     pdfLoaded: false,
@@ -652,6 +672,7 @@ function getDocumentFormData() {
     pchOnly: document.getElementById("champ-pch").checked,
     city: document.getElementById("champ-ville").value.trim(),
     gevascoSchoolOrCity: document.getElementById("champ-gevasco").value.trim(),
+    manualInstructor: document.getElementById("champ-instructrice-manuelle").value.trim(),
     outOfDepartment: document.getElementById("champ-hors-departement").checked
   };
 }
@@ -681,6 +702,15 @@ function clearDocumentFormError() {
 }
 
 function applySectorizationToDocumentData(documentData) {
+  if (documentData.manualInstructor) {
+    return {
+      ...documentData,
+      instructor: documentData.manualInstructor,
+      sectorizationSource: "Correction manuelle",
+      sectorizationStatus: SECTORIZATION_STATUS.MANUAL
+    };
+  }
+
   const sectorizationResult = findInstructorForDocument(documentData);
 
   return {
@@ -692,8 +722,12 @@ function applySectorizationToDocumentData(documentData) {
 }
 
 function findInstructorForDocument(documentData) {
+  if (documentData.documentType === DOCUMENT_TYPES.APPEAL) {
+    return createSectorizationResult("", "Recours", SECTORIZATION_STATUS.WARNING);
+  }
+
   if (documentData.outOfDepartment) {
-    return createSectorizationResult("", "", SECTORIZATION_STATUS.WARNING);
+    return createSectorizationResult("", "Hors département", SECTORIZATION_STATUS.WARNING);
   }
 
   if (documentData.pchOnly) {
@@ -880,6 +914,8 @@ function fillDocumentForm(documentItem) {
   document.getElementById("champ-ville").value = documentItem.city;
   document.getElementById("champ-gevasco").value =
     documentItem.gevascoSchoolOrCity;
+  document.getElementById("champ-instructrice-manuelle").value =
+    documentItem.manualInstructor || "";
   document.getElementById("champ-hors-departement").checked =
     documentItem.outOfDepartment;
 }
@@ -1093,6 +1129,7 @@ function createDocumentCard(documentItem) {
   addDocumentDetail(documentDetails, `Type : ${formatDocumentType(documentItem.documentType)}`);
   addDocumentDetail(documentDetails, `Ville : ${documentItem.city || "Non renseignée"}`);
   addDocumentDetail(documentDetails, `Instructrice : ${formatInstructor(documentItem)}`);
+  addDocumentStatusDetail(documentDetails, documentItem);
 
   if (documentItem.gevascoSchoolOrCity) {
     addDocumentDetail(documentDetails, `École / GEVASCO : ${documentItem.gevascoSchoolOrCity}`);
@@ -1104,6 +1141,10 @@ function createDocumentCard(documentItem) {
 
   if (documentItem.outOfDepartment) {
     addDocumentDetail(documentDetails, "Hors département");
+  }
+
+  if (documentItem.sectorizationSource) {
+    addDocumentDetail(documentDetails, `Source : ${documentItem.sectorizationSource}`);
   }
 
   cardContent.appendChild(documentTitle);
@@ -1122,6 +1163,14 @@ function addDocumentDetail(documentDetails, text) {
 
   detail.className = "detail-document";
   detail.textContent = text;
+  documentDetails.appendChild(detail);
+}
+
+function addDocumentStatusDetail(documentDetails, documentItem) {
+  const detail = document.createElement("span");
+
+  detail.className = `detail-document statut-sectorisation ${getSectorizationStatusClass(documentItem)}`;
+  detail.textContent = formatSectorizationStatus(documentItem);
   documentDetails.appendChild(detail);
 }
 
@@ -1163,4 +1212,36 @@ function formatInstructor(documentItem) {
   }
 
   return "Non trouvée";
+}
+
+function formatSectorizationStatus(documentItem) {
+  if (documentItem.sectorizationStatus === SECTORIZATION_STATUS.FOUND) {
+    return "Statut : attribuée automatiquement";
+  }
+
+  if (documentItem.sectorizationStatus === SECTORIZATION_STATUS.MANUAL) {
+    return "Statut : correction manuelle";
+  }
+
+  if (documentItem.sectorizationStatus === SECTORIZATION_STATUS.WARNING) {
+    return "Statut : à vérifier";
+  }
+
+  return "Statut : non trouvée";
+}
+
+function getSectorizationStatusClass(documentItem) {
+  if (documentItem.sectorizationStatus === SECTORIZATION_STATUS.FOUND) {
+    return "statut-sectorisation-ok";
+  }
+
+  if (documentItem.sectorizationStatus === SECTORIZATION_STATUS.MANUAL) {
+    return "statut-sectorisation-manuel";
+  }
+
+  if (documentItem.sectorizationStatus === SECTORIZATION_STATUS.WARNING) {
+    return "statut-sectorisation-attention";
+  }
+
+  return "statut-sectorisation-vide";
 }

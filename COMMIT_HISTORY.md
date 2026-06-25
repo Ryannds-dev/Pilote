@@ -288,3 +288,23 @@ Objectif : rendre les erreurs d'import Excel plus compréhensibles.
 - message dédié quand le fichier PCH ne correspond pas ;
 - message dédié quand le fichier enfant ne correspond pas ;
 - suppression du message trop technique sur les colonnes introuvables.
+
+## Sectorization: Handle special cases
+
+Date : 2026-06-25
+
+Objectif : mieux gérer les cas particuliers de sectorisation dans la session.
+
+- ajout d'un champ de correction manuelle de l'instructrice ;
+- suggestions d'instructrices issues des fichiers Excel importés ;
+- priorité donnée à l'instructrice saisie manuellement quand elle est renseignée ;
+- affichage d'un statut de sectorisation sur chaque document ;
+- mise en évidence des documents à vérifier ;
+- gestion des recours en statut à vérifier ;
+- indication de la source de sectorisation dans la carte document.
+
+Limites volontaires :
+
+- pas de sauvegarde persistante de la correction manuelle ;
+- pas encore de filtre dédié aux documents à vérifier ;
+- pas de workflow de validation séparé.

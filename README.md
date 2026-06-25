@@ -20,10 +20,13 @@ Le formulaire de démarrage est bloqué tant que les 3 fichiers de sectorisation
 
 - Import manuel des fichiers Excel de sectorisation.
 - Validation des colonnes attendues dans les fichiers Excel.
-- Suggestions de villes et d'écoles / GEVASCO à partir des Excel importés.
+- Suggestions de villes, d'écoles / GEVASCO et d'instructrices à partir des Excel importés.
 - Création d'une session de travail.
 - Ajout, modification et suppression de documents.
 - Attribution automatique d'une instructrice quand une correspondance claire est trouvée.
+- Correction manuelle de l'instructrice si nécessaire.
+- Statut visible pour les documents attribués, à vérifier, non trouvés ou corrigés manuellement.
+- Gestion des recours en statut à vérifier.
 - Statistiques en temps réel sur les documents du lot.
 - Comptage des documents par instructrice.
 - Affichage des documents ajoutés dans le lot.

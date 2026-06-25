@@ -569,6 +569,30 @@ h1 {
   font-size: 0.92rem;
 }
 
+.statut-sectorisation {
+  font-weight: 700;
+}
+
+.statut-sectorisation-ok {
+  color: #18542a;
+  background: #edf8f0;
+}
+
+.statut-sectorisation-manuel {
+  color: #503600;
+  background: #fff3cf;
+}
+
+.statut-sectorisation-attention {
+  color: var(--rouge-pilote);
+  background: #fff3f5;
+}
+
+.statut-sectorisation-vide {
+  color: var(--gris-secondaire);
+  background: #eef0f3;
+}
+
 .actions-document {
   display: flex;
   flex-wrap: wrap;

@@ -36,8 +36,8 @@
       <section class="zone-excel" aria-labelledby="excel-title">
         <h2 id="excel-title">Fichiers de sectorisation</h2>
         <p>
-          Importez les fichiers Excel de sectorisation avant de commencer. PILOTE
-          les lit uniquement depuis ce poste et ne les envoie nulle part.
+          Importez les fichiers Excel de sectorisation avant de commencer.
+          PILOTE les lit uniquement depuis ce poste et ne les envoie nulle part.
         </p>
 
         <div class="liste-imports-excel">
@@ -157,10 +157,7 @@
       >
         <h2 id="documents-title">Documents du lot</h2>
 
-        <section
-          class="zone-statistiques"
-          aria-labelledby="statistiques-title"
-        >
+        <section class="zone-statistiques" aria-labelledby="statistiques-title">
           <h3 id="statistiques-title">Statistiques</h3>
 
           <div class="grille-statistiques" aria-label="Statistiques du lot">
@@ -273,6 +270,21 @@
                 placeholder="École ou ville GEVASCO si besoin"
               />
               <datalist id="suggestions-ecoles-gevasco"></datalist>
+            </div>
+
+            <div class="champ-formulaire">
+              <label for="champ-instructrice-manuelle">
+                Instructrice si correction manuelle
+              </label>
+              <input
+                id="champ-instructrice-manuelle"
+                name="manualInstructor"
+                type="text"
+                autocomplete="off"
+                list="suggestions-instructrices"
+                placeholder="À remplir seulement si besoin"
+              />
+              <datalist id="suggestions-instructrices"></datalist>
             </div>
 
             <div class="cases-formulaire">
