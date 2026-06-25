@@ -130,6 +130,54 @@ h1 {
   max-width: 520px;
 }
 
+.zone-reprise-session {
+  margin-top: 28px;
+  padding: 20px;
+  border: 1px solid var(--gris-bordure);
+  background: var(--gris-fond-page);
+}
+
+.zone-reprise-session h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 1rem;
+}
+
+.zone-reprise-session p {
+  margin-bottom: 14px;
+}
+
+.zone-reprise-session input {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 12px;
+  border: 1px solid var(--gris-bordure);
+  color: var(--gris-texte);
+  background: var(--blanc);
+  font: inherit;
+}
+
+.zone-reprise-session input:disabled {
+  color: #7b818a;
+  background: #f0f1f3;
+  cursor: not-allowed;
+}
+
+.message-import-session {
+  margin-top: 12px;
+  margin-bottom: 0;
+  color: var(--gris-secondaire);
+  font-weight: 700;
+}
+
+.message-import-session-ok {
+  color: #18542a;
+}
+
+.message-import-session-erreur {
+  color: var(--rouge-pilote);
+}
+
 .champ-formulaire {
   display: grid;
   gap: 8px;
@@ -180,7 +228,8 @@ h1 {
 .bouton-ajouter-document,
 .bouton-annuler-modification,
 .bouton-modifier-document,
-.bouton-supprimer-document {
+.bouton-supprimer-document,
+.bouton-sauvegarder-session {
   width: fit-content;
   min-height: 46px;
   padding: 12px 18px;
@@ -193,7 +242,8 @@ h1 {
 }
 
 .bouton-demarrer-session:disabled,
-.bouton-ajouter-document:disabled {
+.bouton-ajouter-document:disabled,
+.bouton-sauvegarder-session:disabled {
   color: #6f7580;
   background: #d9dde3;
   cursor: not-allowed;
@@ -210,7 +260,9 @@ h1 {
 .bouton-demarrer-session:not(:disabled):hover,
 .bouton-demarrer-session:not(:disabled):focus,
 .bouton-ajouter-document:not(:disabled):hover,
-.bouton-ajouter-document:not(:disabled):focus {
+.bouton-ajouter-document:not(:disabled):focus,
+.bouton-sauvegarder-session:not(:disabled):hover,
+.bouton-sauvegarder-session:not(:disabled):focus {
   background: #8f0f25;
 }
 
@@ -233,7 +285,8 @@ h1 {
 .bouton-ajouter-document:focus,
 .bouton-annuler-modification:focus,
 .bouton-modifier-document:focus,
-.bouton-supprimer-document:focus {
+.bouton-supprimer-document:focus,
+.bouton-sauvegarder-session:focus {
   outline: 3px solid #f7c8d1;
   outline-offset: 2px;
 }
@@ -396,6 +449,37 @@ h1 {
 .zone-documents h2 {
   margin-bottom: 24px;
   font-size: 1.25rem;
+}
+
+.zone-sauvegarde-session {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  align-items: start;
+  margin-bottom: 32px;
+  padding: 20px;
+  border: 1px solid var(--gris-bordure);
+  border-left: 6px solid var(--rouge-pilote);
+  background: var(--gris-fond-page);
+}
+
+.zone-sauvegarde-session h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+}
+
+.zone-sauvegarde-session p {
+  margin-bottom: 0;
+  color: var(--gris-secondaire);
+  line-height: 1.5;
+}
+
+.message-sauvegarde-session {
+  grid-column: 1 / -1;
+  min-height: 22px;
+  color: var(--gris-secondaire);
+  font-weight: 700;
 }
 
 .zone-statistiques {
@@ -686,8 +770,13 @@ h1 {
   .bouton-ajouter-document,
   .bouton-annuler-modification,
   .bouton-modifier-document,
-  .bouton-supprimer-document {
+  .bouton-supprimer-document,
+  .bouton-sauvegarder-session {
     width: 100%;
+  }
+
+  .zone-sauvegarde-session {
+    grid-template-columns: 1fr;
   }
 }
 

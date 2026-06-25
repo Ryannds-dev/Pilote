@@ -328,3 +328,32 @@ Limites volontaires :
 - pas encore d'export ZIP ;
 - pas encore de vérification globale avant export ;
 - les fichiers PDF restent en mémoire tant que la page est ouverte.
+
+## Save: Add manual JSON session backup
+
+Date : 2026-06-25
+
+Objectif : permettre à l'agent de sauvegarder et reprendre une session sans base de données.
+
+- ajout d'un bouton "Sauvegarder la session" ;
+- export d'un fichier JSON nommé avec l'identifiant de session ;
+- import d'une sauvegarde JSON PILOTE ;
+- restauration de l'agent, de la date de tampon, du nom de session et des documents ;
+- blocage de l'import JSON tant que les fichiers de sectorisation ne sont pas chargés ;
+- détection des clics de sauvegarde inutiles quand rien n'a changé depuis la dernière sauvegarde ;
+- message clair si la sauvegarde ne crée pas de nouveau fichier ;
+- confirmation avant de remplacer une session déjà ouverte.
+
+Points d'attention :
+
+- le bouton de sauvegarde reste utilisable pour rassurer l'agent, mais aucun nouveau fichier n'est téléchargé si la session n'a pas changé ;
+- le JSON ne peut pas contenir les fichiers PDF eux-mêmes ;
+- après rechargement, PILOTE affiche le nom du PDF connu et demande de le réassocier ;
+- cette sauvegarde est volontairement manuelle : pas de stockage caché dans le navigateur pour l'instant.
+
+Limites volontaires :
+
+- pas de sauvegarde automatique ;
+- pas d'export ZIP ;
+- pas d'export statistique ;
+- pas de restauration automatique des fichiers PDF.

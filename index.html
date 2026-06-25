@@ -126,6 +126,27 @@
           </button>
         </form>
 
+        <div class="zone-reprise-session">
+          <h3>Reprendre une session sauvegardée</h3>
+          <p>
+            Importez un fichier JSON PILOTE pour retrouver une session déjà
+            commencée.
+          </p>
+          <input
+            id="fichier-session-json"
+            type="file"
+            accept="application/json,.json"
+            disabled
+          />
+          <p
+            id="message-import-session"
+            class="message-import-session"
+            aria-live="polite"
+          >
+            Import disponible après les fichiers de sectorisation.
+          </p>
+        </div>
+
         <article id="carte-session-creee" class="carte-session-creee" hidden>
           <h3>Session créée</h3>
           <dl class="liste-informations-session">
@@ -156,6 +177,31 @@
         hidden
       >
         <h2 id="documents-title">Documents du lot</h2>
+
+        <section
+          class="zone-sauvegarde-session"
+          aria-labelledby="sauvegarde-session-title"
+        >
+          <div>
+            <h3 id="sauvegarde-session-title">Sauvegarde</h3>
+            <p>
+              Téléchargez un fichier JSON pour garder une copie de la session
+              en cours.
+            </p>
+          </div>
+          <button
+            id="bouton-sauvegarder-session"
+            class="bouton-sauvegarder-session"
+            type="button"
+          >
+            Sauvegarder la session
+          </button>
+          <p
+            id="message-sauvegarde-session"
+            class="message-sauvegarde-session"
+            aria-live="polite"
+          ></p>
+        </section>
 
         <section class="zone-statistiques" aria-labelledby="statistiques-title">
           <h3 id="statistiques-title">Statistiques</h3>

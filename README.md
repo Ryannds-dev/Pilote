@@ -17,8 +17,11 @@ L'application fonctionne dans le navigateur, sans backend, sans base de données
    - sectorisation enfant.
 3. Démarrer une session en indiquant l'agent et la date de tampon.
 4. Ajouter les documents du lot.
+5. Sauvegarder la session en JSON si besoin.
 
 Le formulaire de démarrage est bloqué tant que les 3 fichiers de sectorisation ne sont pas importés correctement.
+
+Une session déjà sauvegardée peut être rechargée après l'import des fichiers de sectorisation.
 
 ## Fonctionnalités disponibles
 
@@ -34,6 +37,9 @@ Le formulaire de démarrage est bloqué tant que les 3 fichiers de sectorisation
 - Association d'un fichier PDF à un document.
 - Contrôle des fichiers PDF uniquement.
 - Statut visuel PDF manquant ou PDF associé.
+- Export manuel de la session en JSON.
+- Import d'une sauvegarde JSON PILOTE.
+- Détection des sauvegardes inutiles quand rien n'a changé depuis le dernier export.
 - Statistiques en temps réel sur les documents du lot.
 - Comptage des documents par instructrice.
 - Affichage des documents ajoutés dans le lot.
@@ -67,6 +73,12 @@ COMMIT_HISTORY.md
 ## Remarque sur les fichiers Excel
 
 Les fichiers Excel ne sont pas lus automatiquement depuis le disque. L'agent les sélectionne dans l'interface, ce qui permet au navigateur de les lire localement sans serveur.
+
+## Remarque sur les sauvegardes
+
+La sauvegarde JSON conserve les informations de session et les documents saisis. Elle ne contient pas les fichiers PDF eux-mêmes.
+
+Après rechargement d'une sauvegarde, PILOTE affiche le nom du PDF connu et indique clairement qu'il faut le réassocier.
 
 ## Bibliothèques externes
 

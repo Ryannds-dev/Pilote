@@ -18,6 +18,8 @@ const SECTORIZATION_STATUS = {
   MANUAL: "manual"
 };
 
+const SAVE_FORMAT_VERSION = 1;
+
 const EXCEL_FILES = {
   ADULT: {
     label: "Sectorisation adulte",
@@ -62,6 +64,7 @@ const currentSession = {
 
 let documentIdCounter = 0;
 let editedDocumentId = "";
+let lastSavedSessionSignature = "";
 
 const excelData = {
   files: {},
@@ -76,10 +79,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const formulaireDemarrage = document.getElementById("formulaire-demarrage-session");
   const formulaireDocument = document.getElementById("formulaire-document");
   const cancelEditButton = document.getElementById("bouton-annuler-modification");
+  const saveSessionButton = document.getElementById("bouton-sauvegarder-session");
+  const sessionImportInput = document.getElementById("fichier-session-json");
 
   formulaireDemarrage.addEventListener("submit", handleSessionStart);
   formulaireDocument.addEventListener("submit", handleDocumentSubmit);
   cancelEditButton.addEventListener("click", cancelDocumentEdition);
+  saveSessionButton.addEventListener("click", saveCurrentSession);
+  sessionImportInput.addEventListener("change", () => {
+    handleSessionFileSelection(sessionImportInput.files[0]);
+  });
 
   prepareExcelImportArea();
 });
@@ -310,23 +319,32 @@ function updateSessionStartAvailability() {
   const startButton = document.querySelector(".bouton-demarrer-session");
   const agentInput = document.getElementById("champ-agent");
   const tamponDateInput = document.getElementById("champ-date-tampon");
+  const sessionImportInput = document.getElementById("fichier-session-json");
   const excelMessage = document.getElementById("message-import-excel");
+  const sessionImportMessage = document.getElementById("message-import-session");
   const ready = areRequiredExcelFilesReady();
 
   startButton.disabled = !ready;
   agentInput.disabled = !ready;
   tamponDateInput.disabled = !ready;
+  sessionImportInput.disabled = !ready;
 
   if (ready) {
     excelMessage.textContent =
       "Import terminé : vous pouvez démarrer une session.";
     excelMessage.className = "message-import-excel message-import-excel-ok";
+    sessionImportMessage.textContent =
+      "Vous pouvez aussi importer une sauvegarde JSON existante.";
+    sessionImportMessage.className = "message-import-session message-import-session-ok";
     return;
   }
 
   excelMessage.textContent =
     "Import obligatoire : chargez les 3 fichiers pour débloquer le démarrage de session.";
   excelMessage.className = "message-import-excel message-import-excel-attente";
+  sessionImportMessage.textContent =
+    "Import disponible après les fichiers de sectorisation.";
+  sessionImportMessage.className = "message-import-session";
 }
 
 function renderExcelFileStatuses() {
@@ -534,9 +552,11 @@ function handleSessionStart(event) {
   currentSession.createdAt = new Date().toISOString();
   currentSession.documents = [];
   editedDocumentId = "";
+  lastSavedSessionSignature = "";
 
   clearStartFormError();
   showSessionInformation(currentSession);
+  updateSaveControls("");
 }
 
 function validateStartForm(agentValue, tamponDateValue) {
@@ -583,6 +603,243 @@ function showSessionInformation(session) {
   document.getElementById("zone-documents").hidden = false;
 }
 
+function saveCurrentSession() {
+  if (!currentSession.sessionId) {
+    updateSaveControls("Aucune session à sauvegarder.");
+    return;
+  }
+
+  const currentSignature = createCurrentSessionSignature();
+
+  if (lastSavedSessionSignature === currentSignature) {
+    updateSaveControls("Aucune modification depuis la dernière sauvegarde.");
+    return;
+  }
+
+  const saveContent = JSON.stringify(buildSessionSaveFile(), null, 2);
+  const fileName = `${currentSession.sessionId}.json`;
+
+  downloadTextFile(fileName, saveContent);
+  lastSavedSessionSignature = currentSignature;
+  updateSaveControls(`Session sauvegardée : ${fileName}.`);
+}
+
+function buildSessionSaveFile() {
+  return {
+    app: "PILOTE",
+    formatVersion: SAVE_FORMAT_VERSION,
+    savedAt: new Date().toISOString(),
+    session: buildSerializableSession()
+  };
+}
+
+function buildSerializableSession() {
+  return {
+    agent: currentSession.agent,
+    tamponDate: currentSession.tamponDate,
+    sessionId: currentSession.sessionId,
+    createdAt: currentSession.createdAt,
+    documents: currentSession.documents.map(buildSerializableDocument)
+  };
+}
+
+function buildSerializableDocument(documentItem) {
+  return {
+    id: documentItem.id,
+    multigestFileName: documentItem.multigestFileName,
+    publicType: documentItem.publicType,
+    documentType: documentItem.documentType,
+    pchOnly: documentItem.pchOnly,
+    city: documentItem.city,
+    gevascoSchoolOrCity: documentItem.gevascoSchoolOrCity,
+    outOfDepartment: documentItem.outOfDepartment,
+    instructor: documentItem.instructor,
+    manualInstructor: documentItem.manualInstructor,
+    sectorizationSource: documentItem.sectorizationSource,
+    sectorizationStatus: documentItem.sectorizationStatus,
+    pdfLoaded: documentItem.pdfLoaded,
+    pdfFileName: documentItem.pdfFileName,
+    pdfNeedsReimport: documentItem.pdfNeedsReimport,
+    createdAt: documentItem.createdAt,
+    updatedAt: documentItem.updatedAt
+  };
+}
+
+function createCurrentSessionSignature() {
+  return JSON.stringify(buildSerializableSession());
+}
+
+function downloadTextFile(fileName, content) {
+  const fileBlob = new Blob([content], { type: "application/json" });
+  const temporaryLink = document.createElement("a");
+  const temporaryUrl = URL.createObjectURL(fileBlob);
+
+  temporaryLink.href = temporaryUrl;
+  temporaryLink.download = fileName;
+  document.body.appendChild(temporaryLink);
+  temporaryLink.click();
+  temporaryLink.remove();
+  URL.revokeObjectURL(temporaryUrl);
+}
+
+function handleSessionFileSelection(selectedFile) {
+  if (!selectedFile) {
+    return;
+  }
+
+  if (!areRequiredExcelFilesReady()) {
+    showSessionImportMessage(
+      "Importez les fichiers de sectorisation avant de reprendre une session.",
+      true
+    );
+    resetSessionImportInput();
+    return;
+  }
+
+  if (!isJsonFile(selectedFile)) {
+    showSessionImportMessage("Le fichier sélectionné doit être un JSON.", true);
+    resetSessionImportInput();
+    return;
+  }
+
+  if (currentSession.sessionId && !confirmSessionReplacement()) {
+    resetSessionImportInput();
+    return;
+  }
+
+  readSessionSaveFile(selectedFile);
+}
+
+function isJsonFile(file) {
+  const fileName = String(file.name || "").toLowerCase();
+
+  return file.type === "application/json" || fileName.endsWith(".json");
+}
+
+function confirmSessionReplacement() {
+  return window.confirm(
+    "Une session est déjà ouverte. Importer une sauvegarde remplacera la session affichée."
+  );
+}
+
+function readSessionSaveFile(selectedFile) {
+  const fileReader = new FileReader();
+
+  fileReader.onload = (event) => {
+    try {
+      const saveFile = JSON.parse(event.target.result);
+
+      restoreSessionFromSaveFile(saveFile);
+      showSessionImportMessage(`Session importée : ${selectedFile.name}.`, false);
+    } catch (error) {
+      showSessionImportMessage(error.message, true);
+    }
+
+    resetSessionImportInput();
+  };
+
+  fileReader.onerror = () => {
+    showSessionImportMessage("Lecture de la sauvegarde impossible.", true);
+    resetSessionImportInput();
+  };
+
+  fileReader.readAsText(selectedFile);
+}
+
+function restoreSessionFromSaveFile(saveFile) {
+  validateSessionSaveFile(saveFile);
+
+  const restoredSession = saveFile.session;
+
+  currentSession.agent = String(restoredSession.agent || "").trim();
+  currentSession.tamponDate = String(restoredSession.tamponDate || "").trim();
+  currentSession.sessionId = String(restoredSession.sessionId || "").trim();
+  currentSession.createdAt = String(restoredSession.createdAt || "").trim();
+  currentSession.documents = restoredSession.documents.map(normalizeImportedDocument);
+  editedDocumentId = "";
+  documentIdCounter = currentSession.documents.length;
+  lastSavedSessionSignature = createCurrentSessionSignature();
+
+  clearStartFormError();
+  clearDocumentFormError();
+  resetDocumentForm();
+  showSessionInformation(currentSession);
+  updateSaveControls("Session importée. Aucun changement depuis l'import.");
+}
+
+function validateSessionSaveFile(saveFile) {
+  if (!saveFile || saveFile.app !== "PILOTE") {
+    throw new Error("Ce fichier ne semble pas être une sauvegarde PILOTE.");
+  }
+
+  if (saveFile.formatVersion !== SAVE_FORMAT_VERSION) {
+    throw new Error("Cette sauvegarde PILOTE n'a pas le format attendu.");
+  }
+
+  if (!saveFile.session || !saveFile.session.sessionId) {
+    throw new Error("La sauvegarde ne contient pas de session valide.");
+  }
+
+  if (!saveFile.session.agent || !saveFile.session.tamponDate) {
+    throw new Error("La sauvegarde ne contient pas les informations de session attendues.");
+  }
+
+  if (!Array.isArray(saveFile.session.documents)) {
+    throw new Error("La liste des documents est absente ou invalide.");
+  }
+}
+
+function normalizeImportedDocument(documentItem) {
+  const hadPdfInSavedSession = Boolean(
+    (documentItem.pdfLoaded || documentItem.pdfNeedsReimport) &&
+      documentItem.pdfFileName
+  );
+
+  return createDocument({
+    id: String(documentItem.id || ""),
+    multigestFileName: String(documentItem.multigestFileName || ""),
+    publicType: String(documentItem.publicType || ""),
+    documentType: String(documentItem.documentType || ""),
+    pchOnly: Boolean(documentItem.pchOnly),
+    city: String(documentItem.city || ""),
+    gevascoSchoolOrCity: String(documentItem.gevascoSchoolOrCity || ""),
+    outOfDepartment: Boolean(documentItem.outOfDepartment),
+    instructor: String(documentItem.instructor || ""),
+    manualInstructor: String(documentItem.manualInstructor || ""),
+    sectorizationSource: String(documentItem.sectorizationSource || ""),
+    sectorizationStatus: String(documentItem.sectorizationStatus || SECTORIZATION_STATUS.PENDING),
+    pdfLoaded: false,
+    pdfFileName: String(documentItem.pdfFileName || ""),
+    pdfFile: null,
+    pdfNeedsReimport: hadPdfInSavedSession,
+    createdAt: String(documentItem.createdAt || ""),
+    updatedAt: String(documentItem.updatedAt || "")
+  });
+}
+
+function resetSessionImportInput() {
+  document.getElementById("fichier-session-json").value = "";
+}
+
+function showSessionImportMessage(message, isError) {
+  const sessionImportMessage = document.getElementById("message-import-session");
+
+  sessionImportMessage.textContent = message;
+  sessionImportMessage.className = isError
+    ? "message-import-session message-import-session-erreur"
+    : "message-import-session message-import-session-ok";
+}
+
+function updateSaveControls(message) {
+  const saveMessage = document.getElementById("message-sauvegarde-session");
+
+  if (!saveMessage) {
+    return;
+  }
+
+  saveMessage.textContent = message;
+}
+
 function formatDateForDisplay(dateValue) {
   const [year, month, day] = dateValue.split("-");
 
@@ -615,6 +872,7 @@ function createDocument(documentData = {}) {
     pdfLoaded: false,
     pdfFileName: "",
     pdfFile: null,
+    pdfNeedsReimport: false,
     createdAt: "",
     updatedAt: "",
     ...documentData
@@ -622,7 +880,7 @@ function createDocument(documentData = {}) {
 
   document.id = document.id || generateDocumentId();
   document.createdAt = document.createdAt || now;
-  document.updatedAt = now;
+  document.updatedAt = document.updatedAt || now;
 
   return document;
 }
@@ -638,6 +896,7 @@ function addDocumentToSession(documentData = {}) {
   updateDocumentCounter();
   renderDocumentList();
   updateStatisticsDisplay();
+  updateSaveControls("Modifications non sauvegardées.");
 
   return document;
 }
@@ -680,7 +939,8 @@ function getDocumentFormData() {
     outOfDepartment: document.getElementById("champ-hors-departement").checked,
     pdfLoaded: selectedPdfFile ? true : Boolean(existingDocument?.pdfLoaded),
     pdfFileName: selectedPdfFile ? selectedPdfFile.name : existingDocument?.pdfFileName || "",
-    pdfFile: selectedPdfFile || existingDocument?.pdfFile || null
+    pdfFile: selectedPdfFile || existingDocument?.pdfFile || null,
+    pdfNeedsReimport: selectedPdfFile ? false : Boolean(existingDocument?.pdfNeedsReimport)
   };
 }
 
@@ -882,6 +1142,7 @@ function updateDocumentInSession(documentId, documentData) {
 
   renderDocumentList();
   updateStatisticsDisplay();
+  updateSaveControls("Modifications non sauvegardées.");
 }
 
 function deleteDocumentFromSession(documentId) {
@@ -912,6 +1173,7 @@ function deleteDocumentFromSession(documentId) {
   updateDocumentCounter();
   renderDocumentList();
   updateStatisticsDisplay();
+  updateSaveControls("Modifications non sauvegardées.");
 }
 
 function startDocumentEdition(documentId) {
@@ -946,7 +1208,9 @@ function fillDocumentForm(documentItem) {
   document.getElementById("champ-hors-departement").checked =
     documentItem.outOfDepartment;
   document.getElementById("message-pdf-actuel").textContent =
-    documentItem.pdfLoaded
+    documentItem.pdfNeedsReimport
+      ? `PDF à réassocier : ${documentItem.pdfFileName}`
+      : documentItem.pdfLoaded
       ? `PDF déjà associé : ${documentItem.pdfFileName}`
       : "Aucun PDF associé.";
 }
@@ -1140,7 +1404,7 @@ function createDocumentCard(documentItem) {
     documentItem.pdfLoaded ? "icone-pdf-associe" : "icone-pdf-manquant"
   }`;
   pdfIcon.src = documentItem.pdfLoaded ? "assets/pdf-icon.svg" : "assets/empty-icon.svg";
-  pdfIcon.alt = documentItem.pdfLoaded ? "PDF associé" : "PDF non associé";
+  pdfIcon.alt = documentItem.pdfLoaded ? "PDF associé" : "PDF non associé ou à réassocier";
   cardContent.className = "contenu-carte-document";
   documentTitle.className = "titre-document";
   documentTitle.textContent = documentItem.multigestFileName;
@@ -1215,9 +1479,14 @@ function addPdfStatusDetail(documentDetails, documentItem) {
   detail.className = `detail-document statut-pdf ${
     documentItem.pdfLoaded ? "statut-pdf-ok" : "statut-pdf-manquant"
   }`;
-  detail.textContent = documentItem.pdfLoaded
-    ? `PDF : ${documentItem.pdfFileName}`
-    : "PDF : manquant";
+  if (documentItem.pdfLoaded) {
+    detail.textContent = `PDF : ${documentItem.pdfFileName}`;
+  } else if (documentItem.pdfNeedsReimport) {
+    detail.textContent = `PDF à réassocier : ${documentItem.pdfFileName}`;
+  } else {
+    detail.textContent = "PDF : manquant";
+  }
+
   documentDetails.appendChild(detail);
 }
 
