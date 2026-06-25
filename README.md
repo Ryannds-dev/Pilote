@@ -31,6 +31,9 @@ Le formulaire de démarrage est bloqué tant que les 3 fichiers de sectorisation
 - Correction manuelle de l'instructrice si nécessaire.
 - Statut visible pour les documents attribués, à vérifier, non trouvés ou corrigés manuellement.
 - Gestion des recours en statut à vérifier.
+- Association d'un fichier PDF à un document.
+- Contrôle des fichiers PDF uniquement.
+- Statut visuel PDF manquant ou PDF associé.
 - Statistiques en temps réel sur les documents du lot.
 - Comptage des documents par instructrice.
 - Affichage des documents ajoutés dans le lot.

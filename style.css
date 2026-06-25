@@ -163,6 +163,12 @@ h1 {
   cursor: not-allowed;
 }
 
+.message-pdf-actuel {
+  margin-bottom: 0;
+  color: var(--gris-secondaire);
+  font-size: 0.92rem;
+}
+
 .message-erreur-formulaire {
   min-height: 24px;
   margin-bottom: 0;
@@ -545,6 +551,16 @@ h1 {
   height: 48px;
 }
 
+.icone-pdf-manquant {
+  opacity: 0.45;
+  filter: grayscale(1);
+}
+
+.icone-pdf-associe {
+  opacity: 1;
+  filter: none;
+}
+
 .contenu-carte-document {
   min-width: 0;
 }
@@ -589,6 +605,20 @@ h1 {
 }
 
 .statut-sectorisation-vide {
+  color: var(--gris-secondaire);
+  background: #eef0f3;
+}
+
+.statut-pdf {
+  font-weight: 700;
+}
+
+.statut-pdf-ok {
+  color: var(--rouge-pilote);
+  background: #fff3f5;
+}
+
+.statut-pdf-manquant {
   color: var(--gris-secondaire);
   background: #eef0f3;
 }

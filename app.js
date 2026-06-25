@@ -614,6 +614,7 @@ function createDocument(documentData = {}) {
     sectorizationStatus: SECTORIZATION_STATUS.PENDING,
     pdfLoaded: false,
     pdfFileName: "",
+    pdfFile: null,
     createdAt: "",
     updatedAt: "",
     ...documentData
@@ -665,6 +666,9 @@ function handleDocumentSubmit(event) {
 }
 
 function getDocumentFormData() {
+  const selectedPdfFile = document.getElementById("champ-pdf-document").files[0] || null;
+  const existingDocument = getEditedDocument();
+
   return {
     multigestFileName: document.getElementById("champ-nom-multigest").value.trim(),
     publicType: document.getElementById("champ-public").value,
@@ -673,7 +677,10 @@ function getDocumentFormData() {
     city: document.getElementById("champ-ville").value.trim(),
     gevascoSchoolOrCity: document.getElementById("champ-gevasco").value.trim(),
     manualInstructor: document.getElementById("champ-instructrice-manuelle").value.trim(),
-    outOfDepartment: document.getElementById("champ-hors-departement").checked
+    outOfDepartment: document.getElementById("champ-hors-departement").checked,
+    pdfLoaded: selectedPdfFile ? true : Boolean(existingDocument?.pdfLoaded),
+    pdfFileName: selectedPdfFile ? selectedPdfFile.name : existingDocument?.pdfFileName || "",
+    pdfFile: selectedPdfFile || existingDocument?.pdfFile || null
   };
 }
 
@@ -690,7 +697,27 @@ function validateDocumentForm(documentData) {
     return "Veuillez sélectionner le type de document.";
   }
 
+  if (documentData.pdfFile && !isPdfFile(documentData.pdfFile)) {
+    return "Le fichier associé doit être un PDF.";
+  }
+
   return "";
+}
+
+function isPdfFile(file) {
+  const fileName = String(file.name || "").toLowerCase();
+
+  return file.type === "application/pdf" || fileName.endsWith(".pdf");
+}
+
+function getEditedDocument() {
+  if (!editedDocumentId) {
+    return null;
+  }
+
+  return currentSession.documents.find((documentItem) => {
+    return documentItem.id === editedDocumentId;
+  }) || null;
 }
 
 function showDocumentFormError(message) {
@@ -918,6 +945,10 @@ function fillDocumentForm(documentItem) {
     documentItem.manualInstructor || "";
   document.getElementById("champ-hors-departement").checked =
     documentItem.outOfDepartment;
+  document.getElementById("message-pdf-actuel").textContent =
+    documentItem.pdfLoaded
+      ? `PDF déjà associé : ${documentItem.pdfFileName}`
+      : "Aucun PDF associé.";
 }
 
 function cancelDocumentEdition() {
@@ -931,6 +962,7 @@ function resetDocumentForm() {
   document.querySelector(".bouton-ajouter-document").textContent =
     "Ajouter le document";
   document.getElementById("bouton-annuler-modification").hidden = true;
+  document.getElementById("message-pdf-actuel").textContent = "";
 }
 
 function updateDocumentCounter() {
@@ -1104,9 +1136,11 @@ function createDocumentCard(documentItem) {
   const deleteButton = document.createElement("button");
 
   documentCard.className = "carte-document";
-  pdfIcon.className = "icone-pdf-document";
-  pdfIcon.src = "assets/empty-icon.svg";
-  pdfIcon.alt = "PDF non associé";
+  pdfIcon.className = `icone-pdf-document ${
+    documentItem.pdfLoaded ? "icone-pdf-associe" : "icone-pdf-manquant"
+  }`;
+  pdfIcon.src = documentItem.pdfLoaded ? "assets/pdf-icon.svg" : "assets/empty-icon.svg";
+  pdfIcon.alt = documentItem.pdfLoaded ? "PDF associé" : "PDF non associé";
   cardContent.className = "contenu-carte-document";
   documentTitle.className = "titre-document";
   documentTitle.textContent = documentItem.multigestFileName;
@@ -1130,6 +1164,7 @@ function createDocumentCard(documentItem) {
   addDocumentDetail(documentDetails, `Ville : ${documentItem.city || "Non renseignée"}`);
   addDocumentDetail(documentDetails, `Instructrice : ${formatInstructor(documentItem)}`);
   addDocumentStatusDetail(documentDetails, documentItem);
+  addPdfStatusDetail(documentDetails, documentItem);
 
   if (documentItem.gevascoSchoolOrCity) {
     addDocumentDetail(documentDetails, `École / GEVASCO : ${documentItem.gevascoSchoolOrCity}`);
@@ -1171,6 +1206,18 @@ function addDocumentStatusDetail(documentDetails, documentItem) {
 
   detail.className = `detail-document statut-sectorisation ${getSectorizationStatusClass(documentItem)}`;
   detail.textContent = formatSectorizationStatus(documentItem);
+  documentDetails.appendChild(detail);
+}
+
+function addPdfStatusDetail(documentDetails, documentItem) {
+  const detail = document.createElement("span");
+
+  detail.className = `detail-document statut-pdf ${
+    documentItem.pdfLoaded ? "statut-pdf-ok" : "statut-pdf-manquant"
+  }`;
+  detail.textContent = documentItem.pdfLoaded
+    ? `PDF : ${documentItem.pdfFileName}`
+    : "PDF : manquant";
   documentDetails.appendChild(detail);
 }
 

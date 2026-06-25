@@ -308,3 +308,23 @@ Limites volontaires :
 - pas de sauvegarde persistante de la correction manuelle ;
 - pas encore de filtre dédié aux documents à vérifier ;
 - pas de workflow de validation séparé.
+
+## PDF: Add document PDF import
+
+Date : 2026-06-25
+
+Objectif : permettre l'association d'un fichier PDF à chaque document.
+
+- ajout d'un champ d'import PDF dans le formulaire document ;
+- contrôle des fichiers PDF uniquement ;
+- conservation du PDF existant lors d'une modification si aucun nouveau fichier n'est choisi ;
+- affichage du nom du PDF associé ;
+- ajout d'une icône PDF colorée quand un PDF est présent ;
+- conservation de l'icône grisée quand aucun PDF n'est associé ;
+- ajout d'un statut visuel PDF présent ou manquant dans chaque carte document.
+
+Limites volontaires :
+
+- pas encore d'export ZIP ;
+- pas encore de vérification globale avant export ;
+- les fichiers PDF restent en mémoire tant que la page est ouverte.
