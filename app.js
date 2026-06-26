@@ -91,8 +91,57 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   prepareExcelImportArea();
+  prepareDocumentFilters();
+  synchronizeDocumentPanelsHeight();
   updateSaveControls("Sauvegarde disponible après le démarrage d'une session.");
 });
+
+function prepareDocumentFilters() {
+  const searchInput = document.getElementById("recherche-documents");
+  const pdfFilter = document.getElementById("filtre-pdf");
+  const instructorFilter = document.getElementById("filtre-instructrice");
+  const documentTypeFilter = document.getElementById("filtre-type-document");
+  const clearFiltersButton = document.getElementById("bouton-effacer-filtres");
+
+  searchInput.addEventListener("input", renderDocumentList);
+  pdfFilter.addEventListener("change", renderDocumentList);
+  instructorFilter.addEventListener("change", renderDocumentList);
+  documentTypeFilter.addEventListener("change", renderDocumentList);
+  clearFiltersButton.addEventListener("click", clearDocumentFilters);
+}
+
+function clearDocumentFilters() {
+  document.getElementById("recherche-documents").value = "";
+  document.getElementById("filtre-pdf").value = "";
+  document.getElementById("filtre-instructrice").value = "";
+  document.getElementById("filtre-type-document").value = "";
+  renderDocumentList();
+}
+
+function synchronizeDocumentPanelsHeight() {
+  const documentFormArea = document.querySelector(".zone-ajout-document");
+  const documentListArea = document.querySelector(".zone-liste-documents");
+  const wideScreen = window.matchMedia("(min-width: 1101px)");
+
+  if (!documentFormArea || !documentListArea) {
+    return;
+  }
+
+  const updateDocumentListHeight = () => {
+    if (wideScreen.matches) {
+      documentListArea.style.height = `${documentFormArea.offsetHeight}px`;
+      return;
+    }
+
+    documentListArea.style.height = "";
+  };
+
+  const formSizeObserver = new ResizeObserver(updateDocumentListHeight);
+
+  formSizeObserver.observe(documentFormArea);
+  wideScreen.addEventListener("change", updateDocumentListHeight);
+  updateDocumentListHeight();
+}
 
 function prepareExcelImportArea() {
   Object.entries(EXCEL_FILES).forEach(([fileKey, fileConfig]) => {
@@ -1382,23 +1431,93 @@ function createInstructorStatisticLine(instructorName, documentCount) {
 function renderDocumentList() {
   const documentList = document.getElementById("liste-documents");
   const emptyListMessage = document.getElementById("message-liste-vide");
+  const noResultMessage = document.getElementById("message-aucun-resultat");
+  const filterResultCount = document.getElementById("nombre-resultats-filtres");
 
-  if (!documentList || !emptyListMessage) {
+  if (!documentList || !emptyListMessage || !noResultMessage || !filterResultCount) {
     return;
   }
 
+  updateInstructorFilterOptions();
+
+  const filteredDocuments = getFilteredDocuments();
+  const filtersAreActive = areDocumentFiltersActive();
+
   documentList.innerHTML = "";
   emptyListMessage.hidden = currentSession.documents.length > 0;
+  noResultMessage.hidden =
+    currentSession.documents.length === 0 || filteredDocuments.length > 0;
+  filterResultCount.hidden = !filtersAreActive || currentSession.documents.length === 0;
+  filterResultCount.textContent =
+    `${filteredDocuments.length} document(s) affiché(s) sur ${currentSession.documents.length}`;
 
-  currentSession.documents.forEach((documentItem) => {
-    documentList.appendChild(createDocumentCard(documentItem));
+  filteredDocuments.forEach(({ documentItem, documentNumber }) => {
+    documentList.appendChild(createDocumentCard(documentItem, documentNumber));
   });
 }
 
-function createDocumentCard(documentItem) {
+function getFilteredDocuments() {
+  const searchedName = normalizeExcelText(
+    document.getElementById("recherche-documents").value
+  );
+  const selectedPdfStatus = document.getElementById("filtre-pdf").value;
+  const selectedInstructor = document.getElementById("filtre-instructrice").value;
+  const selectedDocumentType = document.getElementById("filtre-type-document").value;
+
+  return currentSession.documents
+    .map((documentItem, documentIndex) => ({
+      documentItem,
+      documentNumber: documentIndex + 1
+    }))
+    .filter(({ documentItem }) => {
+      const nameMatches =
+        !searchedName ||
+        normalizeExcelText(documentItem.multigestFileName).includes(searchedName);
+      const pdfMatches =
+        !selectedPdfStatus ||
+        (selectedPdfStatus === "present" && documentItem.pdfLoaded) ||
+        (selectedPdfStatus === "manquant" && !documentItem.pdfLoaded);
+      const instructorMatches =
+        !selectedInstructor ||
+        getInstructorStatisticName(documentItem) === selectedInstructor;
+      const documentTypeMatches =
+        !selectedDocumentType || documentItem.documentType === selectedDocumentType;
+
+      return nameMatches && pdfMatches && instructorMatches && documentTypeMatches;
+    });
+}
+
+function areDocumentFiltersActive() {
+  return [
+    document.getElementById("recherche-documents").value,
+    document.getElementById("filtre-pdf").value,
+    document.getElementById("filtre-instructrice").value,
+    document.getElementById("filtre-type-document").value
+  ].some(Boolean);
+}
+
+function updateInstructorFilterOptions() {
+  const instructorFilter = document.getElementById("filtre-instructrice");
+  const selectedInstructor = instructorFilter.value;
+  const instructorNames = [
+    ...new Set(currentSession.documents.map(getInstructorStatisticName))
+  ].sort((firstName, secondName) => firstName.localeCompare(secondName, "fr"));
+
+  instructorFilter.innerHTML = "";
+  instructorFilter.appendChild(new Option("Toutes les instructrices", ""));
+
+  instructorNames.forEach((instructorName) => {
+    instructorFilter.appendChild(new Option(instructorName, instructorName));
+  });
+
+  instructorFilter.value = selectedInstructor;
+}
+
+function createDocumentCard(documentItem, documentNumber) {
   const documentCard = document.createElement("article");
   const pdfIcon = document.createElement("img");
   const cardContent = document.createElement("div");
+  const documentNumberLabel = document.createElement("p");
   const documentTitle = document.createElement("p");
   const documentDetails = document.createElement("div");
   const documentActions = document.createElement("div");
@@ -1412,6 +1531,8 @@ function createDocumentCard(documentItem) {
   pdfIcon.src = documentItem.pdfLoaded ? "assets/pdf-icon.svg" : "assets/empty-icon.svg";
   pdfIcon.alt = documentItem.pdfLoaded ? "PDF associé" : "PDF non associé ou à réassocier";
   cardContent.className = "contenu-carte-document";
+  documentNumberLabel.className = "numero-document";
+  documentNumberLabel.textContent = `Document ${documentNumber}`;
   documentTitle.className = "titre-document";
   documentTitle.textContent = documentItem.multigestFileName;
   documentDetails.className = "details-document";
@@ -1452,6 +1573,7 @@ function createDocumentCard(documentItem) {
     addDocumentDetail(documentDetails, `Source : ${documentItem.sectorizationSource}`);
   }
 
+  cardContent.appendChild(documentNumberLabel);
   cardContent.appendChild(documentTitle);
   cardContent.appendChild(documentDetails);
   documentActions.appendChild(editButton);

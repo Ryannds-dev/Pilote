@@ -35,277 +35,349 @@
 
       <div class="organisation-application">
         <div class="colonne-manipulations">
-      <section class="zone-excel" aria-labelledby="excel-title">
-        <h2 id="excel-title">Fichiers de sectorisation</h2>
-        <p>
-          Importez les fichiers Excel de sectorisation avant de commencer.
-          PILOTE les lit uniquement depuis ce poste et ne les envoie nulle part.
-        </p>
+          <section class="zone-excel" aria-labelledby="excel-title">
+            <h2 id="excel-title">Fichiers de sectorisation</h2>
+            <p>
+              Importez les fichiers Excel de sectorisation avant de commencer.
+              PILOTE les lit uniquement depuis ce poste et ne les envoie nulle
+              part.
+            </p>
 
-        <div class="liste-imports-excel">
-          <div class="bloc-import-excel">
-            <label for="fichier-sectorisation-adulte">
-              Sectorisation adulte
-            </label>
-            <input
-              id="fichier-sectorisation-adulte"
-              type="file"
-              accept=".xlsx,.xls"
-            />
-          </div>
-
-          <div class="bloc-import-excel">
-            <label for="fichier-sectorisation-pch">Sectorisation PCH</label>
-            <input
-              id="fichier-sectorisation-pch"
-              type="file"
-              accept=".xlsx,.xls"
-            />
-          </div>
-
-          <div class="bloc-import-excel">
-            <label for="fichier-sectorisation-enfant">
-              Sectorisation enfant
-            </label>
-            <input
-              id="fichier-sectorisation-enfant"
-              type="file"
-              accept=".xlsx,.xls"
-            />
-          </div>
-        </div>
-
-        <p id="message-import-excel" class="message-import-excel">
-          Import obligatoire : chargez les 3 fichiers pour débloquer le
-          démarrage de session.
-        </p>
-
-        <ul id="liste-fichiers-excel" class="liste-fichiers-excel"></ul>
-      </section>
-
-      <section class="zone-demarrage-session" aria-labelledby="start-title">
-        <h2 id="start-title">Démarrage de session</h2>
-        <p>
-          Indiquez l'agent qui traite les documents et la date de tampon à
-          utiliser après avoir importé les fichiers de sectorisation.
-        </p>
-
-        <form
-          id="formulaire-demarrage-session"
-          class="formulaire-demarrage-session"
-          novalidate
-        >
-          <div class="champ-formulaire">
-            <label for="champ-agent">Initiales ou nom de l'agent</label>
-            <input
-              id="champ-agent"
-              name="agent"
-              type="text"
-              autocomplete="off"
-              placeholder="Exemple : RDS"
-              disabled
-            />
-          </div>
-
-          <div class="champ-formulaire">
-            <label for="champ-date-tampon">Date de tampon</label>
-            <input
-              id="champ-date-tampon"
-              name="tamponDate"
-              type="date"
-              disabled
-            />
-          </div>
-
-          <p
-            id="message-erreur-demarrage"
-            class="message-erreur-formulaire"
-            aria-live="polite"
-          ></p>
-
-          <button class="bouton-demarrer-session" type="submit" disabled>
-            Démarrer la session
-          </button>
-        </form>
-
-        <article id="carte-session-creee" class="carte-session-creee" hidden>
-          <h3>Session créée</h3>
-          <dl class="liste-informations-session">
-            <div>
-              <dt>Agent</dt>
-              <dd id="valeur-agent-session"></dd>
-            </div>
-            <div>
-              <dt>Date de tampon</dt>
-              <dd id="valeur-date-session"></dd>
-            </div>
-            <div>
-              <dt>Session</dt>
-              <dd id="valeur-nom-session"></dd>
-            </div>
-          </dl>
-
-          <p class="compteur-documents-session">
-            Documents dans le lot : <span id="nombre-documents-session">0</span>
-          </p>
-        </article>
-      </section>
-
-      <section
-        id="zone-documents"
-        class="zone-documents"
-        aria-labelledby="documents-title"
-        hidden
-      >
-        <h2 id="documents-title">Documents du lot</h2>
-
-        <div class="organisation-documents">
-        <section
-          class="zone-ajout-document"
-          aria-labelledby="ajout-document-title"
-        >
-          <h3 id="ajout-document-title">Ajouter un document</h3>
-
-          <form id="formulaire-document" class="formulaire-document" novalidate>
-            <div class="champ-formulaire">
-              <label for="champ-nom-multigest">Nom MultiGest</label>
-              <input
-                id="champ-nom-multigest"
-                name="multigestFileName"
-                type="text"
-                autocomplete="off"
-                placeholder="Nom du document dans MultiGest"
-              />
-            </div>
-
-            <div class="champ-formulaire">
-              <label for="champ-public">Public</label>
-              <select id="champ-public" name="publicType">
-                <option value="">Sélectionner</option>
-                <option value="adulte">Adulte</option>
-                <option value="enfant">Enfant</option>
-              </select>
-            </div>
-
-            <div class="champ-formulaire">
-              <label for="champ-type-document">Type de document</label>
-              <select id="champ-type-document" name="documentType">
-                <option value="">Sélectionner</option>
-                <option value="demande">Demande</option>
-                <option value="piece_complementaire">
-                  Pièce complémentaire
-                </option>
-                <option value="recours">Recours</option>
-              </select>
-            </div>
-
-            <div class="champ-formulaire">
-              <label for="champ-ville">Ville</label>
-              <input
-                id="champ-ville"
-                name="city"
-                type="text"
-                autocomplete="off"
-                list="suggestions-villes"
-                placeholder="Ville de résidence"
-              />
-              <datalist id="suggestions-villes"></datalist>
-            </div>
-
-            <div class="champ-formulaire">
-              <label for="champ-gevasco">École / GEVASCO</label>
-              <input
-                id="champ-gevasco"
-                name="gevascoSchoolOrCity"
-                type="text"
-                autocomplete="off"
-                list="suggestions-ecoles-gevasco"
-                placeholder="École ou ville GEVASCO si besoin"
-              />
-              <datalist id="suggestions-ecoles-gevasco"></datalist>
-            </div>
-
-            <div class="champ-formulaire">
-              <label for="champ-instructrice-manuelle">
-                Instructrice (à compléter uniquement si la recherche n'aboutit
-                pas ou pour une situation particulière)
-              </label>
-              <input
-                id="champ-instructrice-manuelle"
-                name="manualInstructor"
-                type="text"
-                autocomplete="off"
-                list="suggestions-instructrices"
-                placeholder="À remplir seulement si besoin"
-              />
-              <datalist id="suggestions-instructrices"></datalist>
-            </div>
-
-            <div class="champ-formulaire">
-              <label for="champ-pdf-document">PDF associé</label>
-              <input
-                id="champ-pdf-document"
-                name="pdfFile"
-                type="file"
-                accept="application/pdf,.pdf"
-              />
-              <p id="message-pdf-actuel" class="message-pdf-actuel"></p>
-            </div>
-
-            <div class="cases-formulaire">
-              <label>
-                <input id="champ-pch" name="pchOnly" type="checkbox" />
-                PCH uniquement
-              </label>
-
-              <label>
+            <div class="liste-imports-excel">
+              <div class="bloc-import-excel">
+                <label for="fichier-sectorisation-adulte">
+                  Sectorisation adulte
+                </label>
                 <input
-                  id="champ-hors-departement"
-                  name="outOfDepartment"
-                  type="checkbox"
+                  id="fichier-sectorisation-adulte"
+                  type="file"
+                  accept=".xlsx,.xls"
                 />
-                Hors département
-              </label>
+              </div>
+
+              <div class="bloc-import-excel">
+                <label for="fichier-sectorisation-pch">Sectorisation PCH</label>
+                <input
+                  id="fichier-sectorisation-pch"
+                  type="file"
+                  accept=".xlsx,.xls"
+                />
+              </div>
+
+              <div class="bloc-import-excel">
+                <label for="fichier-sectorisation-enfant">
+                  Sectorisation enfant
+                </label>
+                <input
+                  id="fichier-sectorisation-enfant"
+                  type="file"
+                  accept=".xlsx,.xls"
+                />
+              </div>
             </div>
 
-            <p
-              id="message-erreur-document"
-              class="message-erreur-formulaire"
-              aria-live="polite"
-            ></p>
+            <p id="message-import-excel" class="message-import-excel">
+              Import obligatoire : chargez les 3 fichiers pour débloquer le
+              démarrage de session.
+            </p>
 
-            <button class="bouton-ajouter-document" type="submit">
-              Ajouter le document
-            </button>
+            <ul id="liste-fichiers-excel" class="liste-fichiers-excel"></ul>
+          </section>
 
-            <button
-              id="bouton-annuler-modification"
-              class="bouton-annuler-modification"
-              type="button"
+          <section class="zone-demarrage-session" aria-labelledby="start-title">
+            <h2 id="start-title">Démarrage de session</h2>
+            <p>
+              Indiquez l'agent qui traite les documents et la date de tampon à
+              utiliser après avoir importé les fichiers de sectorisation.
+            </p>
+
+            <form
+              id="formulaire-demarrage-session"
+              class="formulaire-demarrage-session"
+              novalidate
+            >
+              <div class="champ-formulaire">
+                <label for="champ-agent">Initiales ou nom de l'agent</label>
+                <input
+                  id="champ-agent"
+                  name="agent"
+                  type="text"
+                  autocomplete="off"
+                  placeholder="Exemple : RDS"
+                  disabled
+                />
+              </div>
+
+              <div class="champ-formulaire">
+                <label for="champ-date-tampon">Date de tampon</label>
+                <input
+                  id="champ-date-tampon"
+                  name="tamponDate"
+                  type="date"
+                  disabled
+                />
+              </div>
+
+              <p
+                id="message-erreur-demarrage"
+                class="message-erreur-formulaire"
+                aria-live="polite"
+              ></p>
+
+              <button class="bouton-demarrer-session" type="submit" disabled>
+                Démarrer la session
+              </button>
+            </form>
+
+            <article
+              id="carte-session-creee"
+              class="carte-session-creee"
               hidden
             >
-              Annuler la modification
-            </button>
-          </form>
-        </section>
+              <h3>Session créée</h3>
+              <dl class="liste-informations-session">
+                <div>
+                  <dt>Agent</dt>
+                  <dd id="valeur-agent-session"></dd>
+                </div>
+                <div>
+                  <dt>Date de tampon</dt>
+                  <dd id="valeur-date-session"></dd>
+                </div>
+                <div>
+                  <dt>Session</dt>
+                  <dd id="valeur-nom-session"></dd>
+                </div>
+              </dl>
 
-        <section
-          class="zone-liste-documents"
-          aria-labelledby="liste-documents-title"
+              <p class="compteur-documents-session">
+                Documents dans le lot :
+                <span id="nombre-documents-session">0</span>
+              </p>
+            </article>
+          </section>
+
+          <section
+            id="zone-documents"
+            class="zone-documents"
+            aria-labelledby="documents-title"
+            hidden
+          >
+            <h2 id="documents-title">Documents du lot</h2>
+
+            <div class="organisation-documents">
+              <section
+                class="zone-ajout-document"
+                aria-labelledby="ajout-document-title"
+              >
+                <h3 id="ajout-document-title">Ajouter un document</h3>
+
+                <form
+                  id="formulaire-document"
+                  class="formulaire-document"
+                  novalidate
+                >
+                  <div class="champ-formulaire">
+                    <label for="champ-nom-multigest">Nom MultiGest</label>
+                    <input
+                      id="champ-nom-multigest"
+                      name="multigestFileName"
+                      type="text"
+                      autocomplete="off"
+                      placeholder="Nom du document dans MultiGest"
+                    />
+                  </div>
+
+                  <div class="champ-formulaire">
+                    <label for="champ-public">Public</label>
+                    <select id="champ-public" name="publicType">
+                      <option value="">Sélectionner</option>
+                      <option value="adulte">Adulte</option>
+                      <option value="enfant">Enfant</option>
+                    </select>
+                  </div>
+
+                  <div class="champ-formulaire">
+                    <label for="champ-type-document">Type de document</label>
+                    <select id="champ-type-document" name="documentType">
+                      <option value="">Sélectionner</option>
+                      <option value="demande">Demande</option>
+                      <option value="piece_complementaire">
+                        Pièce complémentaire
+                      </option>
+                      <option value="recours">Recours</option>
+                    </select>
+                  </div>
+
+                  <div class="champ-formulaire">
+                    <label for="champ-ville">Ville</label>
+                    <input
+                      id="champ-ville"
+                      name="city"
+                      type="text"
+                      autocomplete="off"
+                      list="suggestions-villes"
+                      placeholder="Ville de résidence"
+                    />
+                    <datalist id="suggestions-villes"></datalist>
+                  </div>
+
+                  <div class="champ-formulaire">
+                    <label for="champ-gevasco">École / GEVASCO</label>
+                    <input
+                      id="champ-gevasco"
+                      name="gevascoSchoolOrCity"
+                      type="text"
+                      autocomplete="off"
+                      list="suggestions-ecoles-gevasco"
+                      placeholder="École ou ville GEVASCO si besoin"
+                    />
+                    <datalist id="suggestions-ecoles-gevasco"></datalist>
+                  </div>
+
+                  <div class="champ-formulaire">
+                    <label for="champ-instructrice-manuelle">
+                      Instructrice (à compléter uniquement si la recherche
+                      n'aboutit pas ou pour une situation particulière)
+                    </label>
+                    <input
+                      id="champ-instructrice-manuelle"
+                      name="manualInstructor"
+                      type="text"
+                      autocomplete="off"
+                      list="suggestions-instructrices"
+                      placeholder="À remplir seulement si besoin"
+                    />
+                    <datalist id="suggestions-instructrices"></datalist>
+                  </div>
+
+                  <div class="champ-formulaire">
+                    <label for="champ-pdf-document">PDF associé</label>
+                    <input
+                      id="champ-pdf-document"
+                      name="pdfFile"
+                      type="file"
+                      accept="application/pdf,.pdf"
+                    />
+                    <p id="message-pdf-actuel" class="message-pdf-actuel"></p>
+                  </div>
+
+                  <div class="cases-formulaire">
+                    <label>
+                      <input id="champ-pch" name="pchOnly" type="checkbox" />
+                      PCH uniquement
+                    </label>
+
+                    <label>
+                      <input
+                        id="champ-hors-departement"
+                        name="outOfDepartment"
+                        type="checkbox"
+                      />
+                      Hors département
+                    </label>
+                  </div>
+
+                  <p
+                    id="message-erreur-document"
+                    class="message-erreur-formulaire"
+                    aria-live="polite"
+                  ></p>
+
+                  <button class="bouton-ajouter-document" type="submit">
+                    Ajouter le document
+                  </button>
+
+                  <button
+                    id="bouton-annuler-modification"
+                    class="bouton-annuler-modification"
+                    type="button"
+                    hidden
+                  >
+                    Annuler la modification
+                  </button>
+                </form>
+              </section>
+
+              <section
+                class="zone-liste-documents"
+                aria-labelledby="liste-documents-title"
+              >
+                <h3 id="liste-documents-title">
+                  Documents ajoutés (<span id="nombre-documents-liste">0</span>)
+                </h3>
+                <div
+                  class="filtres-documents"
+                  aria-label="Recherche et filtres des documents"
+                >
+                  <label class="champ-filtre-recherche">
+                    Rechercher un nom MultiGest
+                    <input
+                      id="recherche-documents"
+                      type="search"
+                      placeholder="Saisir un nom"
+                    />
+                  </label>
+
+                  <label>
+                    Statut PDF
+                    <select id="filtre-pdf">
+                      <option value="">Tous les PDF</option>
+                      <option value="present">PDF associé</option>
+                      <option value="manquant">
+                        PDF manquant ou à réassocier
+                      </option>
+                    </select>
+                  </label>
+
+                  <label>
+                    Instructrice
+                    <select id="filtre-instructrice">
+                      <option value="">Toutes les instructrices</option>
+                    </select>
+                  </label>
+
+                  <label>
+                    Type de document
+                    <select id="filtre-type-document">
+                      <option value="">Tous les types</option>
+                      <option value="demande">Demande</option>
+                      <option value="piece_complementaire">
+                        Pièce complémentaire
+                      </option>
+                      <option value="recours">Recours</option>
+                    </select>
+                  </label>
+
+                  <button
+                    id="bouton-effacer-filtres"
+                    class="bouton-effacer-filtres"
+                    type="button"
+                  >
+                    Effacer les filtres
+                  </button>
+                </div>
+                <p
+                  id="nombre-resultats-filtres"
+                  class="nombre-resultats-filtres"
+                  hidden
+                ></p>
+                <p id="message-liste-vide" class="message-liste-vide">
+                  Aucun document ajouté pour le moment.
+                </p>
+                <p id="message-aucun-resultat" class="message-liste-vide" hidden>
+                  Aucun document ne correspond aux filtres sélectionnés.
+                </p>
+                <div id="liste-documents" class="liste-documents"></div>
+              </section>
+            </div>
+          </section>
+        </div>
+
+        <aside
+          class="panneau-actions-session"
+          aria-labelledby="actions-session-title"
         >
-          <h3 id="liste-documents-title">
-            Documents ajoutés (<span id="nombre-documents-liste">0</span>)
-          </h3>
-          <p id="message-liste-vide" class="message-liste-vide">
-            Aucun document ajouté pour le moment.
-          </p>
-          <div id="liste-documents" class="liste-documents"></div>
-        </section>
-        </div>
-      </section>
-        </div>
-
-        <aside class="panneau-actions-session" aria-labelledby="actions-session-title">
           <h2 id="actions-session-title">Gestion de session</h2>
 
           <section class="zone-reprise-session">
@@ -335,8 +407,8 @@
           >
             <h3 id="sauvegarde-session-title">Sauvegarder</h3>
             <p>
-              Téléchargez un fichier JSON pour garder une copie de la session
-              en cours.
+              Téléchargez un fichier JSON pour garder une copie de la session en
+              cours.
             </p>
             <button
               id="bouton-sauvegarder-session"
@@ -355,7 +427,10 @@
             </p>
           </section>
 
-          <section class="zone-statistiques" aria-labelledby="statistiques-title">
+          <section
+            class="zone-statistiques"
+            aria-labelledby="statistiques-title"
+          >
             <h3 id="statistiques-title">Statistiques</h3>
 
             <div class="grille-statistiques" aria-label="Statistiques du lot">

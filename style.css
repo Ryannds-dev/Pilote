@@ -633,16 +633,70 @@ h1 {
 }
 
 .zone-liste-documents {
+  display: flex;
+  flex-direction: column;
   min-width: 0;
   padding: 18px;
   border: 1px solid var(--gris-bordure);
   background: var(--gris-fond-page);
+  overflow: hidden;
 }
 
 .zone-liste-documents h3 {
   margin-top: 0;
   margin-bottom: 14px;
   font-size: 1.1rem;
+}
+
+.filtres-documents {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--gris-bordure);
+}
+
+.filtres-documents label {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  color: var(--gris-texte);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.filtres-documents input,
+.filtres-documents select {
+  width: 100%;
+  min-width: 0;
+  padding: 8px;
+  color: var(--gris-texte);
+  border: 1px solid var(--gris-bordure);
+  background: var(--blanc);
+  font: inherit;
+}
+
+.champ-filtre-recherche,
+.bouton-effacer-filtres {
+  grid-column: 1 / -1;
+}
+
+.bouton-effacer-filtres {
+  justify-self: start;
+  padding: 8px 12px;
+  color: var(--gris-texte);
+  border: 1px solid var(--gris-bordure);
+  background: var(--blanc);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.nombre-resultats-filtres {
+  margin: 0 0 10px;
+  color: var(--gris-secondaire);
+  font-size: 0.9rem;
+  font-weight: 700;
 }
 
 .message-liste-vide {
@@ -652,8 +706,10 @@ h1 {
 
 .liste-documents {
   display: grid;
+  flex: 1;
   gap: 14px;
-  max-height: calc(100vh - 170px);
+  min-height: 0;
+  align-content: start;
   overflow-y: auto;
   padding-right: 8px;
   scrollbar-gutter: stable;
@@ -685,6 +741,17 @@ h1 {
 
 .contenu-carte-document {
   min-width: 0;
+}
+
+.numero-document {
+  display: inline-block;
+  margin-bottom: 8px;
+  padding: 4px 7px;
+  color: var(--gris-secondaire);
+  border: 1px solid var(--gris-bordure);
+  background: var(--gris-fond-page);
+  font-size: 0.8rem;
+  font-weight: 700;
 }
 
 .titre-document {
@@ -768,9 +835,12 @@ h1 {
   }
 
   .liste-documents {
-    max-height: none;
     overflow: visible;
     padding-right: 0;
+  }
+
+  .zone-liste-documents {
+    overflow: visible;
   }
 }
 
@@ -828,6 +898,15 @@ h1 {
 
   .carte-document {
     grid-template-columns: 1fr;
+  }
+
+  .filtres-documents {
+    grid-template-columns: 1fr;
+  }
+
+  .champ-filtre-recherche,
+  .bouton-effacer-filtres {
+    grid-column: auto;
   }
 
   .bouton-demarrer-session,

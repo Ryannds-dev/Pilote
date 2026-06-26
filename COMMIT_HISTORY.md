@@ -383,7 +383,8 @@ Objectif : rendre l'écran principal plus clair en séparant les manipulations d
 - déplacement du bouton de sauvegarde JSON dans le même panneau ;
 - conservation du bloc central pour les fichiers Excel, le démarrage, les documents et les statistiques ;
 - bouton de sauvegarde visible mais désactivé tant qu'aucune session n'est ouverte ;
-- adaptation responsive pour afficher le panneau proprement sur petit écran.
+- sur les écrans de plus de `1100 px`, panneau de gestion affiché à droite et conservé à l'écran pendant le défilement ;
+- sur les écrans de `1100 px` ou moins, panneau placé au-dessus des manipulations principales et affichage ramené sur une seule colonne.
 
 Point d'attention :
 
@@ -398,8 +399,9 @@ Objectif : rendre la saisie plus pratique en affichant le formulaire à côté d
 - formulaire d'ajout de document placé à gauche ;
 - liste des documents placée à droite ;
 - statistiques déplacées dans le panneau latéral pour rester visibles ;
-- panneau latéral conservé en position fixe pendant le défilement sur grand écran ;
-- repli responsive en une colonne quand l'écran devient trop étroit.
+- sur les écrans de plus de `1100 px`, formulaire et liste affichés côte à côte, avec le panneau latéral conservé à l'écran pendant le défilement ;
+- sur les écrans de `1100 px` ou moins, formulaire, liste et panneau latéral affichés les uns sous les autres ;
+- sur les écrans de `640 px` ou moins, formulaire ramené sur une seule colonne et boutons principaux affichés sur toute la largeur.
 
 Point d'attention :
 
@@ -412,11 +414,42 @@ Date : 2026-06-26
 Objectif : faciliter la saisie quand la session contient beaucoup de documents.
 
 - ajout du nombre de documents directement dans le titre "Documents ajoutés" ;
+- ajout d'un numéro visible sur chaque document pour faciliter le repérage dans les longues listes ;
+- recalcul automatique des numéros selon l'ordre de la liste après une suppression ;
 - liste des documents isolée dans un panneau visuellement distinct ;
-- ajout d'un défilement interne pour la liste sur grand écran ;
-- formulaire d'ajout conservé visible à côté de la liste sur grand écran ;
-- retour à un affichage simple en une colonne sur écran plus étroit.
+- sur les écrans de plus de `1100 px`, hauteur de la liste limitée précisément à la hauteur du formulaire situé à gauche ;
+- apparition immédiate du défilement interne dès que les documents dépassent la hauteur du bouton d'ajout ;
+- ajustement automatique de cette hauteur quand le formulaire change ou quand la fenêtre est redimensionnée ;
+- sur les écrans de `1100 px` ou moins, suppression du défilement interne et retour à une liste complète sous le formulaire ;
+- sur les écrans de `640 px` ou moins, cartes de documents ramenées sur une seule colonne et boutons affichés sur toute la largeur ;
+- sur les écrans de `420 px` ou moins, statistiques affichées sur une seule colonne pour rester lisibles.
 
 Point d'attention :
 
-- l'enjeu était d'éviter les grands allers-retours dans la page entre la saisie et la liste lorsque beaucoup de documents sont ajoutés.
+- l'enjeu était d'éviter les grands allers-retours dans la page entre la saisie et la liste lorsque beaucoup de documents sont ajoutés ;
+- le CSS ne peut pas connaître seul la hauteur variable du formulaire : une synchronisation JavaScript observe donc ses changements de taille ;
+- le numéro sert uniquement de repère visuel : il n'est pas enregistré comme une donnée du document et reste toujours cohérent avec sa place actuelle dans la liste.
+
+## Search: Add document search and filters
+
+Date : 2026-06-26
+
+Objectif : retrouver rapidement les documents utiles dans une session chargée.
+
+- recherche instantanée dans le nom MultiGest ;
+- recherche tolérante aux majuscules, accents, apostrophes, tirets et espaces ;
+- filtre des documents avec PDF associé ou PDF manquant ;
+- filtre par instructrice, avec une liste construite à partir des documents de la session ;
+- filtre par type de document : demande, pièce complémentaire ou recours ;
+- combinaison possible de plusieurs critères ;
+- bouton permettant d'effacer tous les filtres ;
+- affichage du nombre de résultats par rapport au nombre total de documents ;
+- message distinct quand la session est vide et quand aucun document ne correspond ;
+- conservation du numéro d'origine des documents dans les résultats filtrés ;
+- sur les écrans de `640 px` ou moins, filtres affichés sur une seule colonne.
+
+Points d'attention :
+
+- les filtres modifient uniquement l'affichage : ils ne changent et ne suppriment aucune donnée ;
+- le filtre « PDF manquant » inclut également les PDF à réassocier après l'import d'une sauvegarde JSON ;
+- la liste des instructrices est actualisée après chaque ajout, modification, suppression ou restauration de document.
