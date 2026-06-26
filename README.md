@@ -80,6 +80,12 @@ La sauvegarde JSON conserve les informations de session et les documents saisis.
 
 Après rechargement d'une sauvegarde, PILOTE affiche le nom du PDF connu et indique clairement qu'il faut le réassocier.
 
+## Remarque sur les PDF
+
+Quand un PDF est associé à un document, PILOTE ne crée pas de copie du fichier dans le dossier du projet. Le navigateur garde seulement un accès temporaire au fichier sélectionné tant que la page reste ouverte.
+
+Avant l'export final, il faut donc éviter de supprimer, déplacer ou renommer les PDF d'origine. Si la page est fermée ou si une sauvegarde JSON est rechargée, les PDF devront être réassociés.
+
 ## Bibliothèques externes
 
 Le dossier `libs` contient SheetJS, utilisé pour lire les fichiers Excel.

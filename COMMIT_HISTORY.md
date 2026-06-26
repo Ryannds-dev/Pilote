@@ -357,3 +357,18 @@ Limites volontaires :
 - pas d'export ZIP ;
 - pas d'export statistique ;
 - pas de restauration automatique des fichiers PDF.
+
+## Docs: Clarify PDF file handling
+
+Date : 2026-06-26
+
+Objectif : préciser dans la documentation comment PILOTE gère les PDF sélectionnés.
+
+- ajout d'une remarque dédiée aux PDF dans le README ;
+- précision que PILOTE ne crée pas de copie automatique des PDF ;
+- indication de conserver les PDF d'origine tant que l'export final n'est pas terminé ;
+- rappel qu'après rechargement JSON, les PDF devront être réassociés.
+
+Point d'attention :
+
+- cette précision évite de laisser croire qu'une sauvegarde JSON ou une association PDF protège déjà les fichiers PDF eux-mêmes.
