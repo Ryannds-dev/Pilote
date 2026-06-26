@@ -368,7 +368,15 @@ h1 {
   padding: 32px;
   border: 2px solid #d88a00;
   border-left: 8px solid #d88a00;
-  background: var(--blanc);
+  background: #fffdf8;
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease;
+}
+
+.zone-excel-validee {
+  border-color: #267a3e;
+  background: #f7fcf8;
 }
 
 .zone-excel h2 {

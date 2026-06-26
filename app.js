@@ -372,12 +372,14 @@ function updateSessionStartAvailability() {
   const sessionImportInput = document.getElementById("fichier-session-json");
   const excelMessage = document.getElementById("message-import-excel");
   const sessionImportMessage = document.getElementById("message-import-session");
+  const excelImportArea = document.querySelector(".zone-excel");
   const ready = areRequiredExcelFilesReady();
 
   startButton.disabled = !ready;
   agentInput.disabled = !ready;
   tamponDateInput.disabled = !ready;
   sessionImportInput.disabled = !ready;
+  excelImportArea.classList.toggle("zone-excel-validee", ready);
 
   if (ready) {
     excelMessage.textContent =

@@ -453,3 +453,18 @@ Points d'attention :
 - les filtres modifient uniquement l'affichage : ils ne changent et ne suppriment aucune donnée ;
 - le filtre « PDF manquant » inclut également les PDF à réassocier après l'import d'une sauvegarde JSON ;
 - la liste des instructrices est actualisée après chaque ajout, modification, suppression ou restauration de document.
+
+## Excel: Show completed import state
+
+Date : 2026-06-27
+
+Objectif : rendre immédiatement visible l'état global des fichiers de sectorisation.
+
+- contour jaune tant que les trois fichiers Excel ne sont pas validés ;
+- contour et fond verts lorsque les trois imports sont terminés correctement ;
+- retour automatique à l'état jaune si un fichier est retiré ou devient invalide ;
+- conservation des messages détaillés pour connaître l'état de chaque fichier.
+
+Point d'attention :
+
+- la couleur dépend de la validation réelle des trois fichiers, pas seulement de leur sélection.
