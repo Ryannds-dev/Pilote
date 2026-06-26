@@ -1234,12 +1234,15 @@ function resetDocumentForm() {
 
 function updateDocumentCounter() {
   const documentCounter = document.getElementById("nombre-documents-session");
+  const documentListCounter = document.getElementById("nombre-documents-liste");
 
-  if (!documentCounter) {
-    return;
+  if (documentCounter) {
+    documentCounter.textContent = currentSession.documents.length;
   }
 
-  documentCounter.textContent = currentSession.documents.length;
+  if (documentListCounter) {
+    documentListCounter.textContent = currentSession.documents.length;
+  }
 }
 
 function updateStatisticsDisplay() {

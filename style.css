@@ -590,6 +590,11 @@ h1 {
   font-size: 1.1rem;
 }
 
+.zone-ajout-document {
+  position: sticky;
+  top: 24px;
+}
+
 .organisation-documents {
   display: grid;
   grid-template-columns: minmax(320px, 390px) minmax(0, 1fr);
@@ -629,6 +634,9 @@ h1 {
 
 .zone-liste-documents {
   min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--gris-bordure);
+  background: var(--gris-fond-page);
 }
 
 .zone-liste-documents h3 {
@@ -645,6 +653,10 @@ h1 {
 .liste-documents {
   display: grid;
   gap: 14px;
+  max-height: calc(100vh - 170px);
+  overflow-y: auto;
+  padding-right: 8px;
+  scrollbar-gutter: stable;
 }
 
 .carte-document {
@@ -749,6 +761,16 @@ h1 {
   .panneau-actions-session {
     position: static;
     order: -1;
+  }
+
+  .zone-ajout-document {
+    position: static;
+  }
+
+  .liste-documents {
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
   }
 }
 

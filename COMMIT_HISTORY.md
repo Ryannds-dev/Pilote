@@ -404,3 +404,19 @@ Objectif : rendre la saisie plus pratique en affichant le formulaire à côté d
 Point d'attention :
 
 - la difficulté était de garder les informations utiles sous les yeux sans transformer le centre de l'écran en mélange de boutons, statistiques et saisie.
+
+## UX: Make document list easier to manage
+
+Date : 2026-06-26
+
+Objectif : faciliter la saisie quand la session contient beaucoup de documents.
+
+- ajout du nombre de documents directement dans le titre "Documents ajoutés" ;
+- liste des documents isolée dans un panneau visuellement distinct ;
+- ajout d'un défilement interne pour la liste sur grand écran ;
+- formulaire d'ajout conservé visible à côté de la liste sur grand écran ;
+- retour à un affichage simple en une colonne sur écran plus étroit.
+
+Point d'attention :
+
+- l'enjeu était d'éviter les grands allers-retours dans la page entre la saisie et la liste lorsque beaucoup de documents sont ajoutés.
