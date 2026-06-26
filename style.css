@@ -28,7 +28,7 @@ body {
 
 .organisation-application {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 300px;
+  grid-template-columns: minmax(0, 1fr) 360px;
   gap: 28px;
   align-items: start;
 }
@@ -41,6 +41,8 @@ body {
   position: sticky;
   top: 24px;
   margin-top: 28px;
+  max-height: calc(100vh - 48px);
+  overflow: auto;
   padding: 24px;
   border: 1px solid var(--gris-bordure);
   border-top: 6px solid var(--rouge-pilote);
@@ -503,9 +505,9 @@ h1 {
 }
 
 .zone-statistiques {
-  margin-bottom: 32px;
-  padding-bottom: 28px;
-  border-bottom: 1px solid var(--gris-bordure);
+  margin-top: 24px;
+  padding-top: 22px;
+  border-top: 1px solid var(--gris-bordure);
 }
 
 .zone-statistiques h3 {
@@ -516,13 +518,13 @@ h1 {
 
 .grille-statistiques {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
 
 .carte-statistique {
-  min-height: 88px;
-  padding: 16px;
+  min-height: 78px;
+  padding: 14px;
   border: 1px solid var(--gris-bordure);
   border-left: 4px solid var(--rouge-pilote);
   background: var(--gris-fond-page);
@@ -538,7 +540,7 @@ h1 {
 
 .carte-statistique strong {
   color: var(--gris-texte);
-  font-size: 1.8rem;
+  font-size: 1.45rem;
   line-height: 1;
 }
 
@@ -588,9 +590,15 @@ h1 {
   font-size: 1.1rem;
 }
 
+.organisation-documents {
+  display: grid;
+  grid-template-columns: minmax(320px, 390px) minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+
 .formulaire-document {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
 }
 
@@ -620,9 +628,7 @@ h1 {
 }
 
 .zone-liste-documents {
-  margin-top: 32px;
-  padding-top: 28px;
-  border-top: 1px solid var(--gris-bordure);
+  min-width: 0;
 }
 
 .zone-liste-documents h3 {
@@ -734,6 +740,18 @@ h1 {
   margin-top: 14px;
 }
 
+@media (max-width: 1100px) {
+  .organisation-application,
+  .organisation-documents {
+    grid-template-columns: 1fr;
+  }
+
+  .panneau-actions-session {
+    position: static;
+    order: -1;
+  }
+}
+
 @media (max-width: 640px) {
   .page-principale {
     padding: 24px 16px;
@@ -743,13 +761,7 @@ h1 {
     padding: 32px 24px;
   }
 
-  .organisation-application {
-    grid-template-columns: 1fr;
-  }
-
   .panneau-actions-session {
-    position: static;
-    order: -1;
     padding: 24px;
   }
 

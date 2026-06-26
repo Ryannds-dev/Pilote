@@ -388,3 +388,19 @@ Objectif : rendre l'écran principal plus clair en séparant les manipulations d
 Point d'attention :
 
 - les fonctionnalités n'ont pas changé ; seul leur emplacement a été revu pour éviter que les options de sauvegarde/import perturbent la saisie principale.
+
+## UX: Place form beside document list
+
+Date : 2026-06-26
+
+Objectif : rendre la saisie plus pratique en affichant le formulaire à côté de la liste des documents.
+
+- formulaire d'ajout de document placé à gauche ;
+- liste des documents placée à droite ;
+- statistiques déplacées dans le panneau latéral pour rester visibles ;
+- panneau latéral conservé en position fixe pendant le défilement sur grand écran ;
+- repli responsive en une colonne quand l'écran devient trop étroit.
+
+Point d'attention :
+
+- la difficulté était de garder les informations utiles sous les yeux sans transformer le centre de l'écran en mélange de boutons, statistiques et saisie.
