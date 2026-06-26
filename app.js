@@ -91,6 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   prepareExcelImportArea();
+  updateSaveControls("Sauvegarde disponible après le démarrage d'une session.");
 });
 
 function prepareExcelImportArea() {
@@ -831,12 +832,14 @@ function showSessionImportMessage(message, isError) {
 }
 
 function updateSaveControls(message) {
+  const saveButton = document.getElementById("bouton-sauvegarder-session");
   const saveMessage = document.getElementById("message-sauvegarde-session");
 
   if (!saveMessage) {
     return;
   }
 
+  saveButton.disabled = !currentSession.sessionId;
   saveMessage.textContent = message;
 }
 

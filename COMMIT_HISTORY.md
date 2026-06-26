@@ -372,3 +372,19 @@ Objectif : préciser dans la documentation comment PILOTE gère les PDF sélecti
 Point d'attention :
 
 - cette précision évite de laisser croire qu'une sauvegarde JSON ou une association PDF protège déjà les fichiers PDF eux-mêmes.
+
+## UX: Move session tools to side panel
+
+Date : 2026-06-26
+
+Objectif : rendre l'écran principal plus clair en séparant les manipulations du lot et les actions de gestion de session.
+
+- déplacement de l'import JSON de session dans un panneau latéral ;
+- déplacement du bouton de sauvegarde JSON dans le même panneau ;
+- conservation du bloc central pour les fichiers Excel, le démarrage, les documents et les statistiques ;
+- bouton de sauvegarde visible mais désactivé tant qu'aucune session n'est ouverte ;
+- adaptation responsive pour afficher le panneau proprement sur petit écran.
+
+Point d'attention :
+
+- les fonctionnalités n'ont pas changé ; seul leur emplacement a été revu pour éviter que les options de sauvegarde/import perturbent la saisie principale.
