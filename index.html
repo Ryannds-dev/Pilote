@@ -7,6 +7,7 @@
     <link rel="icon" type="image/png" href="assets/favicon.png" />
     <link rel="stylesheet" href="style.css" />
     <script src="libs/xlsx.full.min.js" defer></script>
+    <script src="libs/jszip.min.js" defer></script>
     <script src="app.js" defer></script>
   </head>
   <body>
@@ -424,6 +425,59 @@
               aria-live="polite"
             >
               Sauvegarde disponible après le démarrage d'une session.
+            </p>
+          </section>
+
+          <section
+            class="zone-export-pdf"
+            aria-labelledby="export-pdf-title"
+          >
+            <h3 id="export-pdf-title">Exporter les PDF</h3>
+
+            <div class="compatibilite-navigateur">
+              <div class="navigateurs-export">
+                <img src="assets/microsoft-edge.svg" alt="Microsoft Edge" />
+                <img src="assets/google-chrome.svg" alt="Google Chrome" />
+              </div>
+              <p>
+                Edge et Chrome peuvent créer directement les dossiers des
+                instructrices.
+              </p>
+            </div>
+
+            <div class="compatibilite-navigateur">
+              <div class="navigateurs-export">
+                <img src="assets/firefox.svg" alt="Mozilla Firefox" />
+              </div>
+              <p>
+                Firefox utilise un fichier ZIP contenant les mêmes dossiers.
+              </p>
+            </div>
+
+            <button
+              id="bouton-exporter-dossiers"
+              class="bouton-exporter-dossiers"
+              type="button"
+              disabled
+            >
+              Créer les dossiers
+            </button>
+
+            <button
+              id="bouton-exporter-zip"
+              class="bouton-exporter-zip"
+              type="button"
+              disabled
+            >
+              Télécharger le ZIP
+            </button>
+
+            <p
+              id="message-export-pdf"
+              class="message-export-pdf"
+              aria-live="polite"
+            >
+              Export disponible après l'ajout des documents.
             </p>
           </section>
 

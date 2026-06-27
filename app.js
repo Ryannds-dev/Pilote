@@ -81,11 +81,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const cancelEditButton = document.getElementById("bouton-annuler-modification");
   const saveSessionButton = document.getElementById("bouton-sauvegarder-session");
   const sessionImportInput = document.getElementById("fichier-session-json");
+  const exportFoldersButton = document.getElementById("bouton-exporter-dossiers");
+  const exportZipButton = document.getElementById("bouton-exporter-zip");
 
   formulaireDemarrage.addEventListener("submit", handleSessionStart);
   formulaireDocument.addEventListener("submit", handleDocumentSubmit);
   cancelEditButton.addEventListener("click", cancelDocumentEdition);
   saveSessionButton.addEventListener("click", saveCurrentSession);
+  exportFoldersButton.addEventListener("click", exportPdfsToFolders);
+  exportZipButton.addEventListener("click", exportPdfsToZip);
   sessionImportInput.addEventListener("change", () => {
     handleSessionFileSelection(sessionImportInput.files[0]);
   });
@@ -94,6 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
   prepareDocumentFilters();
   synchronizeDocumentPanelsHeight();
   updateSaveControls("Sauvegarde disponible après le démarrage d'une session.");
+  updatePdfExportControls();
 });
 
 function prepareDocumentFilters() {
@@ -723,6 +728,10 @@ function createCurrentSessionSignature() {
 
 function downloadTextFile(fileName, content) {
   const fileBlob = new Blob([content], { type: "application/json" });
+  downloadBlobFile(fileName, fileBlob);
+}
+
+function downloadBlobFile(fileName, fileBlob) {
   const temporaryLink = document.createElement("a");
   const temporaryUrl = URL.createObjectURL(fileBlob);
 
@@ -732,6 +741,251 @@ function downloadTextFile(fileName, content) {
   temporaryLink.click();
   temporaryLink.remove();
   URL.revokeObjectURL(temporaryUrl);
+}
+
+function updatePdfExportControls() {
+  const exportFoldersButton = document.getElementById("bouton-exporter-dossiers");
+  const exportZipButton = document.getElementById("bouton-exporter-zip");
+  const exportMessage = document.getElementById("message-export-pdf");
+  const sessionHasDocuments =
+    Boolean(currentSession.sessionId) && currentSession.documents.length > 0;
+  const folderExportIsSupported =
+    typeof window.showDirectoryPicker === "function";
+
+  exportFoldersButton.disabled = !sessionHasDocuments || !folderExportIsSupported;
+  exportZipButton.disabled = !sessionHasDocuments;
+
+  if (!sessionHasDocuments) {
+    setPdfExportMessage(
+      "Export disponible après l'ajout des documents.",
+      "information"
+    );
+    return;
+  }
+
+  if (!folderExportIsSupported) {
+    setPdfExportMessage(
+      "La création directe des dossiers n'est pas disponible dans ce navigateur. Utilisez le ZIP.",
+      "information"
+    );
+    return;
+  }
+
+  exportMessage.textContent =
+    "Choisissez la création directe des dossiers ou le téléchargement ZIP.";
+  exportMessage.className = "message-export-pdf";
+}
+
+async function exportPdfsToFolders() {
+  const validationMessage = validatePdfExport();
+
+  if (validationMessage) {
+    setPdfExportMessage(validationMessage, "error");
+    return;
+  }
+
+  if (typeof window.showDirectoryPicker !== "function") {
+    setPdfExportMessage(
+      "Ce navigateur ne peut pas créer les dossiers. Utilisez le téléchargement ZIP.",
+      "error"
+    );
+    return;
+  }
+
+  try {
+    const selectedDirectory = await window.showDirectoryPicker({
+      id: "pilote-pdf-export",
+      mode: "readwrite"
+    });
+    const sessionDirectory = await selectedDirectory.getDirectoryHandle(
+      cleanFileSystemName(currentSession.sessionId, "SESSION_PILOTE"),
+      { create: true }
+    );
+
+    setPdfExportMessage("Création des dossiers en cours…", "information");
+    await writePdfsIntoDirectory(sessionDirectory);
+    setPdfExportMessage(
+      `Export terminé dans le dossier ${currentSession.sessionId}.`,
+      "success"
+    );
+  } catch (error) {
+    if (error.name === "AbortError") {
+      setPdfExportMessage("Export annulé : aucun dossier n'a été sélectionné.", "information");
+      return;
+    }
+
+    setPdfExportMessage(
+      "L'export vers les dossiers a échoué. Aucun document de PILOTE n'a été modifié.",
+      "error"
+    );
+    console.error(error);
+  }
+}
+
+async function writePdfsIntoDirectory(sessionDirectory) {
+  const directoryHandles = new Map();
+  const usedFileNames = new Map();
+
+  for (const documentItem of currentSession.documents) {
+    const instructorFolderName = getDocumentExportFolderName(documentItem);
+
+    if (!directoryHandles.has(instructorFolderName)) {
+      directoryHandles.set(
+        instructorFolderName,
+        await sessionDirectory.getDirectoryHandle(instructorFolderName, {
+          create: true
+        })
+      );
+      usedFileNames.set(instructorFolderName, new Set());
+    }
+
+    const pdfFileName = createUniquePdfFileName(
+      documentItem.pdfFileName,
+      usedFileNames.get(instructorFolderName)
+    );
+    const pdfHandle = await directoryHandles
+      .get(instructorFolderName)
+      .getFileHandle(pdfFileName, { create: true });
+    const writableFile = await pdfHandle.createWritable();
+
+    await writableFile.write(documentItem.pdfFile);
+    await writableFile.close();
+  }
+}
+
+async function exportPdfsToZip() {
+  const validationMessage = validatePdfExport();
+
+  if (validationMessage) {
+    setPdfExportMessage(validationMessage, "error");
+    return;
+  }
+
+  if (!window.JSZip) {
+    setPdfExportMessage(
+      "La bibliothèque ZIP locale n'est pas disponible. Vérifiez le dossier libs.",
+      "error"
+    );
+    return;
+  }
+
+  try {
+    const zipFile = new window.JSZip();
+    const usedFileNames = new Map();
+
+    currentSession.documents.forEach((documentItem) => {
+      const instructorFolderName = getDocumentExportFolderName(documentItem);
+
+      if (!usedFileNames.has(instructorFolderName)) {
+        usedFileNames.set(instructorFolderName, new Set());
+      }
+
+      const pdfFileName = createUniquePdfFileName(
+        documentItem.pdfFileName,
+        usedFileNames.get(instructorFolderName)
+      );
+
+      zipFile
+        .folder(instructorFolderName)
+        .file(pdfFileName, documentItem.pdfFile);
+    });
+
+    setPdfExportMessage("Préparation du ZIP en cours…", "information");
+    const zipContent = await zipFile.generateAsync({
+      type: "blob",
+      compression: "DEFLATE",
+      compressionOptions: { level: 6 }
+    });
+    const zipFileName = `${cleanFileSystemName(
+      currentSession.sessionId,
+      "SESSION_PILOTE"
+    )}.zip`;
+
+    downloadBlobFile(zipFileName, zipContent);
+    setPdfExportMessage(`ZIP téléchargé : ${zipFileName}.`, "success");
+  } catch (error) {
+    setPdfExportMessage(
+      "La création du ZIP a échoué. Aucun document de PILOTE n'a été modifié.",
+      "error"
+    );
+    console.error(error);
+  }
+}
+
+function validatePdfExport() {
+  if (!currentSession.sessionId || currentSession.documents.length === 0) {
+    return "Ajoutez au moins un document avant l'export.";
+  }
+
+  const missingPdfCount = currentSession.documents.filter((documentItem) => {
+    return !documentItem.pdfLoaded || !documentItem.pdfFile;
+  }).length;
+
+  if (missingPdfCount > 0) {
+    return `${missingPdfCount} document(s) sans PDF : associez tous les PDF avant l'export.`;
+  }
+
+  return "";
+}
+
+function getDocumentExportFolderName(documentItem) {
+  if (
+    documentItem.sectorizationStatus === SECTORIZATION_STATUS.WARNING ||
+    !documentItem.instructor
+  ) {
+    return "A_VERIFIER";
+  }
+
+  return cleanFileSystemName(documentItem.instructor, "A_VERIFIER");
+}
+
+function cleanFileSystemName(value, fallbackName) {
+  const cleanName = String(value || "")
+    .replace(/[<>:"/\\|?*\u0000-\u001F]/g, " ")
+    .replace(/\s+/g, " ")
+    .replace(/[. ]+$/g, "")
+    .trim();
+  const reservedWindowsName = /^(con|prn|aux|nul|com[1-9]|lpt[1-9])$/i;
+
+  if (!cleanName) {
+    return fallbackName;
+  }
+
+  return reservedWindowsName.test(cleanName) ? `_${cleanName}` : cleanName;
+}
+
+function createUniquePdfFileName(originalFileName, usedFileNames) {
+  const cleanFileName = cleanFileSystemName(originalFileName, "document.pdf");
+  const extensionPosition = cleanFileName.toLowerCase().lastIndexOf(".pdf");
+  const fileNameWithoutExtension =
+    extensionPosition === -1
+      ? cleanFileName
+      : cleanFileName.slice(0, extensionPosition);
+  let uniqueFileName = `${fileNameWithoutExtension}.pdf`;
+  let copyNumber = 2;
+
+  while (usedFileNames.has(uniqueFileName.toLowerCase())) {
+    uniqueFileName = `${fileNameWithoutExtension} (${copyNumber}).pdf`;
+    copyNumber += 1;
+  }
+
+  usedFileNames.add(uniqueFileName.toLowerCase());
+  return uniqueFileName;
+}
+
+function setPdfExportMessage(message, status) {
+  const exportMessage = document.getElementById("message-export-pdf");
+
+  exportMessage.textContent = message;
+  exportMessage.className = "message-export-pdf";
+
+  if (status === "success") {
+    exportMessage.classList.add("message-export-pdf-ok");
+  }
+
+  if (status === "error") {
+    exportMessage.classList.add("message-export-pdf-erreur");
+  }
 }
 
 function handleSessionFileSelection(selectedFile) {
@@ -1456,6 +1710,8 @@ function renderDocumentList() {
   filteredDocuments.forEach(({ documentItem, documentNumber }) => {
     documentList.appendChild(createDocumentCard(documentItem, documentNumber));
   });
+
+  updatePdfExportControls();
 }
 
 function getFilteredDocuments() {

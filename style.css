@@ -258,7 +258,9 @@ h1 {
 .bouton-annuler-modification,
 .bouton-modifier-document,
 .bouton-supprimer-document,
-.bouton-sauvegarder-session {
+.bouton-sauvegarder-session,
+.bouton-exporter-dossiers,
+.bouton-exporter-zip {
   width: fit-content;
   min-height: 46px;
   padding: 12px 18px;
@@ -272,7 +274,9 @@ h1 {
 
 .bouton-demarrer-session:disabled,
 .bouton-ajouter-document:disabled,
-.bouton-sauvegarder-session:disabled {
+.bouton-sauvegarder-session:disabled,
+.bouton-exporter-dossiers:disabled,
+.bouton-exporter-zip:disabled {
   color: #6f7580;
   background: #d9dde3;
   cursor: not-allowed;
@@ -280,10 +284,74 @@ h1 {
 
 .bouton-annuler-modification,
 .bouton-modifier-document,
-.bouton-supprimer-document {
+.bouton-supprimer-document,
+.bouton-exporter-zip {
   border: 1px solid var(--gris-bordure);
   color: var(--gris-texte);
   background: var(--blanc);
+}
+
+.bouton-exporter-zip:disabled {
+  color: #6f7580;
+  background: #d9dde3;
+}
+
+.zone-export-pdf {
+  padding: 22px 0;
+  border-bottom: 1px solid var(--gris-bordure);
+}
+
+.zone-export-pdf h3 {
+  margin-top: 0;
+  margin-bottom: 14px;
+  font-size: 1rem;
+}
+
+.compatibilite-navigateur {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.compatibilite-navigateur p {
+  margin: 0;
+  color: var(--gris-secondaire);
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.navigateurs-export {
+  display: flex;
+  gap: 5px;
+}
+
+.navigateurs-export img {
+  width: 26px;
+  height: 26px;
+}
+
+.bouton-exporter-dossiers,
+.bouton-exporter-zip {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.message-export-pdf {
+  margin: 12px 0 0;
+  color: var(--gris-secondaire);
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.message-export-pdf-ok {
+  color: #18542a;
+}
+
+.message-export-pdf-erreur {
+  color: var(--rouge-pilote);
 }
 
 .bouton-demarrer-session:not(:disabled):hover,
@@ -920,9 +988,11 @@ h1 {
   .bouton-demarrer-session,
   .bouton-ajouter-document,
   .bouton-annuler-modification,
-  .bouton-modifier-document,
-  .bouton-supprimer-document,
-  .bouton-sauvegarder-session {
+    .bouton-modifier-document,
+    .bouton-supprimer-document,
+    .bouton-sauvegarder-session,
+    .bouton-exporter-dossiers,
+    .bouton-exporter-zip {
     width: 100%;
   }
 

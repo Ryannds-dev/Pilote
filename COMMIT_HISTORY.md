@@ -468,3 +468,29 @@ Objectif : rendre immédiatement visible l'état global des fichiers de sectoris
 Point d'attention :
 
 - la couleur dépend de la validation réelle des trois fichiers, pas seulement de leur sélection.
+
+## Export: Support folders and ZIP
+
+Date : 2026-06-27
+
+Objectif : exporter les PDF classés par instructrice sans exclure Firefox.
+
+- ajout de JSZip `3.10.1` dans `libs` pour fonctionner sans Internet ;
+- ajout des licences et des sources des fichiers externes ;
+- ajout d'une zone d'information avec les icônes Edge, Chrome et Firefox ;
+- export direct dans des dossiers avec les navigateurs compatibles ;
+- choix du dossier de destination par l'agent avant toute écriture ;
+- création d'un dossier portant le nom de la session puis d'un sous-dossier par instructrice ;
+- export ZIP avec la même organisation pour Firefox et les autres navigateurs ;
+- rangement des cas non attribués ou à vérifier dans `A_VERIFIER` ;
+- blocage de l'export tant qu'un PDF manque ;
+- nettoyage des caractères interdits dans les noms de dossiers et de fichiers ;
+- ajout automatique d'un numéro quand plusieurs PDF portent le même nom ;
+- aucun export CSV ni export séparé des statistiques.
+
+Points d'attention :
+
+- une page web ne peut écrire que dans un dossier explicitement choisi par l'agent ;
+- Firefox ne propose pas l'accès direct au dossier : le ZIP assure donc la compatibilité ;
+- les PDF sont traités localement et ne sont envoyés sur aucun service extérieur ;
+- l'export ne remplace pas la sauvegarde JSON de la session.

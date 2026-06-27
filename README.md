@@ -18,6 +18,7 @@ L'application fonctionne dans le navigateur, sans backend, sans base de données
 3. Démarrer une session en indiquant l'agent et la date de tampon.
 4. Ajouter les documents du lot.
 5. Sauvegarder la session en JSON si besoin.
+6. Exporter les PDF directement en dossiers avec Edge/Chrome, ou en ZIP avec Firefox.
 
 Le formulaire de démarrage est bloqué tant que les 3 fichiers de sectorisation ne sont pas importés correctement.
 
@@ -43,6 +44,8 @@ Une session déjà sauvegardée peut être rechargée après l'import des fichie
 - Statistiques en temps réel sur les documents du lot.
 - Comptage des documents par instructrice.
 - Affichage des documents ajoutés dans le lot.
+- Export direct des PDF dans des dossiers classés par instructrice avec Edge ou Chrome.
+- Export ZIP contenant les mêmes dossiers avec Firefox et les autres navigateurs.
 
 ## Structure
 
@@ -68,7 +71,8 @@ COMMIT_HISTORY.md
 - Fonctionnement local.
 - Aucune donnée envoyée sur Internet.
 - Lecture Excel avec SheetJS chargé localement depuis `libs/xlsx.full.min.js`.
-- Licence SheetJS disponible dans `libs`.
+- Export ZIP avec JSZip chargé localement depuis `libs/jszip.min.js`.
+- Licences des bibliothèques disponibles dans `libs`.
 
 ## Remarque sur les fichiers Excel
 
@@ -86,12 +90,28 @@ Quand un PDF est associé à un document, PILOTE ne crée pas de copie du fichie
 
 Avant l'export final, il faut donc éviter de supprimer, déplacer ou renommer les PDF d'origine. Si la page est fermée ou si une sauvegarde JSON est rechargée, les PDF devront être réassociés.
 
+## Remarque sur l'export
+
+Avec Microsoft Edge ou Google Chrome, PILOTE peut demander à l'agent de choisir un dossier puis créer un sous-dossier par instructrice. Un dossier portant le nom de la session est créé pour isoler chaque export.
+
+Avec Mozilla Firefox, l'accès direct aux dossiers n'est pas disponible. PILOTE crée donc un ZIP portant le nom de la session et contenant la même organisation par instructrice.
+
+Les documents sans instructrice claire ou dont la sectorisation reste à vérifier sont rangés dans `A_VERIFIER`.
+
+L'export est bloqué tant qu'un document ne possède pas de PDF associé.
+
 ## Bibliothèques externes
 
-Le dossier `libs` contient SheetJS, utilisé pour lire les fichiers Excel.
+Le dossier `libs` contient SheetJS, utilisé pour lire les fichiers Excel, et JSZip, utilisé pour créer les exports ZIP.
 
 `index.html` charge la version optimisée `libs/xlsx.full.min.js`.
 
 La licence officielle est conservée dans `libs/SheetJS-LICENSE.txt`.
 
-Les informations utiles sur cette bibliothèque sont détaillées dans `libs/README.md`.
+`index.html` charge également `libs/jszip.min.js`.
+
+La licence officielle de JSZip est conservée dans `libs/JSZip-LICENSE.md`.
+
+Les informations utiles sur ces bibliothèques sont détaillées dans `libs/README.md`.
+
+Les sources et la licence des icônes de navigateurs sont détaillées dans `assets/README.md`.
