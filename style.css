@@ -319,24 +319,39 @@ h1 {
   border-top: 1px solid var(--gris-bordure);
 }
 
+.methode-export:last-of-type {
+  border-bottom: 1px solid var(--gris-bordure);
+}
+
 .methode-export-recommandee {
   border-top-color: #267a3e;
 }
 
 .entete-methode-export {
-  display: flex;
-  gap: 10px;
-  align-items: center;
+  color: var(--gris-texte);
+  cursor: pointer;
 }
 
-.entete-methode-export strong {
+.entete-methode-export::marker {
+  color: var(--rouge-pilote);
+}
+
+.titre-methode-export {
+  display: inline-grid;
+  gap: 3px;
+  vertical-align: middle;
+}
+
+.titre-methode-export strong {
   color: var(--gris-texte);
   font-size: 0.95rem;
 }
 
 .navigateurs-export {
-  display: flex;
+  display: inline-flex;
   gap: 5px;
+  margin: 0 8px;
+  vertical-align: middle;
 }
 
 .navigateurs-export img {
@@ -345,7 +360,6 @@ h1 {
 }
 
 .statut-methode-export {
-  margin: 8px 0;
   color: var(--gris-secondaire);
   font-size: 0.82rem;
   font-weight: 700;
@@ -353,6 +367,10 @@ h1 {
 
 .methode-export-recommandee .statut-methode-export {
   color: #18542a;
+}
+
+.contenu-methode-export {
+  padding-top: 8px;
 }
 
 .etapes-export {

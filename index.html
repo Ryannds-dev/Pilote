@@ -439,72 +439,79 @@
               commencer.
             </p>
 
-            <div id="methode-export-dossiers" class="methode-export">
-              <div class="entete-methode-export">
-                <div class="navigateurs-export">
+            <details id="methode-export-dossiers" class="methode-export">
+              <summary class="entete-methode-export">
+                <span class="navigateurs-export">
                   <img src="assets/microsoft-edge.svg" alt="Microsoft Edge" />
                   <img src="assets/google-chrome.svg" alt="Google Chrome" />
-                </div>
-                <strong>Avec Edge ou Chrome</strong>
+                </span>
+                <span class="titre-methode-export">
+                  <strong>Avec Edge ou Chrome</strong>
+                  <small
+                    id="statut-export-dossiers"
+                    class="statut-methode-export"
+                  ></small>
+                </span>
+              </summary>
+
+              <div class="contenu-methode-export">
+                <ol class="etapes-export">
+                  <li>Cliquez sur le bouton ci-dessous.</li>
+                  <li>Choisissez où enregistrer l'export sur l'ordinateur.</li>
+                  <li>
+                    PILOTE crée le dossier de la session et range
+                    automatiquement les PDF par instructrice.
+                  </li>
+                </ol>
+
+                <button
+                  id="bouton-exporter-dossiers"
+                  class="bouton-exporter-dossiers"
+                  type="button"
+                  disabled
+                >
+                  Choisir un dossier et exporter
+                </button>
               </div>
+            </details>
 
-              <p
-                id="statut-export-dossiers"
-                class="statut-methode-export"
-              ></p>
-
-              <ol class="etapes-export">
-                <li>Cliquez sur le bouton ci-dessous.</li>
-                <li>Choisissez où enregistrer l'export sur l'ordinateur.</li>
-                <li>
-                  PILOTE crée le dossier de la session et range automatiquement
-                  les PDF par instructrice.
-                </li>
-              </ol>
-
-              <button
-                id="bouton-exporter-dossiers"
-                class="bouton-exporter-dossiers"
-                type="button"
-                disabled
-              >
-                Choisir un dossier et exporter
-              </button>
-            </div>
-
-            <div id="methode-export-zip" class="methode-export">
-              <div class="entete-methode-export">
-                <div class="navigateurs-export">
+            <details id="methode-export-zip" class="methode-export">
+              <summary class="entete-methode-export">
+                <span class="navigateurs-export">
                   <img src="assets/firefox.svg" alt="Mozilla Firefox" />
-                </div>
-                <strong>Avec Firefox</strong>
+                </span>
+                <span class="titre-methode-export">
+                  <strong>Avec Firefox</strong>
+                  <small
+                    id="statut-export-zip"
+                    class="statut-methode-export"
+                  ></small>
+                </span>
+              </summary>
+
+              <div class="contenu-methode-export">
+                <ol class="etapes-export">
+                  <li>Cliquez sur le bouton ci-dessous.</li>
+                  <li>
+                    Retrouvez le fichier ZIP dans vos téléchargements habituels.
+                  </li>
+                  <li>
+                    Faites un clic droit sur le ZIP, puis choisissez
+                    « Extraire tout » pour obtenir les dossiers des
+                    instructrices.
+                  </li>
+                </ol>
+
+                <button
+                  id="bouton-exporter-zip"
+                  class="bouton-exporter-zip"
+                  type="button"
+                  disabled
+                >
+                  Télécharger l'export pour Firefox
+                </button>
               </div>
-
-              <p
-                id="statut-export-zip"
-                class="statut-methode-export"
-              ></p>
-
-              <ol class="etapes-export">
-                <li>Cliquez sur le bouton ci-dessous.</li>
-                <li>
-                  Retrouvez le fichier ZIP dans vos téléchargements habituels.
-                </li>
-                <li>
-                  Faites un clic droit sur le ZIP, puis choisissez
-                  « Extraire tout » pour obtenir les dossiers des instructrices.
-                </li>
-              </ol>
-
-              <button
-                id="bouton-exporter-zip"
-                class="bouton-exporter-zip"
-                type="button"
-                disabled
-              >
-                Télécharger l'export pour Firefox
-              </button>
-            </div>
+            </details>
 
             <p class="precision-export">
               Les documents sans instructrice certaine seront rangés dans le

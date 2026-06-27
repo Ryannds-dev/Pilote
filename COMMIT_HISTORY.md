@@ -491,6 +491,8 @@ Objectif : exporter les PDF classés par instructrice sans exclure Firefox.
 - étapes visibles pour choisir le dossier ou extraire le ZIP après téléchargement ;
 - libellés de boutons précisant directement l'action réalisée ;
 - rappel visible concernant le dossier `A_VERIFIER` ;
+- méthodes d'export placées dans des volets repliables pour réduire la hauteur du panneau ;
+- ouverture automatique de la méthode recommandée et réduction de l'autre méthode ;
 - aucun export CSV ni export séparé des statistiques.
 
 Points d'attention :

@@ -777,6 +777,13 @@ function updatePdfExportControls() {
     ? "Autre possibilité, compatible avec ce navigateur"
     : "Méthode recommandée sur ce navigateur";
 
+  if (!directExportMethod.dataset.initialized) {
+    directExportMethod.open = folderExportIsSupported;
+    zipExportMethod.open = !folderExportIsSupported;
+    directExportMethod.dataset.initialized = "true";
+    zipExportMethod.dataset.initialized = "true";
+  }
+
   if (!sessionHasDocuments) {
     setPdfExportMessage(
       "Export disponible après l'ajout des documents.",
