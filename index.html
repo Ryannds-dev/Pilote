@@ -433,44 +433,83 @@
             aria-labelledby="export-pdf-title"
           >
             <h3 id="export-pdf-title">Exporter les PDF</h3>
+            <p class="introduction-export">
+              PILOTE indique automatiquement la méthode adaptée à votre
+              navigateur. Tous les documents doivent avoir un PDF avant de
+              commencer.
+            </p>
 
-            <div class="compatibilite-navigateur">
-              <div class="navigateurs-export">
-                <img src="assets/microsoft-edge.svg" alt="Microsoft Edge" />
-                <img src="assets/google-chrome.svg" alt="Google Chrome" />
+            <div id="methode-export-dossiers" class="methode-export">
+              <div class="entete-methode-export">
+                <div class="navigateurs-export">
+                  <img src="assets/microsoft-edge.svg" alt="Microsoft Edge" />
+                  <img src="assets/google-chrome.svg" alt="Google Chrome" />
+                </div>
+                <strong>Avec Edge ou Chrome</strong>
               </div>
-              <p>
-                Edge et Chrome peuvent créer directement les dossiers des
-                instructrices.
-              </p>
+
+              <p
+                id="statut-export-dossiers"
+                class="statut-methode-export"
+              ></p>
+
+              <ol class="etapes-export">
+                <li>Cliquez sur le bouton ci-dessous.</li>
+                <li>Choisissez où enregistrer l'export sur l'ordinateur.</li>
+                <li>
+                  PILOTE crée le dossier de la session et range automatiquement
+                  les PDF par instructrice.
+                </li>
+              </ol>
+
+              <button
+                id="bouton-exporter-dossiers"
+                class="bouton-exporter-dossiers"
+                type="button"
+                disabled
+              >
+                Choisir un dossier et exporter
+              </button>
             </div>
 
-            <div class="compatibilite-navigateur">
-              <div class="navigateurs-export">
-                <img src="assets/firefox.svg" alt="Mozilla Firefox" />
+            <div id="methode-export-zip" class="methode-export">
+              <div class="entete-methode-export">
+                <div class="navigateurs-export">
+                  <img src="assets/firefox.svg" alt="Mozilla Firefox" />
+                </div>
+                <strong>Avec Firefox</strong>
               </div>
-              <p>
-                Firefox utilise un fichier ZIP contenant les mêmes dossiers.
-              </p>
+
+              <p
+                id="statut-export-zip"
+                class="statut-methode-export"
+              ></p>
+
+              <ol class="etapes-export">
+                <li>Cliquez sur le bouton ci-dessous.</li>
+                <li>
+                  Retrouvez le fichier ZIP dans vos téléchargements habituels.
+                </li>
+                <li>
+                  Faites un clic droit sur le ZIP, puis choisissez
+                  « Extraire tout » pour obtenir les dossiers des instructrices.
+                </li>
+              </ol>
+
+              <button
+                id="bouton-exporter-zip"
+                class="bouton-exporter-zip"
+                type="button"
+                disabled
+              >
+                Télécharger l'export pour Firefox
+              </button>
             </div>
 
-            <button
-              id="bouton-exporter-dossiers"
-              class="bouton-exporter-dossiers"
-              type="button"
-              disabled
-            >
-              Créer les dossiers
-            </button>
-
-            <button
-              id="bouton-exporter-zip"
-              class="bouton-exporter-zip"
-              type="button"
-              disabled
-            >
-              Télécharger le ZIP
-            </button>
+            <p class="precision-export">
+              Les documents sans instructrice certaine seront rangés dans le
+              dossier <strong>A_VERIFIER</strong>.
+            </p>
 
             <p
               id="message-export-pdf"

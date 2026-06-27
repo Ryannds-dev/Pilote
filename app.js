@@ -747,6 +747,10 @@ function updatePdfExportControls() {
   const exportFoldersButton = document.getElementById("bouton-exporter-dossiers");
   const exportZipButton = document.getElementById("bouton-exporter-zip");
   const exportMessage = document.getElementById("message-export-pdf");
+  const directExportMethod = document.getElementById("methode-export-dossiers");
+  const zipExportMethod = document.getElementById("methode-export-zip");
+  const directExportStatus = document.getElementById("statut-export-dossiers");
+  const zipExportStatus = document.getElementById("statut-export-zip");
   const sessionHasDocuments =
     Boolean(currentSession.sessionId) && currentSession.documents.length > 0;
   const folderExportIsSupported =
@@ -754,6 +758,24 @@ function updatePdfExportControls() {
 
   exportFoldersButton.disabled = !sessionHasDocuments || !folderExportIsSupported;
   exportZipButton.disabled = !sessionHasDocuments;
+  directExportMethod.classList.toggle(
+    "methode-export-recommandee",
+    folderExportIsSupported
+  );
+  directExportMethod.classList.toggle(
+    "methode-export-indisponible",
+    !folderExportIsSupported
+  );
+  zipExportMethod.classList.toggle(
+    "methode-export-recommandee",
+    !folderExportIsSupported
+  );
+  directExportStatus.textContent = folderExportIsSupported
+    ? "Méthode recommandée sur ce navigateur"
+    : "Cette méthode n'est pas disponible dans ce navigateur";
+  zipExportStatus.textContent = folderExportIsSupported
+    ? "Autre possibilité, compatible avec ce navigateur"
+    : "Méthode recommandée sur ce navigateur";
 
   if (!sessionHasDocuments) {
     setPdfExportMessage(
@@ -772,7 +794,7 @@ function updatePdfExportControls() {
   }
 
   exportMessage.textContent =
-    "Choisissez la création directe des dossiers ou le téléchargement ZIP.";
+    "Les boutons sont disponibles. Utilisez la méthode indiquée comme recommandée.";
   exportMessage.className = "message-export-pdf";
 }
 

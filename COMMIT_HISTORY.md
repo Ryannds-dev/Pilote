@@ -486,11 +486,17 @@ Objectif : exporter les PDF classés par instructrice sans exclure Firefox.
 - blocage de l'export tant qu'un PDF manque ;
 - nettoyage des caractères interdits dans les noms de dossiers et de fichiers ;
 - ajout automatique d'un numéro quand plusieurs PDF portent le même nom ;
+- présentation des exports sous forme de deux parcours détaillés pour Edge/Chrome et Firefox ;
+- indication automatique de la méthode recommandée dans le navigateur utilisé ;
+- étapes visibles pour choisir le dossier ou extraire le ZIP après téléchargement ;
+- libellés de boutons précisant directement l'action réalisée ;
+- rappel visible concernant le dossier `A_VERIFIER` ;
 - aucun export CSV ni export séparé des statistiques.
 
 Points d'attention :
 
 - une page web ne peut écrire que dans un dossier explicitement choisi par l'agent ;
 - Firefox ne propose pas l'accès direct au dossier : le ZIP assure donc la compatibilité ;
+- les explications utilisent des actions concrètes et évitent de demander à l'agent de connaître les différences techniques entre navigateurs ;
 - les PDF sont traités localement et ne sont envoyés sur aucun service extérieur ;
 - l'export ne remplace pas la sauvegarde JSON de la session.
