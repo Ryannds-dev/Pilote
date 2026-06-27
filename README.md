@@ -100,6 +100,24 @@ Les documents sans instructrice claire ou dont la sectorisation reste à vérifi
 
 L'export est bloqué tant qu'un document ne possède pas de PDF associé.
 
+### Vérifier la compatibilité du navigateur
+
+Pour vérifier manuellement si le navigateur permet la création directe des dossiers :
+
+1. Ouvrir PILOTE dans le navigateur à tester.
+2. Appuyer sur `F12`.
+3. Ouvrir l'onglet `Console`.
+4. Saisir la commande suivante puis appuyer sur Entrée :
+
+```javascript
+typeof window.showDirectoryPicker
+```
+
+- Firefox affiche `"undefined"` : la création directe des dossiers n'est pas disponible.
+- Edge et Chrome affichent `"function"` : la création directe des dossiers est disponible.
+
+PILOTE effectue automatiquement cette même vérification pour activer ou désactiver le bouton correspondant.
+
 ## Bibliothèques externes
 
 Le dossier `libs` contient SheetJS, utilisé pour lire les fichiers Excel, et JSZip, utilisé pour créer les exports ZIP.

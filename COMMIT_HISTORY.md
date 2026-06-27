@@ -504,3 +504,8 @@ Points d'attention :
 - les explications utilisent des actions concrètes et évitent de demander à l'agent de connaître les différences techniques entre navigateurs ;
 - les PDF sont traités localement et ne sont envoyés sur aucun service extérieur ;
 - l'export ne remplace pas la sauvegarde JSON de la session.
+
+Documentation complémentaire :
+
+- ajout dans le README de la commande permettant de vérifier manuellement la prise en charge de `showDirectoryPicker` ;
+- indication des résultats attendus dans Firefox, Edge et Chrome.
