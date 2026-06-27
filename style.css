@@ -297,14 +297,16 @@ h1 {
 }
 
 .zone-export-pdf {
-  padding: 22px 0;
-  border-bottom: 1px solid var(--gris-bordure);
+  margin-top: 28px;
+  padding: 32px;
+  border-top: 6px solid var(--rouge-pilote);
+  background: var(--blanc);
 }
 
-.zone-export-pdf h3 {
+.zone-export-pdf h2 {
   margin-top: 0;
   margin-bottom: 8px;
-  font-size: 1rem;
+  font-size: 1.25rem;
 }
 
 .introduction-export {
@@ -314,13 +316,16 @@ h1 {
   line-height: 1.5;
 }
 
-.methode-export {
-  padding: 14px 0;
-  border-top: 1px solid var(--gris-bordure);
+.methodes-export {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px;
 }
 
-.methode-export:last-of-type {
-  border-bottom: 1px solid var(--gris-bordure);
+.methode-export {
+  min-width: 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--gris-bordure);
 }
 
 .methode-export-recommandee {
@@ -328,18 +333,15 @@ h1 {
 }
 
 .entete-methode-export {
+  display: flex;
+  gap: 10px;
+  align-items: center;
   color: var(--gris-texte);
-  cursor: pointer;
-}
-
-.entete-methode-export::marker {
-  color: var(--rouge-pilote);
 }
 
 .titre-methode-export {
-  display: inline-grid;
+  display: grid;
   gap: 3px;
-  vertical-align: middle;
 }
 
 .titre-methode-export strong {
@@ -348,10 +350,8 @@ h1 {
 }
 
 .navigateurs-export {
-  display: inline-flex;
+  display: flex;
   gap: 5px;
-  margin: 0 8px;
-  vertical-align: middle;
 }
 
 .navigateurs-export img {
@@ -367,10 +367,6 @@ h1 {
 
 .methode-export-recommandee .statut-methode-export {
   color: #18542a;
-}
-
-.contenu-methode-export {
-  padding-top: 8px;
 }
 
 .etapes-export {
@@ -391,7 +387,7 @@ h1 {
 }
 
 .precision-export {
-  margin: 4px 0 0;
+  margin: 20px 0 0;
   padding: 10px;
   color: var(--gris-texte);
   background: var(--gris-fond-page);
@@ -992,6 +988,14 @@ h1 {
 
   .panneau-actions-session {
     padding: 24px;
+  }
+
+  .zone-export-pdf {
+    padding: 24px;
+  }
+
+  .methodes-export {
+    grid-template-columns: 1fr;
   }
 
   .ligne-logo {
