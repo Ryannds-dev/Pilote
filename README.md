@@ -111,6 +111,8 @@ Avant l'export, PILOTE affiche un contrôle récapitulatif :
 
 Avec Edge ou Chrome, si un dossier portant déjà le nom de la session existe, PILOTE crée automatiquement un nouveau dossier avec un suffixe comme `_2` ou `_3`. Aucun ancien export n'est remplacé silencieusement.
 
+Si plusieurs PDF portent le même nom dans un dossier d'instructrice, PILOTE conserve le nom du premier puis ajoute les suffixes MultiGest `_002`, `_003`, etc. aux suivants.
+
 ### Vérifier la compatibilité du navigateur
 
 Pour vérifier manuellement si le navigateur permet la création directe des dossiers :

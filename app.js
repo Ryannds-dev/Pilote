@@ -1217,7 +1217,9 @@ function createUniquePdfFileName(originalFileName, usedFileNames) {
   let copyNumber = 2;
 
   while (usedFileNames.has(uniqueFileName.toLowerCase())) {
-    uniqueFileName = `${fileNameWithoutExtension} (${copyNumber}).pdf`;
+    const multigestSuffix = String(copyNumber).padStart(3, "0");
+
+    uniqueFileName = `${fileNameWithoutExtension}_${multigestSuffix}.pdf`;
     copyNumber += 1;
   }
 

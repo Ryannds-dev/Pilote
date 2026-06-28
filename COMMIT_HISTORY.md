@@ -485,7 +485,7 @@ Objectif : exporter les PDF classés par instructrice sans exclure Firefox.
 - rangement des cas non attribués ou à vérifier dans `A_VERIFIER` ;
 - blocage de l'export tant qu'un PDF manque ;
 - nettoyage des caractères interdits dans les noms de dossiers et de fichiers ;
-- ajout automatique d'un numéro quand plusieurs PDF portent le même nom ;
+- ajout automatique des suffixes MultiGest `_002`, `_003`, etc. quand plusieurs PDF portent le même nom ;
 - présentation des exports sous forme de deux parcours détaillés pour Edge/Chrome et Firefox ;
 - indication automatique de la méthode recommandée dans le navigateur utilisé ;
 - étapes visibles pour choisir le dossier ou extraire le ZIP après téléchargement ;
@@ -538,3 +538,8 @@ Points d'attention :
 - les documents sans attribution certaine restent exportables dans `A_VERIFIER` après confirmation ;
 - les erreurs bloquantes empêchent l'export avant l'ouverture du sélecteur de dossier ou la création du ZIP ;
 - la protection contre l'écrasement crée un nouvel export au lieu de modifier un dossier existant.
+
+Convention de nommage :
+
+- le premier PDF conserve son nom d'origine ;
+- les PDF suivants portant le même nom utilisent la convention MultiGest `_002`, `_003`, etc.
