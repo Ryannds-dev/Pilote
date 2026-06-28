@@ -176,6 +176,28 @@ function handleExcelFileSelection(fileKey, selectedFile) {
     return;
   }
 
+  if (!isExcelFile(selectedFile)) {
+    setExcelFileError(
+      fileKey,
+      selectedFile.name,
+      "Le fichier sélectionné doit être un fichier Excel .xlsx ou .xls."
+    );
+    renderExcelFileStatuses();
+    updateSessionStartAvailability();
+    return;
+  }
+
+  if (selectedFile.size === 0) {
+    setExcelFileError(
+      fileKey,
+      selectedFile.name,
+      "Le fichier sélectionné est vide. Choisissez un fichier Excel contenant la sectorisation."
+    );
+    renderExcelFileStatuses();
+    updateSessionStartAvailability();
+    return;
+  }
+
   excelData.files[fileKey].status = "loading";
   excelData.files[fileKey].sourceFileName = selectedFile.name;
   excelData.files[fileKey].errors = [];
@@ -204,6 +226,12 @@ function handleExcelFileSelection(fileKey, selectedFile) {
   };
 
   fileReader.readAsArrayBuffer(selectedFile);
+}
+
+function isExcelFile(file) {
+  const fileName = String(file.name || "").toLowerCase();
+
+  return fileName.endsWith(".xlsx") || fileName.endsWith(".xls");
 }
 
 function resetExcelFileState(fileKey) {
@@ -755,9 +783,15 @@ function updatePdfExportControls() {
     Boolean(currentSession.sessionId) && currentSession.documents.length > 0;
   const folderExportIsSupported =
     typeof window.showDirectoryPicker === "function";
+  const robustnessReport = getSessionRobustnessReport();
+  const exportIsReady =
+    sessionHasDocuments &&
+    robustnessReport.missingPdfCount === 0 &&
+    robustnessReport.incompleteDocumentCount === 0;
 
-  exportFoldersButton.disabled = !sessionHasDocuments || !folderExportIsSupported;
-  exportZipButton.disabled = !sessionHasDocuments;
+  exportFoldersButton.disabled = !exportIsReady || !folderExportIsSupported;
+  exportZipButton.disabled = !exportIsReady;
+  renderPreExportCheck(robustnessReport);
   directExportMethod.classList.toggle(
     "methode-export-recommandee",
     folderExportIsSupported
@@ -785,6 +819,14 @@ function updatePdfExportControls() {
     return;
   }
 
+  if (!exportIsReady) {
+    setPdfExportMessage(
+      "Export bloqué : corrigez les éléments signalés dans la vérification automatique.",
+      "error"
+    );
+    return;
+  }
+
   if (!folderExportIsSupported) {
     setPdfExportMessage(
       "La création directe des dossiers n'est pas disponible dans ce navigateur. Utilisez le ZIP.",
@@ -806,6 +848,11 @@ async function exportPdfsToFolders() {
     return;
   }
 
+  if (!confirmPdfExportWarnings()) {
+    setPdfExportMessage("Export annulé pour permettre les vérifications.", "information");
+    return;
+  }
+
   if (typeof window.showDirectoryPicker !== "function") {
     setPdfExportMessage(
       "Ce navigateur ne peut pas créer les dossiers. Utilisez le téléchargement ZIP.",
@@ -819,15 +866,14 @@ async function exportPdfsToFolders() {
       id: "pilote-pdf-export",
       mode: "readwrite"
     });
-    const sessionDirectory = await selectedDirectory.getDirectoryHandle(
-      cleanFileSystemName(currentSession.sessionId, "SESSION_PILOTE"),
-      { create: true }
+    const sessionExportDirectory = await createAvailableSessionDirectory(
+      selectedDirectory
     );
 
     setPdfExportMessage("Création des dossiers en cours…", "information");
-    await writePdfsIntoDirectory(sessionDirectory);
+    await writePdfsIntoDirectory(sessionExportDirectory.handle);
     setPdfExportMessage(
-      `Export terminé dans le dossier ${currentSession.sessionId}.`,
+      `Export terminé dans le dossier ${sessionExportDirectory.name}.`,
       "success"
     );
   } catch (error) {
@@ -837,10 +883,41 @@ async function exportPdfsToFolders() {
     }
 
     setPdfExportMessage(
-      "L'export vers les dossiers a échoué. Aucun document de PILOTE n'a été modifié.",
+      "L'export a échoué. Vérifiez le dossier choisi : certains fichiers ont peut-être été créés avant l'erreur.",
       "error"
     );
     console.error(error);
+  }
+}
+
+async function createAvailableSessionDirectory(selectedDirectory) {
+  const baseDirectoryName = cleanFileSystemName(
+    currentSession.sessionId,
+    "SESSION_PILOTE"
+  );
+  let copyNumber = 1;
+
+  while (true) {
+    const directoryName =
+      copyNumber === 1
+        ? baseDirectoryName
+        : `${baseDirectoryName}_${copyNumber}`;
+
+    try {
+      await selectedDirectory.getDirectoryHandle(directoryName);
+      copyNumber += 1;
+    } catch (error) {
+      if (error.name !== "NotFoundError") {
+        throw error;
+      }
+
+      return {
+        name: directoryName,
+        handle: await selectedDirectory.getDirectoryHandle(directoryName, {
+          create: true
+        })
+      };
+    }
   }
 }
 
@@ -880,6 +957,11 @@ async function exportPdfsToZip() {
 
   if (validationMessage) {
     setPdfExportMessage(validationMessage, "error");
+    return;
+  }
+
+  if (!confirmPdfExportWarnings()) {
+    setPdfExportMessage("Export annulé pour permettre les vérifications.", "information");
     return;
   }
 
@@ -939,15 +1021,163 @@ function validatePdfExport() {
     return "Ajoutez au moins un document avant l'export.";
   }
 
-  const missingPdfCount = currentSession.documents.filter((documentItem) => {
-    return !documentItem.pdfLoaded || !documentItem.pdfFile;
-  }).length;
+  const robustnessReport = getSessionRobustnessReport();
 
-  if (missingPdfCount > 0) {
-    return `${missingPdfCount} document(s) sans PDF : associez tous les PDF avant l'export.`;
+  if (robustnessReport.missingPdfCount > 0) {
+    return `${robustnessReport.missingPdfCount} document(s) sans PDF : associez tous les PDF avant l'export.`;
+  }
+
+  if (robustnessReport.incompleteDocumentCount > 0) {
+    return `${robustnessReport.incompleteDocumentCount} document(s) incomplet(s) : corrigez-les avant l'export.`;
   }
 
   return "";
+}
+
+function confirmPdfExportWarnings() {
+  const robustnessReport = getSessionRobustnessReport();
+  const warnings = [];
+
+  if (robustnessReport.unresolvedAssignmentCount > 0) {
+    warnings.push(
+      `${robustnessReport.unresolvedAssignmentCount} document(s) seront rangé(s) dans A_VERIFIER`
+    );
+  }
+
+  if (robustnessReport.duplicateDocumentCount > 0) {
+    warnings.push(
+      `${robustnessReport.duplicateDocumentCount} doublon(s) de nom MultiGest sont présents`
+    );
+  }
+
+  if (warnings.length === 0) {
+    return true;
+  }
+
+  return window.confirm(
+    `Attention avant export :\n\n- ${warnings.join("\n- ")}\n\nVoulez-vous continuer ?`
+  );
+}
+
+function getSessionRobustnessReport() {
+  const documents = currentSession.documents;
+
+  return {
+    totalDocumentCount: documents.length,
+    missingPdfCount: documents.filter(isDocumentPdfMissing).length,
+    incompleteDocumentCount: documents.filter(isDocumentIncomplete).length,
+    unresolvedAssignmentCount: documents.filter(isDocumentAssignmentUnresolved).length,
+    duplicateDocumentCount: countDuplicateDocumentNames(documents)
+  };
+}
+
+function isDocumentPdfMissing(documentItem) {
+  return (
+    !documentItem.pdfLoaded ||
+    !documentItem.pdfFile ||
+    documentItem.pdfFile.size === 0 ||
+    documentItem.pdfNeedsReimport
+  );
+}
+
+function isDocumentIncomplete(documentItem) {
+  return (
+    !String(documentItem.multigestFileName || "").trim() ||
+    !Object.values(PUBLIC_TYPES).includes(documentItem.publicType) ||
+    !Object.values(DOCUMENT_TYPES).includes(documentItem.documentType)
+  );
+}
+
+function isDocumentAssignmentUnresolved(documentItem) {
+  return (
+    documentItem.sectorizationStatus === SECTORIZATION_STATUS.WARNING ||
+    documentItem.sectorizationStatus === SECTORIZATION_STATUS.PENDING ||
+    !documentItem.instructor
+  );
+}
+
+function countDuplicateDocumentNames(documents) {
+  const nameCounts = new Map();
+
+  documents.forEach((documentItem) => {
+    const normalizedName = normalizeExcelText(documentItem.multigestFileName);
+
+    if (!normalizedName) {
+      return;
+    }
+
+    nameCounts.set(normalizedName, (nameCounts.get(normalizedName) || 0) + 1);
+  });
+
+  return [...nameCounts.values()].reduce((duplicateCount, nameCount) => {
+    return duplicateCount + Math.max(0, nameCount - 1);
+  }, 0);
+}
+
+function renderPreExportCheck(robustnessReport) {
+  updatePreExportCheckValue(
+    "controle-total-documents",
+    robustnessReport.totalDocumentCount,
+    "information"
+  );
+  updatePreExportCheckValue(
+    "controle-pdf-manquants",
+    robustnessReport.missingPdfCount,
+    robustnessReport.missingPdfCount > 0 ? "error" : "success"
+  );
+  updatePreExportCheckValue(
+    "controle-documents-incomplets",
+    robustnessReport.incompleteDocumentCount,
+    robustnessReport.incompleteDocumentCount > 0 ? "error" : "success"
+  );
+  updatePreExportCheckValue(
+    "controle-attributions-verifier",
+    robustnessReport.unresolvedAssignmentCount,
+    robustnessReport.unresolvedAssignmentCount > 0 ? "warning" : "success"
+  );
+  updatePreExportCheckValue(
+    "controle-doublons",
+    robustnessReport.duplicateDocumentCount,
+    robustnessReport.duplicateDocumentCount > 0 ? "warning" : "success"
+  );
+
+  const summary = document.getElementById("resume-controle-export");
+
+  if (robustnessReport.totalDocumentCount === 0) {
+    summary.textContent = "Ajoutez des documents pour lancer la vérification.";
+    summary.className = "resume-controle-export";
+    return;
+  }
+
+  if (
+    robustnessReport.missingPdfCount > 0 ||
+    robustnessReport.incompleteDocumentCount > 0
+  ) {
+    summary.textContent =
+      "Export impossible pour le moment : corrigez les éléments indiqués en rouge.";
+    summary.className = "resume-controle-export resume-controle-export-erreur";
+    return;
+  }
+
+  if (
+    robustnessReport.unresolvedAssignmentCount > 0 ||
+    robustnessReport.duplicateDocumentCount > 0
+  ) {
+    summary.textContent =
+      "Export possible avec attention : vérifiez les éléments indiqués en orange.";
+    summary.className = "resume-controle-export resume-controle-export-attention";
+    return;
+  }
+
+  summary.textContent = "Tous les contrôles sont validés. L'export est prêt.";
+  summary.className = "resume-controle-export resume-controle-export-ok";
+}
+
+function updatePreExportCheckValue(elementId, value, status) {
+  const checkValue = document.getElementById(elementId);
+
+  checkValue.textContent = value;
+  checkValue.className = `valeur-controle-export valeur-controle-export-${status}`;
 }
 
 function getDocumentExportFolderName(documentItem) {
@@ -1030,6 +1260,15 @@ function handleSessionFileSelection(selectedFile) {
     return;
   }
 
+  if (selectedFile.size === 0) {
+    showSessionImportMessage(
+      "Le fichier JSON sélectionné est vide. Choisissez une sauvegarde PILOTE valide.",
+      true
+    );
+    resetSessionImportInput();
+    return;
+  }
+
   if (currentSession.sessionId && !confirmSessionReplacement()) {
     resetSessionImportInput();
     return;
@@ -1056,11 +1295,19 @@ function readSessionSaveFile(selectedFile) {
   fileReader.onload = (event) => {
     try {
       const saveFile = JSON.parse(event.target.result);
+      const restoredSessionSummary = restoreSessionFromSaveFile(saveFile);
 
-      restoreSessionFromSaveFile(saveFile);
-      showSessionImportMessage(`Session importée : ${selectedFile.name}.`, false);
+      showSessionImportMessage(
+        `Session importée : ${selectedFile.name}.${restoredSessionSummary}`,
+        false
+      );
     } catch (error) {
-      showSessionImportMessage(error.message, true);
+      const errorMessage =
+        error instanceof SyntaxError
+          ? "Ce fichier ne contient pas un JSON valide."
+          : error.message;
+
+      showSessionImportMessage(errorMessage, true);
     }
 
     resetSessionImportInput();
@@ -1093,6 +1340,12 @@ function restoreSessionFromSaveFile(saveFile) {
   resetDocumentForm();
   showSessionInformation(currentSession);
   updateSaveControls("Session importée. Aucun changement depuis l'import.");
+
+  const duplicateCount = countDuplicateDocumentNames(currentSession.documents);
+
+  return duplicateCount > 0
+    ? ` Attention : ${duplicateCount} doublon(s) de nom MultiGest détecté(s).`
+    : "";
 }
 
 function validateSessionSaveFile(saveFile) {
@@ -1114,6 +1367,42 @@ function validateSessionSaveFile(saveFile) {
 
   if (!Array.isArray(saveFile.session.documents)) {
     throw new Error("La liste des documents est absente ou invalide.");
+  }
+
+  const documentIds = new Set();
+
+  saveFile.session.documents.forEach((documentItem, documentIndex) => {
+    validateSavedDocument(documentItem, documentIndex);
+
+    if (documentItem.id && documentIds.has(documentItem.id)) {
+      throw new Error(
+        `La sauvegarde contient plusieurs documents avec le même identifiant interne à la ligne ${documentIndex + 1}.`
+      );
+    }
+
+    if (documentItem.id) {
+      documentIds.add(documentItem.id);
+    }
+  });
+}
+
+function validateSavedDocument(documentItem, documentIndex) {
+  const documentNumber = documentIndex + 1;
+
+  if (!documentItem || typeof documentItem !== "object" || Array.isArray(documentItem)) {
+    throw new Error(`Le document ${documentNumber} de la sauvegarde est invalide.`);
+  }
+
+  if (!String(documentItem.multigestFileName || "").trim()) {
+    throw new Error(`Le document ${documentNumber} n'a pas de nom MultiGest.`);
+  }
+
+  if (!Object.values(PUBLIC_TYPES).includes(documentItem.publicType)) {
+    throw new Error(`Le document ${documentNumber} contient un public invalide.`);
+  }
+
+  if (!Object.values(DOCUMENT_TYPES).includes(documentItem.documentType)) {
+    throw new Error(`Le document ${documentNumber} contient un type invalide.`);
   }
 }
 
@@ -1231,7 +1520,7 @@ function addDocumentToSession(documentData = {}) {
   return document;
 }
 
-function handleDocumentSubmit(event) {
+async function handleDocumentSubmit(event) {
   event.preventDefault();
 
   const documentData = getDocumentFormData();
@@ -1239,6 +1528,25 @@ function handleDocumentSubmit(event) {
 
   if (validationMessage) {
     showDocumentFormError(validationMessage);
+    return;
+  }
+
+  const selectedPdfFile =
+    document.getElementById("champ-pdf-document").files[0] || null;
+
+  if (selectedPdfFile && !(await hasPdfSignature(selectedPdfFile))) {
+    showDocumentFormError(
+      "Ce fichier ne contient pas un PDF valide. Vérifiez le fichier sélectionné."
+    );
+    return;
+  }
+
+  const duplicateDocument = findDuplicateDocument(
+    documentData.multigestFileName,
+    editedDocumentId
+  );
+
+  if (duplicateDocument && !confirmDuplicateDocument(duplicateDocument)) {
     return;
   }
 
@@ -1291,6 +1599,10 @@ function validateDocumentForm(documentData) {
     return "Le fichier associé doit être un PDF.";
   }
 
+  if (documentData.pdfFile && documentData.pdfFile.size === 0) {
+    return "Le fichier PDF sélectionné est vide.";
+  }
+
   return "";
 }
 
@@ -1298,6 +1610,33 @@ function isPdfFile(file) {
   const fileName = String(file.name || "").toLowerCase();
 
   return file.type === "application/pdf" || fileName.endsWith(".pdf");
+}
+
+async function hasPdfSignature(file) {
+  try {
+    const fileStart = await file.slice(0, 1024).text();
+
+    return fileStart.includes("%PDF-");
+  } catch (error) {
+    return false;
+  }
+}
+
+function findDuplicateDocument(multigestFileName, ignoredDocumentId = "") {
+  const normalizedName = normalizeExcelText(multigestFileName);
+
+  return currentSession.documents.find((documentItem) => {
+    return (
+      documentItem.id !== ignoredDocumentId &&
+      normalizeExcelText(documentItem.multigestFileName) === normalizedName
+    );
+  }) || null;
+}
+
+function confirmDuplicateDocument(duplicateDocument) {
+  return window.confirm(
+    `Un document nommé "${duplicateDocument.multigestFileName}" existe déjà dans la session. Voulez-vous quand même enregistrer ce doublon ?`
+  );
 }
 
 function getEditedDocument() {

@@ -509,3 +509,32 @@ Documentation complémentaire :
 
 - ajout dans le README de la commande permettant de vérifier manuellement la prise en charge de `showDirectoryPicker` ;
 - indication des résultats attendus dans Firefox, Edge et Chrome.
+
+## Robustness: Strengthen validation and exports
+
+Date : 2026-06-28
+
+Objectif : éviter les erreurs silencieuses et sécuriser la fin de session.
+
+- refus des fichiers Excel dont l'extension n'est pas `.xlsx` ou `.xls` ;
+- refus des fichiers Excel, JSON et PDF vides ;
+- vérification du contenu réel d'un PDF grâce à sa signature `%PDF-` ;
+- message dédié pour un JSON dont la syntaxe est invalide ;
+- validation de chaque document contenu dans une sauvegarde JSON ;
+- refus des sauvegardes contenant plusieurs fois le même identifiant interne ;
+- détection des doublons de nom MultiGest sans tenir compte des accents, espaces, tirets ou majuscules ;
+- demande de confirmation avant d'ajouter ou de conserver volontairement un doublon ;
+- ajout d'une vérification globale visible avant l'export ;
+- comptage des PDF manquants, documents incomplets, attributions à vérifier et doublons ;
+- blocage de l'export en cas de PDF manquant ou de document incomplet ;
+- avertissement avec confirmation pour les attributions à vérifier et les doublons ;
+- création automatique d'un nouveau dossier suffixé si un export de la même session existe déjà ;
+- message honnête si un export direct échoue après avoir commencé à écrire des fichiers ;
+- adaptation responsive du contrôle : cinq colonnes, puis trois à `1100 px` ou moins, puis une à `640 px` ou moins.
+
+Points d'attention :
+
+- les doublons peuvent être légitimes : ils sont donc signalés et confirmés, mais pas interdits systématiquement ;
+- les documents sans attribution certaine restent exportables dans `A_VERIFIER` après confirmation ;
+- les erreurs bloquantes empêchent l'export avant l'ouverture du sélecteur de dossier ou la création du ZIP ;
+- la protection contre l'écrasement crée un nouvel export au lieu de modifier un dossier existant.

@@ -316,6 +316,79 @@ h1 {
   line-height: 1.5;
 }
 
+.controle-avant-export {
+  margin-bottom: 24px;
+  padding: 18px 0;
+  border-top: 1px solid var(--gris-bordure);
+  border-bottom: 1px solid var(--gris-bordure);
+}
+
+.controle-avant-export h3 {
+  margin: 0 0 12px;
+  font-size: 1rem;
+}
+
+.liste-controles-export {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.liste-controles-export li {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding: 10px;
+  background: var(--gris-fond-page);
+}
+
+.liste-controles-export span {
+  color: var(--gris-secondaire);
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.valeur-controle-export {
+  font-size: 1.2rem;
+}
+
+.valeur-controle-export-information {
+  color: var(--gris-texte);
+}
+
+.valeur-controle-export-success {
+  color: #18542a;
+}
+
+.valeur-controle-export-warning {
+  color: #8a5200;
+}
+
+.valeur-controle-export-error {
+  color: var(--rouge-pilote);
+}
+
+.resume-controle-export {
+  margin: 12px 0 0;
+  color: var(--gris-secondaire);
+  font-weight: 700;
+}
+
+.resume-controle-export-ok {
+  color: #18542a;
+}
+
+.resume-controle-export-attention {
+  color: #8a5200;
+}
+
+.resume-controle-export-erreur {
+  color: var(--rouge-pilote);
+}
+
 .methodes-export {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -975,6 +1048,10 @@ h1 {
   .zone-liste-documents {
     overflow: visible;
   }
+
+  .liste-controles-export {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 640px) {
@@ -995,6 +1072,10 @@ h1 {
   }
 
   .methodes-export {
+    grid-template-columns: 1fr;
+  }
+
+  .liste-controles-export {
     grid-template-columns: 1fr;
   }
 

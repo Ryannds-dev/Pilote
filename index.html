@@ -493,6 +493,42 @@
           utilisez la méthode recommandée pour votre navigateur.
         </p>
 
+        <section
+          class="controle-avant-export"
+          aria-labelledby="controle-export-title"
+        >
+          <h3 id="controle-export-title">Vérification automatique</h3>
+          <ul class="liste-controles-export">
+            <li>
+              <span>Documents dans la session</span>
+              <strong id="controle-total-documents">0</strong>
+            </li>
+            <li>
+              <span>PDF manquants ou à réassocier</span>
+              <strong id="controle-pdf-manquants">0</strong>
+            </li>
+            <li>
+              <span>Documents incomplets</span>
+              <strong id="controle-documents-incomplets">0</strong>
+            </li>
+            <li>
+              <span>Attributions à vérifier</span>
+              <strong id="controle-attributions-verifier">0</strong>
+            </li>
+            <li>
+              <span>Doublons de nom MultiGest</span>
+              <strong id="controle-doublons">0</strong>
+            </li>
+          </ul>
+          <p
+            id="resume-controle-export"
+            class="resume-controle-export"
+            aria-live="polite"
+          >
+            Ajoutez des documents pour lancer la vérification.
+          </p>
+        </section>
+
         <div class="methodes-export">
           <div id="methode-export-dossiers" class="methode-export">
             <div class="entete-methode-export">

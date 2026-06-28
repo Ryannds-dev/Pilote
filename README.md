@@ -46,6 +46,9 @@ Une session déjà sauvegardée peut être rechargée après l'import des fichie
 - Affichage des documents ajoutés dans le lot.
 - Export direct des PDF dans des dossiers classés par instructrice avec Edge ou Chrome.
 - Export ZIP contenant les mêmes dossiers avec Firefox et les autres navigateurs.
+- Détection des doublons de nom MultiGest avec confirmation avant ajout.
+- Vérification automatique de la session avant export.
+- Protection contre l'écrasement d'un dossier d'export existant.
 
 ## Structure
 
@@ -99,6 +102,14 @@ Avec Mozilla Firefox, l'accès direct aux dossiers n'est pas disponible. PILOTE 
 Les documents sans instructrice claire ou dont la sectorisation reste à vérifier sont rangés dans `A_VERIFIER`.
 
 L'export est bloqué tant qu'un document ne possède pas de PDF associé.
+
+Avant l'export, PILOTE affiche un contrôle récapitulatif :
+
+- les PDF manquants et les documents incomplets bloquent l'export ;
+- les attributions à vérifier et les doublons déclenchent un avertissement ;
+- les documents à vérifier peuvent tout de même être exportés dans `A_VERIFIER` après confirmation.
+
+Avec Edge ou Chrome, si un dossier portant déjà le nom de la session existe, PILOTE crée automatiquement un nouveau dossier avec un suffixe comme `_2` ou `_3`. Aucun ancien export n'est remplacé silencieusement.
 
 ### Vérifier la compatibilité du navigateur
 
