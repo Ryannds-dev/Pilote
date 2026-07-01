@@ -604,3 +604,26 @@ Objectif : garantir que les fichiers exportés reprennent le nom attendu dans Mu
 Point d'attention :
 
 - le nom du PDF d'origine reste affiché dans PILOTE pour contrôler le fichier associé, mais il ne détermine plus le nom du fichier exporté.
+
+## Fixes: Align behavior with expected workflow
+
+Date : 2026-07-01
+
+Objectif : vérifier les principaux parcours et corriger les écarts constatés.
+
+- refus d'un fichier Excel qui contient les colonnes attendues mais aucune donnée exploitable ;
+- association d'une école enfant uniquement avec la ville saisie ;
+- regroupement des variantes d'un même nom d'instructrice dans un seul dossier ;
+- réutilisation de l'orthographe officielle des instructrices chargées depuis Excel ;
+- affichage cohérent de `À vérifier` dans les cartes et les statistiques ;
+- validation réelle de la date de tampon et sécurisation du nom de session ;
+- validation des statuts et des valeurs oui/non lors de l'import d'une sauvegarde ;
+- détection identique des noms MultiGest `DOSSIER` et `DOSSIER.pdf` ;
+- prise en compte d'un fichier portant déjà le nom du futur dossier d'export ;
+- tests effectués avec les fichiers Excel réels du projet.
+
+Points d'attention :
+
+- une école homonyme située dans une autre ville ne peut plus entraîner une mauvaise attribution ;
+- les différences d'accents, de casse ou de tirets dans un nom d'instructrice ne créent plus plusieurs dossiers ;
+- les sauvegardes dont les données ont été altérées sont refusées avec un message clair.

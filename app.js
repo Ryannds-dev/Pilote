@@ -325,9 +325,14 @@ function validateSheetRows(sheet, requiredColumns) {
     const columnMap = findExpectedColumns(headerRow, requiredColumns);
 
     if (columnMap) {
-      return {
-        usableRows: buildUsableRows(sheet.rows.slice(rowIndex + 1), columnMap)
-      };
+      const usableRows = buildUsableRows(
+        sheet.rows.slice(rowIndex + 1),
+        columnMap
+      );
+
+      if (usableRows.length > 0) {
+        return { usableRows };
+      }
     }
   }
 
@@ -376,6 +381,10 @@ function isUsableRow(row) {
   const hasContent = Object.values(row).some((value) => value !== "");
 
   if (!hasContent) {
+    return false;
+  }
+
+  if (!String(row.city || "").trim() || !String(row.instructor || "").trim()) {
     return false;
   }
 
@@ -669,7 +678,11 @@ function validateStartForm(agentValue, tamponDateValue) {
     return "Veuillez indiquer les initiales ou le nom court de l'agent.";
   }
 
-  if (!tamponDateValue) {
+  if (!formatAgentName(agentValue)) {
+    return "Le nom de l'agent doit contenir au moins une lettre ou un chiffre.";
+  }
+
+  if (!isValidIsoDate(tamponDateValue)) {
     return "Veuillez indiquer la date de tampon.";
   }
 
@@ -681,7 +694,33 @@ function generateSessionId(tamponDateValue, agentValue) {
 }
 
 function formatAgentName(agentValue) {
-  return agentValue.trim().replace(/\s+/g, "-").toUpperCase();
+  return agentValue
+    .trim()
+    .toUpperCase()
+    .replace(/[<>:"/\\|?*\u0000-\u001F]/g, "-")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^[.-]+|[. -]+$/g, "");
+}
+
+function isValidIsoDate(dateValue) {
+  const dateMatch = String(dateValue || "").match(
+    /^(\d{4})-(\d{2})-(\d{2})$/
+  );
+
+  if (!dateMatch) {
+    return false;
+  }
+
+  const [, year, month, day] = dateMatch;
+  const parsedDate = new Date(`${dateValue}T00:00:00Z`);
+
+  return (
+    !Number.isNaN(parsedDate.getTime()) &&
+    parsedDate.getUTCFullYear() === Number(year) &&
+    parsedDate.getUTCMonth() + 1 === Number(month) &&
+    parsedDate.getUTCDate() === Number(day)
+  );
 }
 
 function showStartFormError(message) {
@@ -718,7 +757,10 @@ function saveCurrentSession() {
   }
 
   const saveContent = JSON.stringify(buildSessionSaveFile(), null, 2);
-  const fileName = `${currentSession.sessionId}.json`;
+  const fileName = `${cleanFileSystemName(
+    currentSession.sessionId,
+    "SESSION_PILOTE"
+  )}.json`;
 
   downloadTextFile(fileName, saveContent);
   lastSavedSessionSignature = currentSignature;
@@ -923,6 +965,11 @@ async function createAvailableSessionDirectory(selectedDirectory) {
       await selectedDirectory.getDirectoryHandle(directoryName);
       copyNumber += 1;
     } catch (error) {
+      if (error.name === "TypeMismatchError") {
+        copyNumber += 1;
+        continue;
+      }
+
       if (error.name !== "NotFoundError") {
         throw error;
       }
@@ -943,23 +990,24 @@ async function writePdfsIntoDirectory(sessionDirectory) {
 
   for (const documentItem of currentSession.documents) {
     const instructorFolderName = getDocumentExportFolderName(documentItem);
+    const instructorFolderKey = getExportFolderKey(instructorFolderName);
 
-    if (!directoryHandles.has(instructorFolderName)) {
+    if (!directoryHandles.has(instructorFolderKey)) {
       directoryHandles.set(
-        instructorFolderName,
+        instructorFolderKey,
         await sessionDirectory.getDirectoryHandle(instructorFolderName, {
           create: true
         })
       );
-      usedFileNames.set(instructorFolderName, new Set());
+      usedFileNames.set(instructorFolderKey, new Set());
     }
 
     const pdfFileName = createUniquePdfFileName(
       documentItem.multigestFileName,
-      usedFileNames.get(instructorFolderName)
+      usedFileNames.get(instructorFolderKey)
     );
     const pdfHandle = await directoryHandles
-      .get(instructorFolderName)
+      .get(instructorFolderKey)
       .getFileHandle(pdfFileName, { create: true });
     const writableFile = await pdfHandle.createWritable();
 
@@ -991,18 +1039,22 @@ async function exportPdfsToZip() {
 
   try {
     const zipFile = new window.JSZip();
+    const exportFolderNames = new Map();
     const usedFileNames = new Map();
 
     currentSession.documents.forEach((documentItem) => {
-      const instructorFolderName = getDocumentExportFolderName(documentItem);
+      const proposedFolderName = getDocumentExportFolderName(documentItem);
+      const instructorFolderKey = getExportFolderKey(proposedFolderName);
 
-      if (!usedFileNames.has(instructorFolderName)) {
-        usedFileNames.set(instructorFolderName, new Set());
+      if (!usedFileNames.has(instructorFolderKey)) {
+        exportFolderNames.set(instructorFolderKey, proposedFolderName);
+        usedFileNames.set(instructorFolderKey, new Set());
       }
 
+      const instructorFolderName = exportFolderNames.get(instructorFolderKey);
       const pdfFileName = createUniquePdfFileName(
         documentItem.multigestFileName,
-        usedFileNames.get(instructorFolderName)
+        usedFileNames.get(instructorFolderKey)
       );
 
       zipFile
@@ -1116,7 +1168,9 @@ function countDuplicateDocumentNames(documents) {
   const nameCounts = new Map();
 
   documents.forEach((documentItem) => {
-    const normalizedName = normalizeExcelText(documentItem.multigestFileName);
+    const normalizedName = normalizeMultiGestFileName(
+      documentItem.multigestFileName
+    );
 
     if (!normalizedName) {
       return;
@@ -1202,6 +1256,13 @@ function getDocumentExportFolderName(documentItem) {
   return cleanFileSystemName(documentItem.instructor, "A_VERIFIER");
 }
 
+function getExportFolderKey(folderName) {
+  return (
+    normalizeExcelText(folderName) ||
+    String(folderName || "").trim().toLocaleLowerCase("fr")
+  );
+}
+
 function cleanFileSystemName(value, fallbackName) {
   const cleanName = String(value || "")
     .replace(/[<>:"/\\|?*\u0000-\u001F]/g, " ")
@@ -1218,10 +1279,8 @@ function cleanFileSystemName(value, fallbackName) {
 }
 
 function createUniquePdfFileName(originalFileName, usedFileNames) {
-  const cleanFileName = cleanFileSystemName(originalFileName, "document.pdf");
-  const fileNameWithoutExtension = cleanFileName.toLowerCase().endsWith(".pdf")
-    ? cleanFileName.slice(0, -4)
-    : cleanFileName;
+  const fileNameWithoutExtension =
+    getMultiGestPdfBaseName(originalFileName) || "document";
   let uniqueFileName = `${fileNameWithoutExtension}.pdf`;
   let copyNumber = 2;
 
@@ -1234,6 +1293,21 @@ function createUniquePdfFileName(originalFileName, usedFileNames) {
 
   usedFileNames.add(uniqueFileName.toLowerCase());
   return uniqueFileName;
+}
+
+function getMultiGestPdfBaseName(multigestFileName) {
+  const cleanFileName = cleanFileSystemName(multigestFileName, "");
+  const fileNameWithoutExtension = cleanFileName
+    .toLowerCase()
+    .endsWith(".pdf")
+    ? cleanFileName.slice(0, -4)
+    : cleanFileName;
+
+  return fileNameWithoutExtension.replace(/[. ]+$/g, "").trim();
+}
+
+function normalizeMultiGestFileName(multigestFileName) {
+  return normalizeExcelText(getMultiGestPdfBaseName(multigestFileName));
 }
 
 function setPdfExportMessage(message, status) {
@@ -1376,6 +1450,10 @@ function validateSessionSaveFile(saveFile) {
     throw new Error("La sauvegarde ne contient pas les informations de session attendues.");
   }
 
+  if (!isValidIsoDate(saveFile.session.tamponDate)) {
+    throw new Error("La sauvegarde contient une date de tampon invalide.");
+  }
+
   if (!Array.isArray(saveFile.session.documents)) {
     throw new Error("La liste des documents est absente ou invalide.");
   }
@@ -1408,12 +1486,41 @@ function validateSavedDocument(documentItem, documentIndex) {
     throw new Error(`Le document ${documentNumber} n'a pas de nom MultiGest.`);
   }
 
+  if (!normalizeMultiGestFileName(documentItem.multigestFileName)) {
+    throw new Error(
+      `Le document ${documentNumber} contient un nom MultiGest inutilisable.`
+    );
+  }
+
   if (!Object.values(PUBLIC_TYPES).includes(documentItem.publicType)) {
     throw new Error(`Le document ${documentNumber} contient un public invalide.`);
   }
 
   if (!Object.values(DOCUMENT_TYPES).includes(documentItem.documentType)) {
     throw new Error(`Le document ${documentNumber} contient un type invalide.`);
+  }
+
+  ["pchOnly", "outOfDepartment", "pdfLoaded", "pdfNeedsReimport"].forEach(
+    (propertyName) => {
+      if (
+        propertyName in documentItem &&
+        typeof documentItem[propertyName] !== "boolean"
+      ) {
+        throw new Error(
+          `Le document ${documentNumber} contient une valeur oui/non invalide.`
+        );
+      }
+    }
+  );
+
+  if (
+    !Object.values(SECTORIZATION_STATUS).includes(
+      documentItem.sectorizationStatus
+    )
+  ) {
+    throw new Error(
+      `Le document ${documentNumber} contient un statut de sectorisation invalide.`
+    );
   }
 }
 
@@ -1598,6 +1705,10 @@ function validateDocumentForm(documentData) {
     return "Veuillez indiquer le nom MultiGest du document.";
   }
 
+  if (!normalizeMultiGestFileName(documentData.multigestFileName)) {
+    return "Le nom MultiGest doit contenir au moins une lettre ou un chiffre.";
+  }
+
   if (!documentData.publicType) {
     return "Veuillez sélectionner le public concerné.";
   }
@@ -1634,12 +1745,13 @@ async function hasPdfSignature(file) {
 }
 
 function findDuplicateDocument(multigestFileName, ignoredDocumentId = "") {
-  const normalizedName = normalizeExcelText(multigestFileName);
+  const normalizedName = normalizeMultiGestFileName(multigestFileName);
 
   return currentSession.documents.find((documentItem) => {
     return (
       documentItem.id !== ignoredDocumentId &&
-      normalizeExcelText(documentItem.multigestFileName) === normalizedName
+      normalizeMultiGestFileName(documentItem.multigestFileName) ===
+        normalizedName
     );
   }) || null;
 }
@@ -1670,9 +1782,14 @@ function clearDocumentFormError() {
 
 function applySectorizationToDocumentData(documentData) {
   if (documentData.manualInstructor) {
+    const manualInstructor = getOfficialInstructorLabel(
+      documentData.manualInstructor
+    );
+
     return {
       ...documentData,
-      instructor: documentData.manualInstructor,
+      manualInstructor,
+      instructor: manualInstructor,
       sectorizationSource: "Correction manuelle",
       sectorizationStatus: SECTORIZATION_STATUS.MANUAL
     };
@@ -1686,6 +1803,17 @@ function applySectorizationToDocumentData(documentData) {
     sectorizationSource: sectorizationResult.source,
     sectorizationStatus: sectorizationResult.status
   };
+}
+
+function getOfficialInstructorLabel(instructorName) {
+  const normalizedInstructorName = normalizeExcelText(instructorName);
+  const matchingReference = excelData.references.instructors.find((reference) => {
+    return reference.normalizedLabel === normalizedInstructorName;
+  });
+
+  return matchingReference
+    ? matchingReference.label
+    : String(instructorName || "").trim();
 }
 
 function findInstructorForDocument(documentData) {
@@ -1729,13 +1857,15 @@ function findChildInstructor(documentData) {
 
 function findInstructorBySchool(schoolName, cityName) {
   const matchingRows = findRowsByNormalizedValue("CHILD", "school", schoolName);
-  const matchingRowsInCity = filterRowsByNormalizedValue(
-    matchingRows,
-    "city",
-    cityName
-  );
+  const normalizedCity = normalizeExcelText(cityName);
 
-  if (matchingRowsInCity.length > 0) {
+  if (normalizedCity) {
+    const matchingRowsInCity = filterRowsByNormalizedValue(
+      matchingRows,
+      "city",
+      cityName
+    );
+
     return buildInstructorResultFromRows("CHILD", matchingRowsInCity);
   }
 
@@ -1778,11 +1908,21 @@ function buildInstructorResultFromRows(fileKey, rows) {
     return createSectorizationResult("", "", SECTORIZATION_STATUS.PENDING);
   }
 
-  const instructorNames = [
-    ...new Set(rows.map((row) => row.instructor).filter(Boolean))
-  ];
+  const instructorNames = new Map();
 
-  if (instructorNames.length !== 1) {
+  rows.forEach((row) => {
+    const instructorName = String(row.instructor || "").trim();
+    const normalizedInstructorName = normalizeExcelText(instructorName);
+
+    if (
+      normalizedInstructorName &&
+      !instructorNames.has(normalizedInstructorName)
+    ) {
+      instructorNames.set(normalizedInstructorName, instructorName);
+    }
+  });
+
+  if (instructorNames.size !== 1) {
     return createSectorizationResult(
       "",
       EXCEL_FILES[fileKey].label,
@@ -1791,7 +1931,7 @@ function buildInstructorResultFromRows(fileKey, rows) {
   }
 
   return createSectorizationResult(
-    instructorNames[0],
+    [...instructorNames.values()][0],
     EXCEL_FILES[fileKey].label,
     SECTORIZATION_STATUS.FOUND
   );
@@ -1989,12 +2129,12 @@ function updateInstructorStatistics(instructorMap, documentItem) {
 }
 
 function getInstructorStatisticName(documentItem) {
-  if (documentItem.instructor) {
-    return documentItem.instructor;
-  }
-
   if (documentItem.sectorizationStatus === SECTORIZATION_STATUS.WARNING) {
     return "À vérifier";
+  }
+
+  if (documentItem.instructor) {
+    return documentItem.instructor;
   }
 
   return "Non trouvée";
@@ -2229,9 +2369,14 @@ function addDuplicateStatusDetail(documentDetails, documentItem) {
 }
 
 function isDocumentNameDuplicate(documentItem) {
-  const normalizedName = normalizeExcelText(documentItem.multigestFileName);
+  const normalizedName = normalizeMultiGestFileName(
+    documentItem.multigestFileName
+  );
   const matchingDocumentCount = currentSession.documents.filter((otherDocument) => {
-    return normalizeExcelText(otherDocument.multigestFileName) === normalizedName;
+    return (
+      normalizeMultiGestFileName(otherDocument.multigestFileName) ===
+      normalizedName
+    );
   }).length;
 
   return normalizedName && matchingDocumentCount > 1;
@@ -2299,12 +2444,12 @@ function formatDocumentType(documentType) {
 }
 
 function formatInstructor(documentItem) {
-  if (documentItem.instructor) {
-    return documentItem.instructor;
-  }
-
   if (documentItem.sectorizationStatus === SECTORIZATION_STATUS.WARNING) {
     return "À vérifier";
+  }
+
+  if (documentItem.instructor) {
+    return documentItem.instructor;
   }
 
   return "Non trouvée";

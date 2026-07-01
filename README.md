@@ -65,6 +65,9 @@ PILOTE :
 
 La session ne peut pas commencer tant que les trois fichiers ne sont pas validés.
 
+Pour le public enfant, une école est recherchée dans la ville saisie. Deux écoles
+portant le même nom dans des villes différentes ne sont donc pas confondues.
+
 ## Documents et sectorisation
 
 Pour chaque document, PILOTE conserve notamment :
@@ -82,6 +85,8 @@ Pour chaque document, PILOTE conserve notamment :
 Les recours, les cas hors département et les recherches sans résultat certain sont signalés comme étant à vérifier. Ils seront placés dans `A_VERIFIER` lors de l'export.
 
 Un doublon de nom MultiGest déclenche une confirmation et reste visible grâce à un badge dédié.
+Les noms `DOSSIER` et `DOSSIER.pdf` sont considérés comme identiques, car ils
+produiraient tous les deux le fichier exporté `DOSSIER.pdf`.
 
 ## Sauvegarder et reprendre une session
 
