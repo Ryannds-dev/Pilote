@@ -135,7 +135,9 @@ Si le dossier de session existe déjà, PILOTE crée un nouveau dossier avec `_2
 
 ### Nommage des PDF
 
-Si plusieurs PDF portent le même nom dans un dossier d'instructrice :
+Chaque PDF exporté porte le nom saisi dans le champ **Nom MultiGest**, quelle que soit l'appellation du fichier PDF sélectionné sur l'ordinateur.
+
+Si plusieurs documents portent le même nom MultiGest dans un dossier d'instructrice :
 
 - le premier conserve son nom ;
 - les suivants reçoivent les suffixes MultiGest `_002`, `_003`, etc.

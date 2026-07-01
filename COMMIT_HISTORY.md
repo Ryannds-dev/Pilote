@@ -588,3 +588,19 @@ Objectif : simplifier la vérification affichée avant l'export.
 Point d'attention :
 
 - le formulaire et l'import JSON empêchent déjà les documents incomplets d'entrer dans la session ; le contrôle interne reste néanmoins présent comme sécurité défensive.
+
+## Export: Use MultiGest names for PDF files
+
+Date : 2026-07-01
+
+Objectif : garantir que les fichiers exportés reprennent le nom attendu dans MultiGest.
+
+- utilisation du champ "Nom MultiGest" pour nommer chaque PDF exporté ;
+- application de la règle dans l'export direct et dans l'export ZIP ;
+- conservation des suffixes `_002`, `_003`, etc. en cas de doublon dans un même dossier ;
+- ajout automatique de l'extension `.pdf` si nécessaire ;
+- mise à jour du README.
+
+Point d'attention :
+
+- le nom du PDF d'origine reste affiché dans PILOTE pour contrôler le fichier associé, mais il ne détermine plus le nom du fichier exporté.

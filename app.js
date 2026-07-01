@@ -955,7 +955,7 @@ async function writePdfsIntoDirectory(sessionDirectory) {
     }
 
     const pdfFileName = createUniquePdfFileName(
-      documentItem.pdfFileName,
+      documentItem.multigestFileName,
       usedFileNames.get(instructorFolderName)
     );
     const pdfHandle = await directoryHandles
@@ -1001,7 +1001,7 @@ async function exportPdfsToZip() {
       }
 
       const pdfFileName = createUniquePdfFileName(
-        documentItem.pdfFileName,
+        documentItem.multigestFileName,
         usedFileNames.get(instructorFolderName)
       );
 
@@ -1219,11 +1219,9 @@ function cleanFileSystemName(value, fallbackName) {
 
 function createUniquePdfFileName(originalFileName, usedFileNames) {
   const cleanFileName = cleanFileSystemName(originalFileName, "document.pdf");
-  const extensionPosition = cleanFileName.toLowerCase().lastIndexOf(".pdf");
-  const fileNameWithoutExtension =
-    extensionPosition === -1
-      ? cleanFileName
-      : cleanFileName.slice(0, extensionPosition);
+  const fileNameWithoutExtension = cleanFileName.toLowerCase().endsWith(".pdf")
+    ? cleanFileName.slice(0, -4)
+    : cleanFileName;
   let uniqueFileName = `${fileNameWithoutExtension}.pdf`;
   let copyNumber = 2;
 
