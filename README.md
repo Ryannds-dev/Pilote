@@ -4,145 +4,248 @@
 
 # PILOTE
 
-PILOTE est un outil local d'aide à la sectorisation des documents numérisés pour une MDPH.
+PILOTE est un outil local d'aide au traitement des documents numérisés pour une MDPH.
 
-L'application fonctionne dans le navigateur, sans backend, sans base de données et sans envoi de données sur Internet.
+Il permet de préparer un lot de documents, de déterminer l'instructrice concernée à partir des fichiers Excel de sectorisation, d'associer les PDF et d'exporter les fichiers classés par instructrice.
 
-## Utilisation actuelle
+PILOTE ne remplace pas MultiGest et n'interagit pas directement avec ses bannettes.
 
-1. Ouvrir `index.html`.
-2. Importer les 3 fichiers Excel de sectorisation :
-   - sectorisation adulte ;
-   - sectorisation PCH ;
-   - sectorisation enfant.
-3. Démarrer une session en indiquant l'agent et la date de tampon.
-4. Ajouter les documents du lot.
-5. Sauvegarder la session en JSON si besoin.
-6. Exporter les PDF directement en dossiers avec Edge/Chrome, ou en ZIP avec Firefox.
+## Confidentialité
 
-Le formulaire de démarrage est bloqué tant que les 3 fichiers de sectorisation ne sont pas importés correctement.
+- aucun backend ;
+- aucune base de données ;
+- aucune donnée envoyée sur Internet ;
+- aucune donnée enregistrée automatiquement dans le navigateur ;
+- fichiers Excel et PDF lus uniquement après leur sélection par l'agent.
 
-Une session déjà sauvegardée peut être rechargée après l'import des fichiers de sectorisation.
+Les bibliothèques nécessaires sont incluses dans le projet. Une connexion Internet n'est donc pas nécessaire pour utiliser PILOTE.
 
-## Fonctionnalités disponibles
+## Prérequis
 
-- Import manuel des fichiers Excel de sectorisation.
-- Validation des colonnes attendues dans les fichiers Excel.
-- Suggestions de villes, d'écoles / GEVASCO et d'instructrices à partir des Excel importés.
-- Création d'une session de travail.
-- Ajout, modification et suppression de documents.
-- Attribution automatique d'une instructrice quand une correspondance claire est trouvée.
-- Correction manuelle de l'instructrice si nécessaire.
-- Statut visible pour les documents attribués, à vérifier, non trouvés ou corrigés manuellement.
-- Gestion des recours en statut à vérifier.
-- Association d'un fichier PDF à un document.
-- Contrôle des fichiers PDF uniquement.
-- Statut visuel PDF manquant ou PDF associé.
-- Export manuel de la session en JSON.
-- Import d'une sauvegarde JSON PILOTE.
-- Détection des sauvegardes inutiles quand rien n'a changé depuis le dernier export.
-- Statistiques en temps réel sur les documents du lot.
-- Comptage des documents par instructrice.
-- Affichage des documents ajoutés dans le lot.
-- Export direct des PDF dans des dossiers classés par instructrice avec Edge ou Chrome.
-- Export ZIP contenant les mêmes dossiers avec Firefox et les autres navigateurs.
-- Détection des doublons de nom MultiGest avec confirmation avant ajout.
-- Vérification automatique de la session avant export.
-- Protection contre l'écrasement d'un dossier d'export existant.
+- un poste Windows avec un navigateur récent ;
+- les trois fichiers Excel de sectorisation adulte, PCH et enfant ;
+- les PDF à traiter ;
+- aucun logiciel supplémentaire à installer ;
+- aucun serveur local à démarrer.
 
-## Structure
+Microsoft Edge ou Google Chrome sont recommandés pour créer directement les dossiers d'export. Firefox reste compatible grâce à l'export ZIP.
 
-```text
-/assets
-/data
-/exports
-/sessions
-/libs
-index.html
-style.css
-app.js
-README.md
-COMMIT_HISTORY.md
-```
+## Ouvrir PILOTE
 
-## Contraintes
+1. Conserver tous les fichiers et dossiers du projet ensemble.
+2. Ouvrir le fichier `index.html`.
+3. Si nécessaire, faire un clic droit sur `index.html`, choisir **Ouvrir avec**, puis sélectionner Edge, Chrome ou Firefox.
 
-- HTML, CSS et JavaScript vanilla uniquement.
-- Aucun framework.
-- Aucun backend.
-- Aucune base de données.
-- Fonctionnement local.
-- Aucune donnée envoyée sur Internet.
-- Lecture Excel avec SheetJS chargé localement depuis `libs/xlsx.full.min.js`.
-- Export ZIP avec JSZip chargé localement depuis `libs/jszip.min.js`.
-- Licences des bibliothèques disponibles dans `libs`.
+Le projet peut être copié sur un emplacement local ou réseau accessible par l'agent, sous réserve des règles internes de la DNUM.
 
-## Remarque sur les fichiers Excel
+## Utilisation
 
-Les fichiers Excel ne sont pas lus automatiquement depuis le disque. L'agent les sélectionne dans l'interface, ce qui permet au navigateur de les lire localement sans serveur.
+1. Importer les trois fichiers Excel dans les emplacements correspondants.
+2. Vérifier que la zone d'import devient verte.
+3. Indiquer l'agent et la date de tampon.
+4. Démarrer la session.
+5. Ajouter chaque document et associer son PDF.
+6. Vérifier l'instructrice proposée et corriger manuellement uniquement si nécessaire.
+7. Utiliser la recherche et les filtres pour contrôler le lot.
+8. Sauvegarder régulièrement la session en JSON.
+9. Consulter la vérification automatique située en bas de la page.
+10. Corriger les erreurs bloquantes puis exporter les PDF.
 
-## Remarque sur les sauvegardes
+## Fichiers de sectorisation
 
-La sauvegarde JSON conserve les informations de session et les documents saisis. Elle ne contient pas les fichiers PDF eux-mêmes.
+Les fichiers Excel doivent être importés à chaque ouverture de PILOTE. Ce choix permet de toujours utiliser les fichiers sélectionnés par l'agent, sans serveur et sans conversion préalable.
 
-Après rechargement d'une sauvegarde, PILOTE affiche le nom du PDF connu et indique clairement qu'il faut le réassocier.
+PILOTE :
 
-## Remarque sur les PDF
+- vérifie que chaque fichier est placé dans le bon emplacement ;
+- recherche les colonnes attendues même si leur ligne change ;
+- refuse les fichiers vides ou dont le format ne correspond pas ;
+- récupère les villes, écoles et instructrices ;
+- accepte les recherches sans accents et tolère les différences de tirets, apostrophes, espaces et majuscules.
 
-Quand un PDF est associé à un document, PILOTE ne crée pas de copie du fichier dans le dossier du projet. Le navigateur garde seulement un accès temporaire au fichier sélectionné tant que la page reste ouverte.
+La session ne peut pas commencer tant que les trois fichiers ne sont pas validés.
 
-Avant l'export final, il faut donc éviter de supprimer, déplacer ou renommer les PDF d'origine. Si la page est fermée ou si une sauvegarde JSON est rechargée, les PDF devront être réassociés.
+## Documents et sectorisation
 
-## Remarque sur l'export
+Pour chaque document, PILOTE conserve notamment :
 
-Avec Microsoft Edge ou Google Chrome, PILOTE peut demander à l'agent de choisir un dossier puis créer un sous-dossier par instructrice. Un dossier portant le nom de la session est créé pour isoler chaque export.
+- le nom MultiGest ;
+- le public adulte ou enfant ;
+- le type de document ;
+- la ville ;
+- l'école ou le GEVASCO si nécessaire ;
+- les cas PCH et hors département ;
+- l'instructrice proposée ou corrigée ;
+- le statut de sectorisation ;
+- le PDF associé.
 
-Avec Mozilla Firefox, l'accès direct aux dossiers n'est pas disponible. PILOTE crée donc un ZIP portant le nom de la session et contenant la même organisation par instructrice.
+Les recours, les cas hors département et les recherches sans résultat certain sont signalés comme étant à vérifier. Ils seront placés dans `A_VERIFIER` lors de l'export.
 
-Les documents sans instructrice claire ou dont la sectorisation reste à vérifier sont rangés dans `A_VERIFIER`.
+Un doublon de nom MultiGest déclenche une confirmation et reste visible grâce à un badge dédié.
 
-L'export est bloqué tant qu'un document ne possède pas de PDF associé.
+## Sauvegarder et reprendre une session
 
-Avant l'export, PILOTE affiche un contrôle récapitulatif :
+Le bouton **Sauvegarder** télécharge un fichier JSON contenant les informations de la session et des documents.
 
-- les PDF manquants et les documents incomplets bloquent l'export ;
-- les attributions à vérifier et les doublons déclenchent un avertissement ;
-- les documents à vérifier peuvent tout de même être exportés dans `A_VERIFIER` après confirmation.
+- plusieurs clics sans modification ne créent pas de nouvelle sauvegarde ;
+- PILOTE avertit avant de fermer une session modifiée qui n'a pas été sauvegardée ;
+- une sauvegarde peut être rechargée après l'import des trois fichiers Excel ;
+- un JSON vide, invalide ou incompatible est refusé.
 
-Avec Edge ou Chrome, si un dossier portant déjà le nom de la session existe, PILOTE crée automatiquement un nouveau dossier avec un suffixe comme `_2` ou `_3`. Aucun ancien export n'est remplacé silencieusement.
+Le JSON ne contient pas les PDF eux-mêmes. Après la reprise d'une session, les PDF doivent donc être associés de nouveau.
 
-Si plusieurs PDF portent le même nom dans un dossier d'instructrice, PILOTE conserve le nom du premier puis ajoute les suffixes MultiGest `_002`, `_003`, etc. aux suivants.
+## Gestion des PDF
 
-### Vérifier la compatibilité du navigateur
+PILOTE vérifie l'extension et le contenu réel des PDF sélectionnés. Un fichier vide ou simplement renommé en `.pdf` est refusé.
 
-Pour vérifier manuellement si le navigateur permet la création directe des dossiers :
+Avant l'export final, il ne faut pas supprimer, déplacer ou renommer les PDF d'origine. Le navigateur garde seulement un accès temporaire aux fichiers tant que la page reste ouverte.
+
+## Vérification avant export
+
+Le contrôle situé en bas de la page affiche :
+
+- le nombre total de documents ;
+- les PDF manquants ou à réassocier ;
+- les documents incomplets ;
+- les attributions à vérifier ;
+- les doublons de nom MultiGest.
+
+Les PDF manquants et les documents incomplets bloquent l'export. Les attributions à vérifier et les doublons affichent un avertissement, puis demandent une confirmation.
+
+## Export selon le navigateur
+
+| Navigateur | Méthode | Résultat |
+| --- | --- | --- |
+| Microsoft Edge | Dossiers directs | Un dossier de session contenant un dossier par instructrice |
+| Google Chrome | Dossiers directs | Un dossier de session contenant un dossier par instructrice |
+| Mozilla Firefox | Fichier ZIP | Un ZIP contenant les mêmes dossiers par instructrice |
+
+### Edge et Chrome
+
+1. Cliquer sur **Choisir un dossier et exporter**.
+2. Sélectionner l'emplacement de destination.
+3. PILOTE crée le dossier de session et les dossiers des instructrices.
+
+Si le dossier de session existe déjà, PILOTE crée un nouveau dossier avec `_2`, `_3`, etc. Aucun ancien export n'est remplacé silencieusement.
+
+### Firefox
+
+1. Cliquer sur **Télécharger l'export pour Firefox**.
+2. Retrouver le ZIP dans les téléchargements.
+3. Faire un clic droit sur le ZIP puis choisir **Extraire tout**.
+
+### Nommage des PDF
+
+Si plusieurs PDF portent le même nom dans un dossier d'instructrice :
+
+- le premier conserve son nom ;
+- les suivants reçoivent les suffixes MultiGest `_002`, `_003`, etc.
+
+### Vérifier manuellement le navigateur
 
 1. Ouvrir PILOTE dans le navigateur à tester.
 2. Appuyer sur `F12`.
-3. Ouvrir l'onglet `Console`.
-4. Saisir la commande suivante puis appuyer sur Entrée :
+3. Ouvrir l'onglet **Console**.
+4. Saisir :
 
 ```javascript
 typeof window.showDirectoryPicker
 ```
 
-- Firefox affiche `"undefined"` : la création directe des dossiers n'est pas disponible.
-- Edge et Chrome affichent `"function"` : la création directe des dossiers est disponible.
+- Firefox affiche `"undefined"`.
+- Edge et Chrome affichent `"function"`.
 
-PILOTE effectue automatiquement cette même vérification pour activer ou désactiver le bouton correspondant.
+PILOTE effectue automatiquement cette vérification pour activer la bonne méthode.
+
+## Statistiques
+
+Les statistiques sont mises à jour après chaque ajout, modification ou suppression :
+
+- total des documents ;
+- demandes ;
+- pièces complémentaires ;
+- recours ;
+- PCH ;
+- hors département ;
+- comptage par instructrice.
+
+Les statistiques ne sont pas exportées dans un fichier séparé. Elles restent consultables dans PILOTE et dans les informations de la session JSON.
+
+## Recherche et filtres
+
+La liste peut être filtrée par :
+
+- nom MultiGest ;
+- présence ou absence du PDF ;
+- instructrice ;
+- type de document.
+
+Les filtres modifient uniquement l'affichage. Ils ne changent et ne suppriment aucune donnée.
+
+## Problèmes fréquents
+
+### Le démarrage reste bloqué
+
+Vérifier que les trois fichiers Excel sont importés au bon endroit et que chaque ligne de statut est verte.
+
+### Une ville ou une école n'est pas proposée
+
+Vérifier le fichier Excel importé et poursuivre la saisie. PILOTE tolère les accents, espaces et tirets, mais la donnée doit exister dans les fichiers sélectionnés.
+
+### Un PDF est refusé
+
+Vérifier qu'il s'agit réellement d'un PDF non vide. Changer uniquement l'extension d'un autre fichier ne suffit pas.
+
+### L'export est désactivé
+
+Consulter la vérification automatique en bas de page. Tous les documents doivent posséder un PDF et leurs informations obligatoires.
+
+### Le bouton de création des dossiers est désactivé
+
+Le navigateur ne prend probablement pas en charge cette fonction. Utiliser le ZIP ou ouvrir PILOTE avec Edge ou Chrome.
+
+## Limites connues
+
+- pas d'écriture dans MultiGest ;
+- pas d'accès direct aux bannettes ;
+- pas de sauvegarde automatique ;
+- pas de restauration des PDF depuis le JSON ;
+- pas d'écriture dans le fichier `statistiques.xlsx` ;
+- pas d'export statistique séparé ;
+- création directe des dossiers indisponible dans Firefox.
+
+## Structure du projet
+
+```text
+/assets      Images, logos, icônes et informations de licence
+/data        Fichiers Excel de sectorisation
+/exports     Emplacement réservé aux exports manuels
+/libs        SheetJS, JSZip et leurs licences
+/sessions    Emplacement réservé aux sauvegardes JSON
+index.html   Structure de l'interface
+style.css    Présentation et responsive
+app.js       Fonctionnement de PILOTE
+README.md    Guide d'installation et d'utilisation
+COMMIT_HISTORY.md
+```
+
+Les dossiers `sessions` et `exports` ne sont pas remplis automatiquement par le navigateur. L'agent choisit l'emplacement des téléchargements ou de l'export.
 
 ## Bibliothèques externes
 
-Le dossier `libs` contient SheetJS, utilisé pour lire les fichiers Excel, et JSZip, utilisé pour créer les exports ZIP.
+- SheetJS Community Edition `0.20.3` pour lire les fichiers Excel ;
+- JSZip `3.10.1` pour produire l'export ZIP ;
+- Tabler Icons pour les icônes de navigateurs.
 
-`index.html` charge la version optimisée `libs/xlsx.full.min.js`.
+Les fichiers sont chargés localement. Leurs sources et licences sont documentées dans `libs/README.md` et `assets/README.md`.
 
-La licence officielle est conservée dans `libs/SheetJS-LICENSE.txt`.
+## Développement
 
-`index.html` charge également `libs/jszip.min.js`.
+Le projet utilise uniquement HTML, CSS et JavaScript vanilla. Il n'utilise aucun framework, gestionnaire de paquets, backend ou service distant.
 
-La licence officielle de JSZip est conservée dans `libs/JSZip-LICENSE.md`.
+Pour une modification :
 
-Les informations utiles sur ces bibliothèques sont détaillées dans `libs/README.md`.
-
-Les sources et la licence des icônes de navigateurs sont détaillées dans `assets/README.md`.
+1. éditer les fichiers concernés ;
+2. ouvrir `index.html` dans un navigateur ;
+3. vérifier le parcours sur Edge ou Chrome et sur Firefox ;
+4. conserver `COMMIT_HISTORY.md` à jour.

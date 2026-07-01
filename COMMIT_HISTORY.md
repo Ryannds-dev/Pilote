@@ -543,3 +543,33 @@ Convention de nommage :
 
 - le premier PDF conserve son nom d'origine ;
 - les PDF suivants portant le même nom utilisent la convention MultiGest `_002`, `_003`, etc.
+
+## Finalization: Complete UX and documentation
+
+Date : 2026-06-28
+
+Objectif : finaliser l'interface et fournir une documentation complète pour les agents et la DNUM.
+
+- ajout d'un avertissement du navigateur avant de fermer une session modifiée non sauvegardée ;
+- ajout d'un badge visible sur chaque document dont le nom MultiGest est en doublon ;
+- alignement des boutons des deux méthodes d'export ;
+- harmonisation des survols et des focus clavier sur les boutons ;
+- focus visible sur les champs, listes et boutons ;
+- ajout des informations d'accessibilité pour les champs obligatoires ;
+- association des imports Excel à leur message d'état pour les lecteurs d'écran ;
+- annonce dynamique de l'état global des imports Excel ;
+- suppression de la transition de couleur si le système demande moins d'animations ;
+- réécriture complète du README ;
+- ajout des prérequis, de l'ouverture sans serveur et du parcours complet ;
+- documentation détaillée des fichiers Excel, PDF, sauvegardes, statistiques et exports ;
+- tableau de compatibilité Edge, Chrome et Firefox ;
+- ajout des problèmes fréquents, limites connues, bibliothèques et informations de développement.
+- empilement du logo et de la mention interne sur les écrans de `420 px` ou moins ;
+- conservation du favicon transparent fourni pour remplacer l'ancienne version sur fond blanc.
+
+Points d'attention :
+
+- l'avertissement de fermeture utilise le message standard du navigateur, car les navigateurs interdisent les textes personnalisés dans cette boîte de dialogue ;
+- le badge de doublon permet de retrouver les documents signalés par le contrôle d'export ;
+- la documentation distingue clairement les dossiers présents dans le projet des emplacements réellement choisis par le navigateur ;
+- aucune fonctionnalité bonus n'a été ajoutée pendant cette phase.

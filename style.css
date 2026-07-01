@@ -40,6 +40,7 @@ body {
 .panneau-actions-session {
   position: sticky;
   top: 24px;
+  min-width: 0;
   margin-top: 28px;
   max-height: calc(100vh - 48px);
   overflow: auto;
@@ -178,6 +179,7 @@ h1 {
 
 .zone-reprise-session input {
   width: 100%;
+  min-width: 0;
   min-height: 46px;
   padding: 10px 12px;
   border: 1px solid var(--gris-bordure);
@@ -396,6 +398,8 @@ h1 {
 }
 
 .methode-export {
+  display: flex;
+  flex-direction: column;
   min-width: 0;
   padding-top: 16px;
   border-top: 1px solid var(--gris-bordure);
@@ -443,6 +447,7 @@ h1 {
 }
 
 .etapes-export {
+  flex: 1;
   margin: 10px 0 12px;
   padding-left: 22px;
   color: var(--gris-secondaire);
@@ -489,14 +494,20 @@ h1 {
 .bouton-ajouter-document:not(:disabled):hover,
 .bouton-ajouter-document:not(:disabled):focus,
 .bouton-sauvegarder-session:not(:disabled):hover,
-.bouton-sauvegarder-session:not(:disabled):focus {
+.bouton-sauvegarder-session:not(:disabled):focus,
+.bouton-exporter-dossiers:not(:disabled):hover,
+.bouton-exporter-dossiers:not(:disabled):focus {
   background: #8f0f25;
 }
 
 .bouton-annuler-modification:hover,
 .bouton-annuler-modification:focus,
 .bouton-modifier-document:hover,
-.bouton-modifier-document:focus {
+.bouton-modifier-document:focus,
+.bouton-effacer-filtres:hover,
+.bouton-effacer-filtres:focus,
+.bouton-exporter-zip:not(:disabled):hover,
+.bouton-exporter-zip:not(:disabled):focus {
   border-color: var(--rouge-pilote);
   color: var(--rouge-pilote);
 }
@@ -513,7 +524,17 @@ h1 {
 .bouton-annuler-modification:focus,
 .bouton-modifier-document:focus,
 .bouton-supprimer-document:focus,
-.bouton-sauvegarder-session:focus {
+.bouton-sauvegarder-session:focus,
+.bouton-effacer-filtres:focus,
+.bouton-exporter-dossiers:focus,
+.bouton-exporter-zip:focus {
+  outline: 3px solid #f7c8d1;
+  outline-offset: 2px;
+}
+
+input:focus-visible,
+select:focus-visible,
+button:focus-visible {
   outline: 3px solid #f7c8d1;
   outline-offset: 2px;
 }
@@ -605,6 +626,7 @@ h1 {
 
 .bloc-import-excel input {
   width: 100%;
+  min-width: 0;
   min-height: 46px;
   padding: 10px 12px;
   border: 1px solid var(--gris-bordure);
@@ -1018,6 +1040,12 @@ h1 {
   background: #eef0f3;
 }
 
+.statut-doublon {
+  color: #6a4300;
+  background: #fff6e5;
+  font-weight: 700;
+}
+
 .actions-document {
   display: flex;
   flex-wrap: wrap;
@@ -1145,7 +1173,17 @@ h1 {
 }
 
 @media (max-width: 420px) {
+  .ligne-logo {
+    flex-direction: column;
+  }
+
   .grille-statistiques {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zone-excel {
+    transition: none;
   }
 }

@@ -53,6 +53,7 @@
                   id="fichier-sectorisation-adulte"
                   type="file"
                   accept=".xlsx,.xls"
+                  aria-describedby="message-import-excel"
                 />
               </div>
 
@@ -62,6 +63,7 @@
                   id="fichier-sectorisation-pch"
                   type="file"
                   accept=".xlsx,.xls"
+                  aria-describedby="message-import-excel"
                 />
               </div>
 
@@ -73,11 +75,16 @@
                   id="fichier-sectorisation-enfant"
                   type="file"
                   accept=".xlsx,.xls"
+                  aria-describedby="message-import-excel"
                 />
               </div>
             </div>
 
-            <p id="message-import-excel" class="message-import-excel">
+            <p
+              id="message-import-excel"
+              class="message-import-excel"
+              aria-live="polite"
+            >
               Import obligatoire : chargez les 3 fichiers pour débloquer le
               démarrage de session.
             </p>
@@ -105,6 +112,7 @@
                   type="text"
                   autocomplete="off"
                   placeholder="Exemple : RDS"
+                  aria-required="true"
                   disabled
                 />
               </div>
@@ -115,6 +123,7 @@
                   id="champ-date-tampon"
                   name="tamponDate"
                   type="date"
+                  aria-required="true"
                   disabled
                 />
               </div>
@@ -186,12 +195,17 @@
                       type="text"
                       autocomplete="off"
                       placeholder="Nom du document dans MultiGest"
+                      aria-required="true"
                     />
                   </div>
 
                   <div class="champ-formulaire">
                     <label for="champ-public">Public</label>
-                    <select id="champ-public" name="publicType">
+                    <select
+                      id="champ-public"
+                      name="publicType"
+                      aria-required="true"
+                    >
                       <option value="">Sélectionner</option>
                       <option value="adulte">Adulte</option>
                       <option value="enfant">Enfant</option>
@@ -200,7 +214,11 @@
 
                   <div class="champ-formulaire">
                     <label for="champ-type-document">Type de document</label>
-                    <select id="champ-type-document" name="documentType">
+                    <select
+                      id="champ-type-document"
+                      name="documentType"
+                      aria-required="true"
+                    >
                       <option value="">Sélectionner</option>
                       <option value="demande">Demande</option>
                       <option value="piece_complementaire">

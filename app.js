@@ -90,6 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
   saveSessionButton.addEventListener("click", saveCurrentSession);
   exportFoldersButton.addEventListener("click", exportPdfsToFolders);
   exportZipButton.addEventListener("click", exportPdfsToZip);
+  window.addEventListener("beforeunload", warnBeforeLeavingUnsavedSession);
   sessionImportInput.addEventListener("change", () => {
     handleSessionFileSelection(sessionImportInput.files[0]);
   });
@@ -100,6 +101,21 @@ document.addEventListener("DOMContentLoaded", () => {
   updateSaveControls("Sauvegarde disponible après le démarrage d'une session.");
   updatePdfExportControls();
 });
+
+function warnBeforeLeavingUnsavedSession(event) {
+  if (!currentSession.sessionId) {
+    return;
+  }
+
+  const currentSignature = createCurrentSessionSignature();
+
+  if (lastSavedSessionSignature === currentSignature) {
+    return;
+  }
+
+  event.preventDefault();
+  event.returnValue = "";
+}
 
 function prepareDocumentFilters() {
   const searchInput = document.getElementById("recherche-documents");
@@ -2177,6 +2193,7 @@ function createDocumentCard(documentItem, documentNumber) {
   addDocumentDetail(documentDetails, `Instructrice : ${formatInstructor(documentItem)}`);
   addDocumentStatusDetail(documentDetails, documentItem);
   addPdfStatusDetail(documentDetails, documentItem);
+  addDuplicateStatusDetail(documentDetails, documentItem);
 
   if (documentItem.gevascoSchoolOrCity) {
     addDocumentDetail(documentDetails, `École / GEVASCO : ${documentItem.gevascoSchoolOrCity}`);
@@ -2204,6 +2221,27 @@ function createDocumentCard(documentItem, documentNumber) {
   documentCard.appendChild(cardContent);
 
   return documentCard;
+}
+
+function addDuplicateStatusDetail(documentDetails, documentItem) {
+  if (!isDocumentNameDuplicate(documentItem)) {
+    return;
+  }
+
+  const detail = document.createElement("span");
+
+  detail.className = "detail-document statut-doublon";
+  detail.textContent = "Doublon de nom MultiGest";
+  documentDetails.appendChild(detail);
+}
+
+function isDocumentNameDuplicate(documentItem) {
+  const normalizedName = normalizeExcelText(documentItem.multigestFileName);
+  const matchingDocumentCount = currentSession.documents.filter((otherDocument) => {
+    return normalizeExcelText(otherDocument.multigestFileName) === normalizedName;
+  }).length;
+
+  return normalizedName && matchingDocumentCount > 1;
 }
 
 function addDocumentDetail(documentDetails, text) {
