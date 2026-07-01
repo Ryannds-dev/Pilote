@@ -106,11 +106,10 @@ Le contrôle situé en bas de la page affiche :
 
 - le nombre total de documents ;
 - les PDF manquants ou à réassocier ;
-- les documents incomplets ;
 - les attributions à vérifier ;
 - les doublons de nom MultiGest.
 
-Les PDF manquants et les documents incomplets bloquent l'export. Les attributions à vérifier et les doublons affichent un avertissement, puis demandent une confirmation.
+Les PDF manquants bloquent l'export. Les attributions à vérifier et les doublons affichent un avertissement, puis demandent une confirmation. La validation interne continue de refuser un document auquel il manque une information obligatoire.
 
 ## Export selon le navigateur
 

@@ -573,3 +573,18 @@ Points d'attention :
 - le badge de doublon permet de retrouver les documents signalés par le contrôle d'export ;
 - la documentation distingue clairement les dossiers présents dans le projet des emplacements réellement choisis par le navigateur ;
 - aucune fonctionnalité bonus n'a été ajoutée pendant cette phase.
+
+## UX: Remove redundant incomplete counter
+
+Date : 2026-07-01
+
+Objectif : simplifier la vérification affichée avant l'export.
+
+- suppression du compteur visible "Documents incomplets" ;
+- passage de la grille de contrôle de cinq à quatre indicateurs ;
+- conservation de la validation interne des informations obligatoires ;
+- mise à jour du README.
+
+Point d'attention :
+
+- le formulaire et l'import JSON empêchent déjà les documents incomplets d'entrer dans la session ; le contrôle interne reste néanmoins présent comme sécurité défensive.

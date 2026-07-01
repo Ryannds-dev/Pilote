@@ -1142,11 +1142,6 @@ function renderPreExportCheck(robustnessReport) {
     robustnessReport.missingPdfCount > 0 ? "error" : "success"
   );
   updatePreExportCheckValue(
-    "controle-documents-incomplets",
-    robustnessReport.incompleteDocumentCount,
-    robustnessReport.incompleteDocumentCount > 0 ? "error" : "success"
-  );
-  updatePreExportCheckValue(
     "controle-attributions-verifier",
     robustnessReport.unresolvedAssignmentCount,
     robustnessReport.unresolvedAssignmentCount > 0 ? "warning" : "success"
