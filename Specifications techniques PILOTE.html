@@ -1,0 +1,679 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>Spécifications techniques PILOTE</title>
+    <style>
+      @page {
+        size: A4;
+        margin: 18mm;
+      }
+
+      body {
+        margin: 0;
+        color: #25282d;
+        background: #ffffff;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 10.5pt;
+        line-height: 1.45;
+      }
+
+      .cover {
+        min-height: 245mm;
+        text-align: center;
+        page-break-after: always;
+      }
+
+      .cover img {
+        width: 350px;
+        max-width: 80%;
+        margin-top: 48mm;
+      }
+
+      .cover-line {
+        width: 90px;
+        height: 6px;
+        margin: 28px auto;
+        background: #b3122d;
+      }
+
+      .cover h1 {
+        margin: 0;
+        color: #25282d;
+        font-size: 28pt;
+      }
+
+      .cover h2 {
+        margin: 12px 0 0;
+        color: #5f6670;
+        font-size: 16pt;
+        font-weight: normal;
+      }
+
+      .cover-details {
+        margin-top: 65px;
+        color: #5f6670;
+      }
+
+      h1,
+      h2,
+      h3 {
+        color: #25282d;
+        page-break-after: avoid;
+      }
+
+      h1 {
+        margin: 0 0 18px;
+        padding-bottom: 9px;
+        border-bottom: 5px solid #b3122d;
+        font-size: 22pt;
+      }
+
+      h2 {
+        margin: 26px 0 10px;
+        color: #8d0e23;
+        font-size: 16pt;
+      }
+
+      h3 {
+        margin: 18px 0 8px;
+        font-size: 12pt;
+      }
+
+      p {
+        margin: 0 0 10px;
+      }
+
+      ul,
+      ol {
+        margin: 6px 0 12px;
+        padding-left: 24px;
+      }
+
+      li + li {
+        margin-top: 4px;
+      }
+
+      table {
+        width: 100%;
+        margin: 10px 0 18px;
+        border-collapse: collapse;
+        page-break-inside: avoid;
+      }
+
+      th,
+      td {
+        padding: 8px 9px;
+        border: 1px solid #d8dbe0;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        color: #ffffff;
+        background: #4a4e55;
+      }
+
+      tr:nth-child(even) td {
+        background: #f5f6f8;
+      }
+
+      code {
+        color: #8d0e23;
+        font-family: Consolas, "Courier New", monospace;
+      }
+
+      .summary-box,
+      .warning-box,
+      .success-box {
+        margin: 14px 0;
+        padding: 13px 15px;
+        background: #f5f6f8;
+        border-left: 5px solid #b3122d;
+        page-break-inside: avoid;
+      }
+
+      .warning-box {
+        border-left-color: #a15c00;
+      }
+
+      .success-box {
+        border-left-color: #18794e;
+      }
+
+      .page-break {
+        page-break-before: always;
+      }
+
+      .small-text {
+        color: #5f6670;
+        font-size: 9pt;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="cover">
+      <img src="assets/logo-header.png" alt="PILOTE" />
+      <div class="cover-line"></div>
+      <h1>Spécifications techniques</h1>
+      <h2>Outil local d’aide à la sectorisation des documents numérisés</h2>
+      <div class="cover-details">
+        <p><strong>Version documentée :</strong> version fonctionnelle actuelle</p>
+        <p><strong>Date :</strong> 2 juillet 2026</p>
+        <p><strong>Technologies :</strong> HTML, CSS et JavaScript vanilla</p>
+      </div>
+    </section>
+
+    <h1>Sommaire</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Partie</th>
+          <th>Contenu</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1. Contexte et objectif</td><td>Besoin métier et rôle de PILOTE.</td></tr>
+        <tr><td>2. Périmètre fonctionnel</td><td>Fonctions couvertes par la version actuelle.</td></tr>
+        <tr><td>3. Choix technologiques</td><td>Architecture web locale et bibliothèques.</td></tr>
+        <tr><td>4. Architecture du projet</td><td>Organisation des fichiers et responsabilités.</td></tr>
+        <tr><td>5. Fonctionnement technique</td><td>Flux Excel, session, documents, PDF et exports.</td></tr>
+        <tr><td>6. Données et persistance</td><td>Mémoire, sauvegarde JSON et fichiers locaux.</td></tr>
+        <tr><td>7. Robustesse et sécurité</td><td>Validations, confidentialité et contrôles.</td></tr>
+        <tr><td>8. Compatibilité et déploiement</td><td>Navigateurs, lancement et livraison.</td></tr>
+        <tr><td>9. Limites et maintenance</td><td>Limites connues, tests et évolutions.</td></tr>
+      </tbody>
+    </table>
+
+    <h1 class="page-break">1. Contexte et objectif</h1>
+
+    <p>
+      PILOTE est un outil local destiné à accompagner les agents d’une MDPH
+      pendant la numérisation de documents. Il répond à un besoin
+      d’orientation : un document numérisé doit ensuite être transmis à
+      l’instructrice concernée.
+    </p>
+
+    <p>
+      L’outil permet de reporter les informations disponibles dans MultiGest
+      et sur le document papier, de rechercher l’instructrice dans les fichiers
+      Excel de sectorisation, d’associer le PDF téléchargé et de préparer un
+      classement final.
+    </p>
+
+    <div class="summary-box">
+      <strong>Positionnement :</strong> PILOTE ne remplace pas MultiGest, ne
+      consulte pas ses bannettes et n’y écrit aucune donnée. Il constitue un
+      tableau de suivi local enrichi pendant la numérisation.
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Besoin</th>
+          <th>Réponse apportée</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Identifier l’instructrice</td>
+          <td>Recherche automatique dans les sectorisations adulte, PCH et enfant.</td>
+        </tr>
+        <tr>
+          <td>Suivre un lot important</td>
+          <td>Liste numérotée, recherche, filtres et statistiques en temps réel.</td>
+        </tr>
+        <tr>
+          <td>Contrôler les PDF</td>
+          <td>Statut visuel, validation du fichier et contrôle avant export.</td>
+        </tr>
+        <tr>
+          <td>Interrompre le travail</td>
+          <td>Sauvegarde et reprise des données de session au format JSON.</td>
+        </tr>
+        <tr>
+          <td>Préparer la transmission</td>
+          <td>Classement des PDF par instructrice avec une zone <code>A_VERIFIER</code>.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h1 class="page-break">2. Périmètre fonctionnel</h1>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Fonction</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Import des sectorisations</td>
+          <td>Sélection et validation de trois fichiers Excel : adulte, PCH et enfant.</td>
+        </tr>
+        <tr>
+          <td>Démarrage de session</td>
+          <td>Saisie de l’agent, de la date de tampon et génération d’un identifiant.</td>
+        </tr>
+        <tr>
+          <td>Gestion des documents</td>
+          <td>Ajout, modification, suppression et numérotation des documents.</td>
+        </tr>
+        <tr>
+          <td>Sectorisation</td>
+          <td>Recherche par ville ou école, avec correction manuelle possible.</td>
+        </tr>
+        <tr>
+          <td>Gestion des PDF</td>
+          <td>Association d’un PDF, contrôle de son contenu et affichage de son statut.</td>
+        </tr>
+        <tr>
+          <td>Recherche et filtres</td>
+          <td>Filtrage par texte, PDF, instructrice et type de document.</td>
+        </tr>
+        <tr>
+          <td>Statistiques</td>
+          <td>Comptages globaux, cas particuliers et répartition par instructrice.</td>
+        </tr>
+        <tr>
+          <td>Sauvegarde</td>
+          <td>Export et import d’une session JSON, sans contenu PDF.</td>
+        </tr>
+        <tr>
+          <td>Export final</td>
+          <td>Dossiers directs dans Edge/Chrome ou archive ZIP dans Firefox.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Hors périmètre</h3>
+    <ul>
+      <li>connexion directe à MultiGest ;</li>
+      <li>lecture ou déplacement automatique dans les bannettes ;</li>
+      <li>base de données et comptes utilisateurs ;</li>
+      <li>envoi de données vers Internet ;</li>
+      <li>sauvegarde automatique permanente ;</li>
+      <li>restauration actuelle du contenu des PDF depuis le JSON.</li>
+    </ul>
+
+    <h1 class="page-break">3. Choix technologiques</h1>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Choix</th>
+          <th>Justification</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>HTML, CSS et JavaScript vanilla</td>
+          <td>Application lisible, sans chaîne de compilation et sans framework.</td>
+        </tr>
+        <tr>
+          <td>Application web locale</td>
+          <td>Ouverture immédiate dans un navigateur installé, sans serveur ni installation.</td>
+        </tr>
+        <tr>
+          <td>Aucun backend</td>
+          <td>Aucune infrastructure réseau, API ou maintenance serveur.</td>
+        </tr>
+        <tr>
+          <td>Aucune base de données</td>
+          <td>Les données restent temporaires ou sont exportées explicitement par l’agent.</td>
+        </tr>
+        <tr>
+          <td>Bibliothèques embarquées</td>
+          <td>Fonctionnement hors ligne et versions contrôlables par la DNUM.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Bibliothèques tierces</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Bibliothèque</th>
+          <th>Version</th>
+          <th>Rôle</th>
+          <th>Licence</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>SheetJS Community Edition</td>
+          <td>0.20.3</td>
+          <td>Lecture locale des classeurs Excel.</td>
+          <td>Apache 2.0</td>
+        </tr>
+        <tr>
+          <td>JSZip</td>
+          <td>3.10.1</td>
+          <td>Création de l’archive d’export compatible Firefox.</td>
+          <td>MIT</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      Les fichiers minifiés et leurs licences sont conservés dans
+      <code>libs/</code>. Ils ne contiennent pas la logique métier propre à
+      PILOTE.
+    </p>
+
+    <h1 class="page-break">4. Architecture du projet</h1>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Dossier ou fichier</th>
+          <th>Responsabilité</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><code>index.html</code></td><td>Structure de l’interface et chargement des ressources.</td></tr>
+        <tr><td><code>style.css</code></td><td>Identité visuelle, états, mise en page et responsive.</td></tr>
+        <tr><td><code>app.js</code></td><td>État de la session, règles métier, validations et exports.</td></tr>
+        <tr><td><code>README.md</code></td><td>Guide d’installation, d’utilisation et limites.</td></tr>
+        <tr><td><code>COMMIT_HISTORY.md</code></td><td>Historique détaillé des évolutions.</td></tr>
+        <tr><td><code>assets/</code></td><td>Logo, favicon, états PDF et icônes de navigateurs.</td></tr>
+        <tr><td><code>data/</code></td><td>Fichiers Excel de référence, sélectionnés manuellement.</td></tr>
+        <tr><td><code>libs/</code></td><td>SheetJS, JSZip, notices et licences.</td></tr>
+        <tr><td><code>sessions/</code></td><td>Emplacement organisationnel réservé aux JSON.</td></tr>
+        <tr><td><code>exports/</code></td><td>Emplacement organisationnel réservé aux exports.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="summary-box">
+      Les dossiers <code>sessions/</code> et <code>exports/</code> ne sont pas
+      alimentés automatiquement. Le navigateur choisit la destination des
+      téléchargements ou demande à l’agent de sélectionner un dossier.
+    </div>
+
+    <h1 class="page-break">5. Fonctionnement technique</h1>
+
+    <h2>5.1 Import et validation des fichiers Excel</h2>
+    <p>
+      L’agent sélectionne les trois fichiers avec un champ de type fichier.
+      Le navigateur transmet leur contenu à PILOTE, puis SheetJS lit les
+      feuilles du classeur.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Fichier attendu</th>
+          <th>Colonnes d’identification</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Sectorisation adulte</td><td><code>Commune</code> et <code>Assistant de gestion</code></td></tr>
+        <tr><td>Sectorisation PCH</td><td><code>Commune</code> et <code>Instructeur PCH</code></td></tr>
+        <tr><td>Sectorisation enfant</td><td><code>Nom</code>, <code>Commune</code> et <code>Instructrice enfant</code></td></tr>
+      </tbody>
+    </table>
+
+    <p>
+      PILOTE recherche les en-têtes dans les premières lignes, ignore les
+      lignes non exploitables et refuse un fichier qui possède les en-têtes
+      sans aucune donnée utile. Après validation, des références de villes,
+      d’écoles et d’instructrices sont construites pour alimenter les
+      suggestions.
+    </p>
+
+    <h2>5.2 Normalisation des recherches</h2>
+    <p>
+      Les recherches sont comparées après passage en minuscules, suppression
+      des accents et harmonisation des espaces, tirets et apostrophes. Ainsi,
+      <code>ÉVREUX</code>, <code>evreux</code> et une variante de casse
+      correspondent à la même valeur.
+    </p>
+
+    <h2>5.3 Création de la session</h2>
+    <p>
+      La session est créée uniquement lorsque les trois sectorisations sont
+      prêtes. Son identifiant suit la convention
+      <code>YYYY-MM-DD_AGENT</code>. Les informations sont conservées dans la
+      mémoire de la page avec une liste de documents initialement vide.
+    </p>
+
+    <h2>5.4 Modèle d’un document</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Groupe</th>
+          <th>Données principales</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Identification</td><td>Identifiant interne, nom MultiGest, dates de création et modification.</td></tr>
+        <tr><td>Qualification</td><td>Public, type de document, PCH et hors département.</td></tr>
+        <tr><td>Recherche</td><td>Ville, école ou GEVASCO.</td></tr>
+        <tr><td>Attribution</td><td>Instructrice, correction manuelle, source et statut.</td></tr>
+        <tr><td>PDF</td><td>Nom, contenu temporaire, présence et besoin de réassociation.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>5.5 Attribution de l’instructrice</h2>
+    <ul>
+      <li>un adulte est recherché par ville dans la sectorisation adulte ;</li>
+      <li>un document PCH est recherché par ville dans la sectorisation PCH ;</li>
+      <li>un enfant est recherché par école et ville, puis par ville si nécessaire ;</li>
+      <li>une école homonyme d’une autre ville n’est pas retenue ;</li>
+      <li>un recours ou un hors département est signalé à vérifier ;</li>
+      <li>une instructrice peut être indiquée manuellement pour un cas particulier.</li>
+    </ul>
+
+    <h2>5.6 PDF</h2>
+    <p>
+      Le fichier sélectionné doit être non vide, avoir une extension PDF ou un
+      type compatible et contenir la signature <code>%PDF-</code> dans son
+      début. Le navigateur fournit un accès temporaire à son contenu tant que
+      la page reste ouverte.
+    </p>
+
+    <h2>5.7 Exports</h2>
+    <p>
+      Avant l’export, PILOTE vérifie la présence des PDF et les informations
+      obligatoires. Les attributions à vérifier et les doublons déclenchent un
+      avertissement.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Méthode</th>
+          <th>Fonctionnement</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Dossiers directs</td>
+          <td>Edge et Chrome utilisent <code>showDirectoryPicker</code> après autorisation de l’agent.</td>
+        </tr>
+        <tr>
+          <td>Archive ZIP</td>
+          <td>JSZip construit la même arborescence dans un fichier téléchargé, notamment pour Firefox.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      Les fichiers exportés reprennent le nom MultiGest. Les doublons dans un
+      même dossier utilisent <code>_002</code>, <code>_003</code>, etc. Les
+      documents sans attribution certaine sont placés dans
+      <code>A_VERIFIER</code>.
+    </p>
+
+    <h1 class="page-break">6. Données et persistance</h1>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Donnée</th>
+          <th>Emplacement</th>
+          <th>Durée</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Sectorisations lues</td>
+          <td>Mémoire de la page</td>
+          <td>Jusqu’à la fermeture ou l’actualisation.</td>
+        </tr>
+        <tr>
+          <td>Session et documents</td>
+          <td>Mémoire de la page</td>
+          <td>Jusqu’à la fermeture ou l’actualisation.</td>
+        </tr>
+        <tr>
+          <td>PDF associés</td>
+          <td>Accès temporaire fourni par le navigateur</td>
+          <td>Pendant la page ouverte.</td>
+        </tr>
+        <tr>
+          <td>Sauvegarde JSON</td>
+          <td>Fichier téléchargé explicitement</td>
+          <td>Selon la conservation décidée par l’utilisateur.</td>
+        </tr>
+        <tr>
+          <td>Export final</td>
+          <td>Dossier choisi ou archive téléchargée</td>
+          <td>Selon la conservation décidée par l’utilisateur.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Sauvegarde JSON</h3>
+    <p>
+      Le JSON contient l’agent, la date de tampon, l’identifiant de session et
+      toutes les informations structurées des documents. Il possède un
+      identifiant d’application et une version de format afin de refuser les
+      fichiers incompatibles.
+    </p>
+
+    <div class="warning-box">
+      Le JSON conserve le nom et l’état du PDF, mais pas son contenu. Après
+      restauration, l’agent doit actuellement redonner accès aux PDF. Une
+      sauvegarde complète au format ZIP, contenant le JSON et les PDF, est une
+      évolution envisagée pour les sessions volumineuses.
+    </div>
+
+    <h1 class="page-break">7. Robustesse et sécurité</h1>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Sujet</th>
+          <th>Mesure présente</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Excel incorrect</td><td>Validation de l’extension, des colonnes et de la présence de données exploitables.</td></tr>
+        <tr><td>PDF invalide</td><td>Contrôle de l’extension, de la taille et de la signature interne.</td></tr>
+        <tr><td>JSON invalide</td><td>Contrôle de la syntaxe, du format, des types et des documents.</td></tr>
+        <tr><td>Doublon</td><td>Détection insensible aux accents, à la casse et à l’extension PDF.</td></tr>
+        <tr><td>Perte de travail</td><td>Avertissement avant fermeture si la session a changé depuis la sauvegarde.</td></tr>
+        <tr><td>Export incomplet</td><td>Blocage si un PDF manque et avertissement sur les cas à vérifier.</td></tr>
+        <tr><td>Écrasement</td><td>Création d’un nouveau dossier de session suffixé si nécessaire.</td></tr>
+        <tr><td>Confidentialité</td><td>Aucun appel réseau et aucune persistance automatique.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="success-box">
+      Le code applicatif n’utilise ni <code>fetch</code>, ni requête réseau, ni
+      service distant. Les fichiers sont lus uniquement après une action
+      explicite de l’agent.
+    </div>
+
+    <h3>Protection des données</h3>
+    <p>
+      L’absence d’envoi Internet ne dispense pas d’appliquer les règles
+      internes de la MDPH. Les PDF, sauvegardes JSON et exports doivent être
+      stockés dans des emplacements autorisés, protégés et supprimés selon les
+      durées de conservation définies.
+    </p>
+
+    <h1 class="page-break">8. Compatibilité et déploiement</h1>
+
+    <h2>8.1 Navigateurs</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Navigateur</th>
+          <th>Utilisation</th>
+          <th>Export</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Microsoft Edge récent</td><td>Compatible</td><td>Dossiers directs ou ZIP</td></tr>
+        <tr><td>Google Chrome récent</td><td>Compatible</td><td>Dossiers directs ou ZIP</td></tr>
+        <tr><td>Mozilla Firefox récent</td><td>Compatible</td><td>ZIP à extraire</td></tr>
+      </tbody>
+    </table>
+
+    <h2>8.2 Déploiement</h2>
+    <ol>
+      <li>Conserver l’ensemble des fichiers et dossiers de PILOTE.</li>
+      <li>Copier le projet dans un emplacement approuvé par la DNUM.</li>
+      <li>Créer éventuellement un raccourci vers <code>index.html</code>.</li>
+      <li>Ouvrir le fichier dans un navigateur compatible.</li>
+    </ol>
+
+    <p>
+      Aucun exécutable n’est compilé et aucun serveur n’est démarré. Le dossier
+      complet constitue le livrable applicatif. Il peut être distribué dans une
+      archive ZIP puis extrait sur le poste ou sur un emplacement réseau
+      autorisé.
+    </p>
+
+    <h1 class="page-break">9. Limites et maintenance</h1>
+
+    <h2>9.1 Limites connues</h2>
+    <ul>
+      <li>la session reste temporaire jusqu’au téléchargement d’un JSON ;</li>
+      <li>le JSON actuel ne contient pas les PDF ;</li>
+      <li>les fichiers Excel doivent être sélectionnés à chaque ouverture ;</li>
+      <li>PILOTE ne contrôle pas la fraîcheur métier des sectorisations ;</li>
+      <li>une attribution automatique dépend de la qualité des données Excel ;</li>
+      <li>les cas particuliers nécessitent toujours une décision humaine ;</li>
+      <li>Firefox ne propose pas l’API de création directe de dossiers utilisée.</li>
+    </ul>
+
+    <h2>9.2 Maintenance</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Corrective</td><td>Corriger une erreur de recherche, d’affichage, de sauvegarde ou d’export.</td></tr>
+        <tr><td>Métier</td><td>Adapter les colonnes ou règles si les sectorisations évoluent.</td></tr>
+        <tr><td>Technique</td><td>Mettre à jour SheetJS ou JSZip après vérification des licences et tests.</td></tr>
+        <tr><td>Documentaire</td><td>Mettre à jour README, historique, documentation HTML et spécifications.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>9.3 Recette conseillée</h2>
+    <ol>
+      <li>Tester l’import des trois sectorisations et les erreurs d’emplacement.</li>
+      <li>Tester une session adulte, enfant, PCH, recours et hors département.</li>
+      <li>Tester une école homonyme dans deux villes.</li>
+      <li>Tester un PDF valide, vide et faussement renommé.</li>
+      <li>Tester les doublons MultiGest et les suffixes d’export.</li>
+      <li>Sauvegarder puis restaurer le JSON.</li>
+      <li>Tester l’export direct dans Edge ou Chrome.</li>
+      <li>Tester l’export ZIP dans Firefox.</li>
+      <li>Effectuer une recette avec des agents sur des données fictives ou autorisées.</li>
+    </ol>
+
+    <p class="small-text">
+      Document établi à partir de la version du projet disponible au
+      2 juillet 2026. Toute évolution fonctionnelle ou technique importante
+      doit entraîner une mise à jour de ces spécifications.
+    </p>
+  </body>
+</html>

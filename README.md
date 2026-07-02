@@ -245,6 +245,17 @@ Les dossiers `sessions` et `exports` ne sont pas remplis automatiquement par le 
 
 Les fichiers sont chargés localement. Leurs sources et licences sont documentées dans `libs/README.md` et `assets/README.md`.
 
+## Documentation technique
+
+Quatre documents complémentaires sont fournis à la racine du projet :
+
+- `documentation_pilote.html` : documentation interactive de l'architecture, des fichiers et des flux ;
+- `Specifications techniques PILOTE.html` : source lisible des spécifications ;
+- `Specifications techniques PILOTE.docx` : version modifiable des spécifications ;
+- `Specifications techniques PILOTE.pdf` : version prête à transmettre ou imprimer.
+
+Le fichier HTML des spécifications est conservé comme source lisible afin de faciliter les futures mises à jour.
+
 ## Développement
 
 Le projet utilise uniquement HTML, CSS et JavaScript vanilla. Il n'utilise aucun framework, gestionnaire de paquets, backend ou service distant.

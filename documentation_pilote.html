@@ -1,0 +1,824 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Documentation technique - PILOTE</title>
+    <link rel="icon" href="assets/favicon.png" type="image/png" />
+    <style>
+      :root {
+        --red: #b3122d;
+        --red-dark: #8d0e23;
+        --red-light: #fff1f3;
+        --text: #25282d;
+        --muted: #5f6670;
+        --border: #dfe2e7;
+        --page: #f5f6f8;
+        --panel: #ffffff;
+        --code: #f0f1f3;
+        --success: #18794e;
+        --warning: #a15c00;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        color: var(--text);
+        background: var(--page);
+        font-family: Arial, Helvetica, sans-serif;
+        line-height: 1.55;
+      }
+
+      button {
+        font: inherit;
+      }
+
+      .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 32px;
+        min-height: 116px;
+        padding: 24px 36px;
+        color: #ffffff;
+        background: #25282d;
+        border-bottom: 6px solid var(--red);
+      }
+
+      .page-header img {
+        width: min(310px, 45vw);
+        height: auto;
+        padding: 10px 14px;
+        background: #ffffff;
+      }
+
+      .page-header-title {
+        text-align: right;
+      }
+
+      .page-header-title p,
+      .page-header-title h1 {
+        margin: 0;
+      }
+
+      .page-header-title p {
+        color: #e9eaec;
+        font-size: 0.86rem;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+
+      .page-header-title h1 {
+        margin-top: 4px;
+        font-size: 1.8rem;
+      }
+
+      .documentation-layout {
+        display: grid;
+        grid-template-columns: 330px minmax(0, 1fr);
+        min-height: calc(100vh - 116px);
+      }
+
+      .navigation-panel {
+        padding: 24px 18px;
+        overflow: auto;
+        background: #ffffff;
+        border-right: 1px solid var(--border);
+      }
+
+      .navigation-title {
+        margin: 0 10px 16px;
+        font-size: 1rem;
+      }
+
+      .navigation-list {
+        display: grid;
+        gap: 5px;
+      }
+
+      .navigation-button {
+        width: 100%;
+        padding: 10px 12px;
+        color: var(--muted);
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 700;
+        text-align: left;
+      }
+
+      .navigation-button:hover,
+      .navigation-button:focus-visible {
+        color: var(--red-dark);
+        background: var(--red-light);
+        outline: none;
+      }
+
+      .navigation-button.is-active {
+        color: var(--red-dark);
+        background: var(--red-light);
+        border-color: #efb7c1;
+      }
+
+      .navigation-button[data-depth="1"] {
+        padding-left: 30px;
+      }
+
+      .file-kind {
+        display: inline-block;
+        min-width: 42px;
+        margin-right: 7px;
+        color: var(--red);
+        font-family: Consolas, "Courier New", monospace;
+        font-size: 0.78rem;
+      }
+
+      .documentation-content {
+        min-width: 0;
+        padding: 34px;
+      }
+
+      .documentation-content:focus {
+        outline: none;
+      }
+
+      .documentation-article {
+        max-width: 1080px;
+        margin: 0 auto;
+      }
+
+      .article-header,
+      .content-card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+      }
+
+      .article-header {
+        padding: 28px;
+        border-top: 6px solid var(--red);
+      }
+
+      .article-header h2,
+      .article-header p {
+        margin: 0;
+      }
+
+      .article-header h2 {
+        font-size: 1.65rem;
+      }
+
+      .article-header p {
+        margin-top: 10px;
+        color: var(--muted);
+      }
+
+      .article-tag {
+        display: inline-block;
+        margin-top: 16px;
+        padding: 5px 9px;
+        color: var(--red-dark);
+        background: var(--red-light);
+        border: 1px solid #efb7c1;
+        border-radius: 4px;
+        font-size: 0.82rem;
+        font-weight: 700;
+      }
+
+      .content-card {
+        margin-top: 18px;
+        padding: 22px;
+      }
+
+      .content-card h3 {
+        margin: 0 0 12px;
+        font-size: 1.12rem;
+      }
+
+      .content-card p {
+        margin: 0 0 10px;
+        color: var(--muted);
+      }
+
+      .content-card p:last-child {
+        margin-bottom: 0;
+      }
+
+      .content-list {
+        margin: 0;
+        padding-left: 22px;
+        color: var(--muted);
+      }
+
+      .content-list li + li {
+        margin-top: 8px;
+      }
+
+      .information-table {
+        width: 100%;
+        margin-top: 10px;
+        border-collapse: collapse;
+      }
+
+      .information-table th,
+      .information-table td {
+        padding: 11px 12px;
+        border: 1px solid var(--border);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      .information-table th {
+        color: var(--text);
+        background: #f0f1f3;
+      }
+
+      code {
+        padding: 2px 5px;
+        color: var(--red-dark);
+        background: var(--code);
+        border-radius: 4px;
+        font-family: Consolas, "Courier New", monospace;
+      }
+
+      .notice {
+        margin-top: 14px;
+        padding: 14px 16px;
+        color: var(--muted);
+        background: #f7f7f8;
+        border-left: 4px solid var(--red);
+        border-radius: 4px;
+      }
+
+      .notice.success {
+        border-left-color: var(--success);
+      }
+
+      .notice.warning {
+        border-left-color: var(--warning);
+      }
+
+      @media (max-width: 850px) {
+        .page-header {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        .page-header-title {
+          text-align: left;
+        }
+
+        .documentation-layout {
+          grid-template-columns: 1fr;
+        }
+
+        .navigation-panel {
+          max-height: 330px;
+          border-right: 0;
+          border-bottom: 1px solid var(--border);
+        }
+
+        .documentation-content {
+          padding: 22px 14px;
+        }
+
+        .information-table {
+          display: block;
+          overflow-x: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="page-header">
+      <img src="assets/logo-header.png" alt="PILOTE" />
+      <div class="page-header-title">
+        <p>Application web locale</p>
+        <h1>Documentation technique</h1>
+      </div>
+    </header>
+
+    <div class="documentation-layout">
+      <aside class="navigation-panel" aria-label="Navigation dans la documentation">
+        <h2 class="navigation-title">Contenu du projet</h2>
+        <nav id="documentation-navigation" class="navigation-list"></nav>
+      </aside>
+
+      <main id="documentation-content" class="documentation-content" tabindex="-1"></main>
+    </div>
+
+    <script>
+      "use strict";
+
+      const navigationItems = [
+        { id: "overview", label: "Vue d'ensemble", kind: "guide", depth: 0 },
+        { id: "index", label: "index.html", kind: "file", depth: 0 },
+        { id: "style", label: "style.css", kind: "file", depth: 0 },
+        { id: "app", label: "app.js", kind: "file", depth: 0 },
+        { id: "readme", label: "README.md", kind: "file", depth: 0 },
+        { id: "history", label: "COMMIT_HISTORY.md", kind: "file", depth: 0 },
+        { id: "assets", label: "assets/", kind: "dir", depth: 0 },
+        { id: "data", label: "data/", kind: "dir", depth: 0 },
+        { id: "libs", label: "libs/", kind: "dir", depth: 0 },
+        { id: "sessions", label: "sessions/", kind: "dir", depth: 0 },
+        { id: "exports", label: "exports/", kind: "dir", depth: 0 },
+        { id: "workflow", label: "Parcours des données", kind: "guide", depth: 0 },
+        { id: "security", label: "Sécurité et limites", kind: "guide", depth: 0 },
+        { id: "maintenance", label: "Maintenance", kind: "guide", depth: 0 }
+      ];
+
+      const documentationPages = {
+        overview: {
+          title: "Vue d'ensemble",
+          kind: "Guide de lecture",
+          summary:
+            "PILOTE est une application web locale qui accompagne les agents pendant la numérisation, sans remplacer MultiGest et sans envoyer de données sur Internet.",
+          sections: [
+            {
+              title: "Finalité",
+              paragraphs: [
+                "L'outil enregistre les informations utiles sur les documents traités, recherche l'instructrice à partir de fichiers Excel de sectorisation, associe les PDF et prépare un export classé.",
+                "Il fonctionne directement depuis le fichier index.html. Aucun serveur, compte utilisateur, backend ou base de données n'est nécessaire."
+              ],
+              notice:
+                "PILOTE n'accède pas aux bannettes MultiGest. L'agent reporte les informations nécessaires dans l'outil."
+            },
+            {
+              title: "Technologies",
+              table: {
+                headers: ["Élément", "Choix", "Rôle"],
+                rows: [
+                  ["Interface", "HTML et CSS", "Structure et présentation responsive"],
+                  ["Logique", "JavaScript vanilla", "Sessions, documents, contrôles et exports"],
+                  ["Excel", "SheetJS 0.20.3", "Lecture locale des sectorisations"],
+                  ["ZIP", "JSZip 3.10.1", "Export compatible avec Firefox"],
+                  ["Stockage", "Mémoire de la page", "Aucune persistance automatique"]
+                ]
+              }
+            },
+            {
+              title: "Ordre de lecture conseillé",
+              list: [
+                "<code>README.md</code> pour comprendre l'usage et les limites.",
+                "<code>index.html</code> pour repérer les zones de l'interface.",
+                "<code>style.css</code> pour comprendre la mise en page.",
+                "<code>app.js</code> pour suivre les règles métier.",
+                "<code>COMMIT_HISTORY.md</code> pour retrouver l'évolution du projet."
+              ]
+            }
+          ]
+        },
+        index: {
+          title: "index.html",
+          kind: "Interface",
+          summary:
+            "Point d'entrée ouvert par l'agent. Ce fichier contient la structure complète de l'écran et charge les styles, les bibliothèques locales et la logique JavaScript.",
+          sections: [
+            {
+              title: "Zones principales",
+              list: [
+                "Import obligatoire des trois fichiers de sectorisation.",
+                "Démarrage de la session avec l'agent et la date de tampon.",
+                "Formulaire d'ajout ou de modification d'un document.",
+                "Liste, recherche et filtres des documents.",
+                "Gestion de la sauvegarde JSON et statistiques.",
+                "Contrôle préalable et choix de la méthode d'export."
+              ]
+            },
+            {
+              title: "Chargement local",
+              paragraphs: [
+                "Le navigateur charge <code>style.css</code>, <code>libs/xlsx.full.min.js</code>, <code>libs/jszip.min.js</code> puis <code>app.js</code>.",
+                "Toutes les dépendances sont présentes dans le dossier du projet. Aucune ressource distante n'est appelée."
+              ],
+              notice:
+                "L'ordre des scripts est important : SheetJS et JSZip doivent être disponibles avant l'exécution de app.js."
+            }
+          ]
+        },
+        style: {
+          title: "style.css",
+          kind: "Présentation",
+          summary:
+            "Feuille de styles unique utilisant la palette institutionnelle rouge, gris et blanc de PILOTE.",
+          sections: [
+            {
+              title: "Principes visuels",
+              list: [
+                "Rouge PILOTE <code>#b3122d</code> pour l'identité et les actions principales.",
+                "Panneaux blancs sur fond gris clair pour faciliter la lecture.",
+                "États jaune, vert et rouge pour l'attente, la réussite et les erreurs.",
+                "Panneau de session fixe sur les grands écrans.",
+                "Liste de documents avec défilement indépendant du formulaire."
+              ]
+            },
+            {
+              title: "Responsive",
+              table: {
+                headers: ["Largeur", "Adaptation"],
+                rows: [
+                  ["1100 px ou moins", "Réorganisation des contrôles et statistiques"],
+                  ["900 px ou moins", "Passage progressif vers une seule colonne"],
+                  ["720 px ou moins", "Formulaire et liste empilés"],
+                  ["640 px ou moins", "Contrôle d'export sur une colonne"],
+                  ["420 px ou moins", "En-tête et logo adaptés aux petits écrans"]
+                ]
+              }
+            }
+          ]
+        },
+        app: {
+          title: "app.js",
+          kind: "Logique métier",
+          summary:
+            "Ce fichier contient l'ensemble du fonctionnement de PILOTE. Les fonctions sont regroupées par parcours utilisateur et utilisent des noms explicites.",
+          sections: [
+            {
+              title: "État conservé en mémoire",
+              table: {
+                headers: ["Objet", "Contenu"],
+                rows: [
+                  ["<code>currentSession</code>", "Agent, date, identifiant, création et documents"],
+                  ["<code>excelData</code>", "Fichiers validés, lignes utiles et suggestions"],
+                  ["<code>editedDocumentId</code>", "Document en cours de modification"],
+                  ["<code>lastSavedSessionSignature</code>", "Détection des changements non sauvegardés"]
+                ]
+              }
+            },
+            {
+              title: "Grandes responsabilités",
+              list: [
+                "Lire et valider les fichiers Excel.",
+                "Normaliser les recherches sans accents, tirets ou différences de casse.",
+                "Créer et restaurer les sessions.",
+                "Ajouter, modifier, supprimer et filtrer les documents.",
+                "Déterminer l'instructrice et gérer les situations à vérifier.",
+                "Contrôler les PDF et les doublons.",
+                "Calculer les statistiques.",
+                "Exporter vers des dossiers directs ou un ZIP."
+              ]
+            },
+            {
+              title: "Règles de sectorisation",
+              table: {
+                headers: ["Situation", "Recherche"],
+                rows: [
+                  ["Adulte", "Ville dans la sectorisation adulte"],
+                  ["PCH", "Ville dans la sectorisation PCH"],
+                  ["Enfant", "École et ville, puis ville si nécessaire"],
+                  ["Recours", "Attribution signalée à vérifier"],
+                  ["Hors département", "Attribution signalée à vérifier"],
+                  ["Correction manuelle", "Nom saisi par l'agent, rapproché des références Excel"]
+                ]
+              },
+              notice:
+                "Une école homonyme située dans une autre ville n'est pas utilisée pour attribuer une instructrice."
+            }
+          ]
+        },
+        readme: {
+          title: "README.md",
+          kind: "Documentation utilisateur",
+          summary:
+            "Notice principale destinée aux agents, à la DNUM et aux personnes qui découvrent le projet.",
+          sections: [
+            {
+              title: "Contenu",
+              list: [
+                "Finalité et confidentialité.",
+                "Prérequis et procédure d'ouverture.",
+                "Parcours d'utilisation complet.",
+                "Sectorisation, PDF, sauvegarde et export.",
+                "Compatibilité des navigateurs.",
+                "Dépannage, limites connues et informations de développement."
+              ]
+            }
+          ]
+        },
+        history: {
+          title: "COMMIT_HISTORY.md",
+          kind: "Historique",
+          summary:
+            "Journal lisible des étapes de développement, des décisions prises et des difficultés rencontrées.",
+          sections: [
+            {
+              title: "Utilité",
+              paragraphs: [
+                "Ce fichier complète l'historique Git avec une explication fonctionnelle de chaque évolution.",
+                "Il permet notamment de retrouver les choix concernant les navigateurs, les sectorisations, la sauvegarde, les PDF et l'ergonomie responsive."
+              ]
+            }
+          ]
+        },
+        assets: {
+          title: "assets/",
+          kind: "Ressources graphiques",
+          summary:
+            "Éléments visuels utilisés par l'application et informations sur leur origine.",
+          sections: [
+            {
+              title: "Fichiers principaux",
+              table: {
+                headers: ["Fichier", "Rôle"],
+                rows: [
+                  ["<code>logo-header.png</code>", "Logo PILOTE affiché dans l'en-tête"],
+                  ["<code>favicon.png</code>", "Icône de l'onglet du navigateur"],
+                  ["<code>empty-icon.svg</code>", "État sans PDF"],
+                  ["<code>pdf-icon.svg</code>", "État avec PDF"],
+                  ["Icônes des navigateurs", "Présentation des méthodes d'export"],
+                  ["<code>README.md</code> et licence", "Provenance et conditions d'utilisation"]
+                ]
+              }
+            }
+          ]
+        },
+        data: {
+          title: "data/",
+          kind: "Données de référence",
+          summary:
+            "Emplacement de rangement des sectorisations de travail. Le navigateur ne les charge pas automatiquement.",
+          sections: [
+            {
+              title: "Fichiers présents",
+              list: [
+                "<code>sectorisation_adulte.xlsx</code>",
+                "<code>sectorisation_pch.xlsx</code>",
+                "<code>sectorisation_enfant.xlsx</code>"
+              ],
+              notice:
+                "Pour respecter les restrictions de sécurité du navigateur, l'agent sélectionne lui-même chaque fichier à l'ouverture de PILOTE."
+            },
+            {
+              title: "Colonnes reconnues",
+              table: {
+                headers: ["Sectorisation", "Colonnes attendues"],
+                rows: [
+                  ["Adulte", "Commune, Assistant de gestion"],
+                  ["PCH", "Commune, Instructeur PCH"],
+                  ["Enfant", "Nom, Commune, Instructrice enfant"]
+                ]
+              }
+            }
+          ]
+        },
+        libs: {
+          title: "libs/",
+          kind: "Bibliothèques locales",
+          summary:
+            "Dépendances tierces livrées avec PILOTE afin que l'application fonctionne sans connexion Internet.",
+          sections: [
+            {
+              title: "Bibliothèques",
+              table: {
+                headers: ["Fichier", "Rôle", "Licence"],
+                rows: [
+                  ["<code>xlsx.full.min.js</code>", "Lecture des fichiers Excel avec SheetJS", "Apache 2.0"],
+                  ["<code>jszip.min.js</code>", "Création de l'export ZIP", "MIT"]
+                ]
+              },
+              notice:
+                "Les fichiers minifiés ne sont pas le code métier de PILOTE. Leur documentation et leur licence sont conservées dans ce dossier."
+            }
+          ]
+        },
+        sessions: {
+          title: "sessions/",
+          kind: "Emplacement réservé",
+          summary:
+            "Repère prévu pour ranger les sauvegardes JSON si l'organisation locale le souhaite.",
+          sections: [
+            {
+              title: "Comportement réel",
+              paragraphs: [
+                "Une page web ne peut pas écrire automatiquement dans ce dossier. Le navigateur télécharge la sauvegarde dans l'emplacement configuré par l'utilisateur.",
+                "Le JSON contient les informations de la session, mais pas le contenu des PDF."
+              ],
+              notice:
+                "Après restauration d'un JSON, les PDF doivent être associés de nouveau. Une sauvegarde complète avec PDF fait partie des évolutions envisageables."
+            }
+          ]
+        },
+        exports: {
+          title: "exports/",
+          kind: "Emplacement réservé",
+          summary:
+            "Repère prévu pour ranger les exports. La destination réelle est choisie ou gérée par le navigateur.",
+          sections: [
+            {
+              title: "Selon le navigateur",
+              table: {
+                headers: ["Navigateur", "Méthode"],
+                rows: [
+                  ["Edge / Chrome", "Choix d'un dossier puis création directe des sous-dossiers"],
+                  ["Firefox", "Téléchargement d'un ZIP à extraire"]
+                ]
+              }
+            },
+            {
+              title: "Organisation obtenue",
+              paragraphs: [
+                "Un dossier porte le nom de la session. Chaque instructrice possède ensuite son propre sous-dossier.",
+                "Les situations non résolues vont dans <code>A_VERIFIER</code>. Les PDF reprennent le nom MultiGest et utilisent les suffixes <code>_002</code>, <code>_003</code> en cas de doublon."
+              ]
+            }
+          ]
+        },
+        workflow: {
+          title: "Parcours des données",
+          kind: "Flux fonctionnel",
+          summary:
+            "Les données restent dans la page ouverte jusqu'à une action explicite de sauvegarde ou d'export.",
+          sections: [
+            {
+              title: "De l'ouverture à l'export",
+              table: {
+                headers: ["Étape", "Traitement"],
+                rows: [
+                  ["1. Excel", "Lecture locale et construction des références"],
+                  ["2. Session", "Création d'un espace de travail en mémoire"],
+                  ["3. Document", "Saisie et attribution de l'instructrice"],
+                  ["4. PDF", "Accès temporaire au fichier sélectionné"],
+                  ["5. JSON", "Téléchargement des données structurées sans PDF"],
+                  ["6. Export", "Écriture des PDF dans des dossiers ou dans un ZIP"]
+                ]
+              }
+            },
+            {
+              title: "Absence de transmission réseau",
+              paragraphs: [
+                "Aucune fonction du projet n'envoie les fichiers vers une API, un serveur ou un service distant.",
+                "Les seules lectures concernent les fichiers choisis explicitement par l'agent."
+              ],
+              notice:
+                "La mémoire de la page est temporaire : fermer ou actualiser l'onglet supprime la session non sauvegardée."
+            }
+          ]
+        },
+        security: {
+          title: "Sécurité et limites",
+          kind: "Points de vigilance",
+          summary:
+            "PILOTE limite les accès au poste et valide les entrées, mais reste soumis au modèle de sécurité des navigateurs.",
+          sections: [
+            {
+              title: "Mesures présentes",
+              list: [
+                "Validation de la structure des fichiers Excel.",
+                "Contrôle de la signature réelle des PDF.",
+                "Validation du format des sauvegardes JSON.",
+                "Détection des doublons et des attributions incertaines.",
+                "Blocage de l'export lorsqu'un PDF manque.",
+                "Avertissement avant de quitter une session modifiée."
+              ]
+            },
+            {
+              title: "Limites connues",
+              list: [
+                "Pas de sauvegarde automatique.",
+                "Les PDF ne sont pas inclus dans le JSON.",
+                "Pas d'accès direct à MultiGest.",
+                "Pas de journal d'activité centralisé.",
+                "La création directe de dossiers n'est pas disponible dans Firefox.",
+                "La qualité des attributions dépend des fichiers Excel importés."
+              ],
+              notice:
+                "Les données utilisées sont potentiellement sensibles. Les règles internes de stockage, de conservation et d'accès restent applicables aux sauvegardes et exports.",
+              noticeType: "warning"
+            }
+          ]
+        },
+        maintenance: {
+          title: "Maintenance",
+          kind: "Guide technique",
+          summary:
+            "Le projet est volontairement réduit à trois fichiers applicatifs principaux et deux bibliothèques tierces.",
+          sections: [
+            {
+              title: "Contrôles après modification",
+              list: [
+                "Ouvrir <code>index.html</code> dans Edge, Chrome et Firefox.",
+                "Importer les trois sectorisations réelles.",
+                "Tester adulte, enfant, PCH, recours et hors département.",
+                "Tester ajout, modification, suppression, filtres et statistiques.",
+                "Sauvegarder puis restaurer une session JSON.",
+                "Tester l'export direct et l'export ZIP.",
+                "Vérifier l'affichage sur écran large et étroit."
+              ]
+            },
+            {
+              title: "Fichiers à mettre à jour ensemble",
+              table: {
+                headers: ["Modification", "Documentation associée"],
+                rows: [
+                  ["Comportement utilisateur", "README.md"],
+                  ["Évolution fonctionnelle", "COMMIT_HISTORY.md"],
+                  ["Architecture ou dépendance", "Cette documentation et les spécifications"],
+                  ["Ressource tierce", "Licence et README du dossier concerné"]
+                ]
+              }
+            }
+          ]
+        }
+      };
+
+      const navigation = document.getElementById("documentation-navigation");
+      const content = document.getElementById("documentation-content");
+
+      navigationItems.forEach((item) => {
+        const button = document.createElement("button");
+
+        button.type = "button";
+        button.className = "navigation-button";
+        button.dataset.pageId = item.id;
+        button.dataset.depth = item.depth;
+        button.innerHTML =
+          `<span class="file-kind">${item.kind}</span>` +
+          `<span>${item.label}</span>`;
+        button.addEventListener("click", () => showDocumentationPage(item.id));
+        navigation.appendChild(button);
+      });
+
+      function showDocumentationPage(pageId) {
+        const page = documentationPages[pageId];
+
+        if (!page) {
+          return;
+        }
+
+        document.querySelectorAll(".navigation-button").forEach((button) => {
+          button.classList.toggle("is-active", button.dataset.pageId === pageId);
+        });
+
+        content.innerHTML = buildPageHtml(page);
+        content.focus({ preventScroll: true });
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      function buildPageHtml(page) {
+        return `
+          <article class="documentation-article">
+            <header class="article-header">
+              <h2>${page.title}</h2>
+              <p>${page.summary}</p>
+              <span class="article-tag">${page.kind}</span>
+            </header>
+            ${page.sections.map(buildSectionHtml).join("")}
+          </article>
+        `;
+      }
+
+      function buildSectionHtml(section) {
+        const paragraphs = (section.paragraphs || [])
+          .map((paragraph) => `<p>${paragraph}</p>`)
+          .join("");
+        const list = section.list
+          ? `<ul class="content-list">${section.list
+              .map((item) => `<li>${item}</li>`)
+              .join("")}</ul>`
+          : "";
+        const table = section.table ? buildTableHtml(section.table) : "";
+        const notice = section.notice
+          ? `<div class="notice ${section.noticeType || ""}">${section.notice}</div>`
+          : "";
+
+        return `
+          <section class="content-card">
+            <h3>${section.title}</h3>
+            ${paragraphs}
+            ${list}
+            ${table}
+            ${notice}
+          </section>
+        `;
+      }
+
+      function buildTableHtml(table) {
+        const tableHead = table.headers
+          .map((header) => `<th>${header}</th>`)
+          .join("");
+        const tableRows = table.rows
+          .map((row) => {
+            return `<tr>${row.map((cell) => `<td>${cell}</td>`).join("")}</tr>`;
+          })
+          .join("");
+
+        return `
+          <table class="information-table">
+            <thead><tr>${tableHead}</tr></thead>
+            <tbody>${tableRows}</tbody>
+          </table>
+        `;
+      }
+
+      showDocumentationPage("overview");
+    </script>
+  </body>
+</html>
