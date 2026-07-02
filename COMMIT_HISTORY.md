@@ -634,13 +634,13 @@ Date : 2026-07-02
 
 Objectif : fournir une documentation agréable à consulter et exploitable par la DNUM.
 
-- adaptation de la documentation technique interactive réalisée pour MultiPrep ;
+- création d'une documentation technique interactive adaptée à PILOTE ;
 - création d'une navigation dédiée à l'arborescence réelle de PILOTE ;
 - explication des responsabilités de `index.html`, `style.css` et `app.js` ;
 - documentation des flux Excel, session, documents, PDF, JSON et export ;
 - présentation des mesures de robustesse, de confidentialité et des limites du navigateur ;
 - création de spécifications techniques formelles avec page de garde et tableaux ;
-- fourniture des spécifications aux formats HTML, Word et PDF ;
+- fourniture des spécifications aux formats Word et PDF ;
 - reprise de l'identité visuelle rouge, gris et blanc de PILOTE ;
 - vérification du rendu HTML sur écran de `1440 × 1000 px` et de `650 × 900 px` ;
 - vérification visuelle du PDF généré sur plusieurs pages.
@@ -649,5 +649,19 @@ Points d'attention :
 
 - la documentation indique clairement que PILOTE ne communique pas avec MultiGest ;
 - la limite actuelle de la sauvegarde JSON sans contenu PDF est explicitée ;
-- le fichier HTML des spécifications sert de source lisible pour les futures mises à jour ;
-- les documents MultiPrep fournis comme modèles ne sont pas intégrés aux livrables PILOTE.
+- les spécifications Word restent modifiables pour les futures mises à jour.
+
+## Docs: Simplify documentation deliverables
+
+Date : 2026-07-02
+
+Objectif : conserver uniquement les documents utiles à PILOTE.
+
+- suppression de la source HTML des spécifications techniques ;
+- conservation de la documentation interactive, du document Word et du PDF ;
+- retrait des documents de référence externes utilisés pendant la préparation ;
+- mise à jour du README et de l'historique.
+
+Point d'attention :
+
+- la version Word constitue désormais le document modifiable des spécifications.
