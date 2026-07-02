@@ -665,3 +665,13 @@ Objectif : conserver uniquement les documents utiles à PILOTE.
 Point d'attention :
 
 - la version Word constitue désormais le document modifiable des spécifications.
+
+## Docs: Clarify sectorization wording
+
+Date : 2026-07-02
+
+Objectif : rendre une limite des sectorisations plus simple à comprendre.
+
+- remplacement de l'expression « fraîcheur métier » dans les spécifications ;
+- précision que PILOTE utilise les fichiers choisis sans pouvoir vérifier qu'ils sont à jour ;
+- mise à jour des versions Word et PDF.
