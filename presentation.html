@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Présentation vidéo de PILOTE, outil local d'aide à la sectorisation."
+    />
+    <title>Présentation de PILOTE</title>
+    <link rel="icon" href="assets/favicon.png" type="image/png" />
+    <link rel="stylesheet" href="presentation.css" />
+  </head>
+  <body>
+    <header class="presentation-header">
+      <a href="index.html" class="logo-link" aria-label="Ouvrir PILOTE">
+        <img
+          src="assets/logo-header.png"
+          alt="PILOTE"
+          class="presentation-logo"
+        />
+      </a>
+      <p class="presentation-kicker">Découvrir l'outil</p>
+      <h1>Le parcours PILOTE, étape par étape</h1>
+      <p class="presentation-introduction">
+        De l'origine du projet au classement final des documents, cette
+        présentation retrace les principales fonctions de l'outil.
+      </p>
+    </header>
+
+    <main>
+      <section
+        id="genese"
+        class="genese-section reveal-on-scroll"
+        aria-labelledby="genese-title"
+      >
+        <div class="section-number" aria-hidden="true">0</div>
+        <p class="section-label">Point de départ</p>
+        <h2 id="genese-title">Genèse</h2>
+        <p id="genese-description" class="genese-description"></p>
+        <div id="genese-video" class="genese-video"></div>
+      </section>
+
+      <section
+        class="timeline-section"
+        aria-labelledby="timeline-title"
+      >
+        <header class="timeline-heading reveal-on-scroll">
+          <p class="section-label">Fonctionnement</p>
+          <h2 id="timeline-title">Une progression simple et guidée</h2>
+          <p>
+            Chaque étape accompagne l'agent dans la préparation et
+            l'orientation des documents numérisés.
+          </p>
+        </header>
+
+        <div id="timeline" class="timeline">
+          <div class="timeline-line" aria-hidden="true">
+            <span id="timeline-progress" class="timeline-progress"></span>
+          </div>
+          <div id="timeline-steps" class="timeline-steps"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="presentation-footer">
+      <img src="assets/favicon.png" alt="" aria-hidden="true" />
+      <div>
+        <strong>PILOTE</strong>
+        <span>Outil local d'aide à la sectorisation</span>
+      </div>
+      <a href="index.html">Ouvrir l'outil</a>
+    </footer>
+
+    <script src="presentation.js"></script>
+  </body>
+</html>

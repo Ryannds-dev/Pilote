@@ -38,6 +38,20 @@ Microsoft Edge ou Google Chrome sont recommandés pour créer directement les do
 
 Le projet peut être copié sur un emplacement local ou réseau accessible par l'agent, sous réserve des règles internes de la DNUM.
 
+## Présentation vidéo
+
+Le fichier `presentation.html` ouvre une présentation séparée de l'application.
+Il contient :
+
+- une introduction consacrée à la genèse du projet ;
+- une frise verticale animée au défilement ;
+- une étape par fonctionnalité ;
+- les vidéos locales du dossier `videos`.
+
+Les titres, descriptions et chemins des vidéos sont regroupés au début de
+`presentation.js`. Ils peuvent être modifiés sans changer la structure de la
+page.
+
 ## Utilisation
 
 1. Importer les trois fichiers Excel dans les emplacements correspondants.
@@ -228,9 +242,13 @@ Le navigateur ne prend probablement pas en charge cette fonction. Utiliser le ZI
 /exports     Emplacement réservé aux exports manuels
 /libs        SheetJS, JSZip et leurs licences
 /sessions    Emplacement réservé aux sauvegardes JSON
+/videos      Vidéos utilisées par la page de présentation
 index.html   Structure de l'interface
 style.css    Présentation et responsive
 app.js       Fonctionnement de PILOTE
+presentation.html
+presentation.css
+presentation.js
 README.md    Guide d'installation et d'utilisation
 COMMIT_HISTORY.md
 ```

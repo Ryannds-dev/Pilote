@@ -675,3 +675,37 @@ Objectif : rendre une limite des sectorisations plus simple à comprendre.
 - remplacement de l'expression « fraîcheur métier » dans les spécifications ;
 - précision que PILOTE utilise les fichiers choisis sans pouvoir vérifier qu'ils sont à jour ;
 - mise à jour des versions Word et PDF.
+
+## Presentation: Add interactive video timeline
+
+Date : 2026-07-02
+
+Objectif : présenter le projet et ses fonctionnalités dans une page dédiée.
+
+- création de `presentation.html`, séparé de l'application principale ;
+- affichage centré du logo et d'une introduction au parcours PILOTE ;
+- ajout d'une section dédiée à la genèse du projet ;
+- création d'une frise verticale composée de sept étapes fonctionnelles ;
+- intégration des huit vidéos locales présentes dans `videos/` ;
+- alternance des étapes de part et d'autre de la frise sur grand écran ;
+- passage à une frise sur une colonne sur tablette et mobile ;
+- apparition progressive des contenus avec `IntersectionObserver` ;
+- progression rouge de la ligne centrale pendant le défilement ;
+- prise en charge de la réduction des animations demandée par le système ;
+- centralisation des titres, descriptions et chemins vidéo dans `presentation.js` ;
+- ajout d'un lien permettant d'ouvrir directement l'outil principal ;
+- documentation de la page dans le README.
+
+Vérifications :
+
+- syntaxe JavaScript validée ;
+- présence des huit fichiers vidéo contrôlée ;
+- chargement des métadonnées vidéo confirmé dans Chrome ;
+- rendu contrôlé à `1440 × 1000 px` et `500 × 900 px` ;
+- contrôle de la frise complète grâce au mode impression.
+
+Points d'attention :
+
+- la page fonctionne localement sans serveur et sans ressource Internet ;
+- les vidéos ne démarrent pas automatiquement afin de laisser le contrôle à l'utilisateur ;
+- l'application principale `index.html` et son fonctionnement ne sont pas modifiés.
